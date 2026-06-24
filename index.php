@@ -119,7 +119,7 @@
                 <div class="col-lg-6">
                     <div class="row g-4">
 
-                        <!-- Kartu 01 -->
+                        <!-- Kartu 1 -->
                         <div class="col-md-6">
                             <div class="feature-card">
                                 <div class="icon-box"><i class="bi bi-cart-plus-fill"></i></div>
@@ -141,7 +141,7 @@
                         <div class="col-md-6">
                             <div class="feature-card">
                                 <div class="icon-box"><i class="bi bi-tools"></i></div>
-                                <h5 class="fw-bold text-dark">Kanibalisasi Aset</h5>
+                                <h5 class="fw-bold text-dark">Dismantling Aset</h5>
                                 <p class="text-secondary mb-0" style="font-size: 14px;">Menyelamatkan komponen berharga dari aset yang rusak total untuk efisiensi kampus.</p>
                             </div>
                         </div>

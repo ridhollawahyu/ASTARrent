@@ -1,0 +1,166 @@
+<?php
+session_start();
+include '../../../config/database.php';
+include '../../../config/functions.php';
+
+/** @var mysqli $koneksi */
+// ==========================================
+// 1. VALIDASI KEAMANAN (HARUS DI ATAS HEADER HTML!)
+// ==========================================
+if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
+    set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Super Admin.');
+    echo "<script>window.location='../../00_auth/login.php';</script>";
+    exit;
+}
+
+// ==========================================
+// 2. LOGIKA FILTER PRODI
+// ==========================================
+$where_sql = "WHERE mahasiswa.statusMahasiswa != 'Nonaktif' ";
+
+$prodi_terpilih = "";
+$status_terpilih = "";
+
+if (isset($_GET['status']) && $_GET['status'] != '') {
+    $status_terpilih = mysqli_real_escape_string($koneksi, $_GET['status']);
+
+    if ($status_terpilih == 'Semua_Termasuk_Arsip') {
+        // Tampilkan semua data, override default
+        $where_sql = "WHERE 1=1";
+    } else {
+        // Tampilkan sesuai yang dipilih user
+        $where_sql = "WHERE mahasiswa.statusMahasiswa = '$status_terpilih'";
+    }
+}
+
+if (isset($_GET['prodi']) && $_GET['prodi'] != '') {
+    $prodi_terpilih = mysqli_real_escape_string($koneksi, $_GET['prodi']);
+    $where_sql .= " AND kodeProdi_mahasiswa = '$prodi_terpilih' ";
+}
+
+// ==========================================
+// 3. BARU PANGGIL HEADER HTML
+// ==========================================
+include '../../../components/header.php';
+?>
+
+<div class="card shadow-sm border-0" style="border-radius: 15px;">
+
+    <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #1d4197; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+        <h5 class="mb-0 text-white fw-bold"><i class="bi bi-people-fill me-2"></i>Data Master Mahasiswa</h5>
+        <div>
+            <a href="../../dashboards/superadmin_home.php" class="btn btn-outline-light btn-sm fw-bold me-2"><i class="bi bi-arrow-left"></i> Dashboard</a>
+            <a href="create.php" class="btn btn-light btn-sm fw-bold text-astar">+ Tambah Mahasiswa</a>
+        </div>
+    </div>
+
+    <div class="card-body p-4">
+        <!-- FITUR FILTER PRODI -->
+        <form method="GET" action="index.php" class="row g-3 align-items-center mb-4 pb-3 border-bottom">
+            <div class="col-auto">
+                <label class="col-form-label fw-bold" style="color: #1d4197;"><i class="bi bi-filter-circle me-1"></i> Filter :</label>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <?php
+                $pilihan_filter = [
+                    '' => '-- Tampilkan Semua --',
+                    'P4' => 'P4 - Prodi 1',
+                    'TPM' => 'TPM - Prodi 2',
+                    'MI' => 'MI - Prodi 3',
+                    'MO' => 'MO - Prodi 4',
+                    'MK' => 'MK - Prodi 5',
+                    'TKBG' => 'TKBG - Prodi 6',
+                    'TRPAB' => 'TRPAB - Prodi 7',
+                    'TRL' => 'TRL - Prodi 8',
+                    'TRPL' => 'TRPL - Prodi 9'
+                ];
+                echo buat_dropdown_astar('prodi', $pilihan_filter, $prodi_terpilih, false);
+                ?>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <?php
+                $opsi_status = [
+                    '' => '-- Status Default (Normal) --',
+                    'Normal' => 'Normal',
+                    'Dibekukan' => 'Suspended',
+                    'Nonaktif' => 'Arsip (Soft Delete)',
+                    'Semua_Termasuk_Arsip' => 'Tampilkan Semua Data'
+                ];
+                // Panggil fungsi Custom Dropdown kita (Tanpa wajib diisi/false)
+                echo buat_dropdown_astar('status', $opsi_status, $status_terpilih, false);
+                ?>
+            </div>
+
+            <div class="col-auto">
+                <button type="submit" class="btn fw-bold text-white px-4" style="background-color: #1d4197; border-radius: 8px;">
+                    Terapkan
+                </button>
+                <a href="index.php" class="btn btn-light fw-bold px-4" style="border: 2px solid #e0e6ed; border-radius: 8px; color: #1d4197;">Reset</a>
+            </div>
+        </form>
+
+        <!-- TABEL DATA MAHASISWA -->
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0 text-center align-middle">
+                <thead style="background-color: #f4f6f9; color: #1d4197;">
+                    <tr>
+                        <th class="text-center" width="5%">No.</th>
+                        <th class="text-center">NIM</th>
+                        <th>Nama Lengkap</th>
+                        <th>Prodi</th>
+                        <th>No. Telp</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $query_sql = "SELECT * FROM mahasiswa " . $where_sql . " ORDER BY nimMahasiswa ASC";
+                    $query = mysqli_query($koneksi, $query_sql);
+
+                    $no = 1;
+
+                    while ($data = mysqli_fetch_array($query)) {
+                    ?>
+                        <tr>
+                            <td class="fw-bold"><?= $no++; ?></td>
+                            <td class="fw-bold"><?= $data['nimMahasiswa']; ?></td>
+                            <td class="text-start"><?= $data['namaMahasiswa']; ?></td>
+                            <td><span class="badge bg-secondary"><?= $data['kodeProdi_mahasiswa']; ?></span></td>
+                            <td><?= $data['noTelp_mahasiswa']; ?></td>
+                            <td><?= $data['emailMahasiswa']; ?></td>
+                            <td>
+                                <?php if ($data['statusMahasiswa'] == 'Normal'): ?>
+                                    <span class="badge bg-success rounded-pill px-3">Normal</span>
+                                <?php elseif ($data['statusMahasiswa'] == 'Dibekukan'): ?>
+                                    <span class="badge bg-danger rounded-pill px-3">Dibekukan</span>
+                                <?php else: ?>
+                                    <span class="badge bg-dark rounded-pill px-3">Nonaktif</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+
+                                <a href="edit.php?nim=<?= $data['nimMahasiswa']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
+                                <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?nim=<?= $data['nimMahasiswa']; ?>')">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    <?php } ?>
+
+                    <?php if (mysqli_num_rows($query) == 0): ?>
+                        <tr>
+                            <td colspan="8" class="py-4 text-muted fst-italic">Tidak ada data mahasiswa yang ditemukan.</td>
+                        </tr>
+                    <?php endif; ?>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<?php include '../../../components/footer.php'; ?>

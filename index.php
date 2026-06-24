@@ -119,7 +119,7 @@
                 <div class="col-lg-6">
                     <div class="row g-4">
 
-                        <!-- Kartu 1 -->
+                        <!-- Kartu 01 -->
                         <div class="col-md-6">
                             <div class="feature-card">
                                 <div class="icon-box"><i class="bi bi-cart-plus-fill"></i></div>

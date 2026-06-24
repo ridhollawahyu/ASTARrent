@@ -27,7 +27,7 @@
         }
 
         /* ------------------------------------------- */
-        /* EFEK BACKGROUND GAMBAR & OVERLAY KACA BIRU COBA  */
+        /* EFEK BACKGROUND GAMBAR & OVERLAY KACA BIRU  */
         /* ------------------------------------------- */
         .hero-section {
             min-height: 100vh;

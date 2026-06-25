@@ -413,29 +413,72 @@ function validasi_kadaluwarsa_peminjaman()
 
 /**
  * FUNGSI 16: GENERATE INPUT TANGGAL & JAM (DATETIME-LOCAL)
- * Otomatis terisi waktu WIB saat ini (jika data baru) atau waktu dari database (jika edit).
+ * Dilengkapi Smart Calendar: Min (Sekarang + 1 Jam), Max (Akhir Semester)
  */
 function buat_input_datetime($nama_input, $nilai_lama = '', $wajib = true)
 {
-    // 1. Pastikan Zona Waktu Indonesia (WIB)
+    // 1. Pastikan zona waktu WIB
     date_default_timezone_set('Asia/Jakarta');
 
-    // 2. Logika Penentuan Waktu
-    if (empty($nilai_lama)) {
-        // Jika data kosong (Form Tambah/Create) -> Ambil waktu DETIK INI
-        // Huruf 'T' wajib ada agar HTML5 mau membacanya!
-        $waktu_tampil = date('Y-m-d\TH:i');
+    $waktu_sekarang = time(); // Detik saat ini
+
+    // ==============================================================
+    // 2. ATURAN MINIMAL (Batas Bawah): Waktu saat ini ditambah 1 Jam
+    // ==============================================================
+    // strtotime('+1 hour') otomatis nambahin 1 jam dari sekarang
+    $waktu_minimal = date('Y-m-d\TH:i', strtotime('+1 hour', $waktu_sekarang));
+
+    // ==============================================================
+    // 3. ATURAN MAKSIMAL (Batas Atas): Tanggal Akhir Semester
+    // ==============================================================
+    $bulan_sekarang = date('n'); // Ambil angka bulan (1 sampai 12)
+    $tahun_sekarang = date('Y'); // Ambil tahun sekarang
+
+    // Asumsi Kalender Kampus:
+    // Semester Genap = Maret (3) sampai Agustus (8)
+    // Semester Ganjil = September (9) sampai Februari (2)
+
+    if ($bulan_sekarang >= 3 && $bulan_sekarang <= 8) {
+        // Jika sekarang bulan 3 s/d 8, berarti batasnya 31 Agustus tahun ini
+        $waktu_maksimal = $tahun_sekarang . '-08-31T23:59';
+        $nama_semester = "Genap";
     } else {
-        // Jika data ada (Form Edit) -> Ubah format dari MySQL (Spasi) jadi format HTML (Huruf T)
+        // Jika Semester Ganjil, batasnya akhir bulan Februari
+        // Kalau sekarang bulan Sept-Des, batas Feb-nya di tahun DEPAN (+1)
+        $tahun_batas = ($bulan_sekarang >= 9) ? $tahun_sekarang + 1 : $tahun_sekarang;
+
+        // date('Y-m-t') otomatis mencari tanggal terakhir di bulan tersebut (bisa 28 atau 29 Februari)
+        $waktu_maksimal = date('Y-m-t\T23:59', strtotime($tahun_batas . '-02-01'));
+        $nama_semester = "Ganjil";
+    }
+
+    // ==============================================================
+    // 4. SET NILAI TAMPILAN DI KOTAK FORM
+    // ==============================================================
+    if (empty($nilai_lama)) {
+        // Jika form buat pinjam baru, otomatis munculkan waktu Minimal (Sekarang + 1 Jam)
+        $waktu_tampil = $waktu_minimal;
+    } else {
+        // Jika form Edit, tampilkan dari database
         $waktu_tampil = date('Y-m-d\TH:i', strtotime($nilai_lama));
     }
 
     $required = $wajib ? 'required' : '';
-    // Batas Minimal Waktu
-    $waktu_sekarang_min = date('Y-m-d\TH:i');
 
-    // 3. Cetak HTML-nya (Tambahkan atribut min)
-    $html = '<input type="datetime-local" name="' . $nama_input . '" class="form-control bg-light" value="' . $waktu_tampil . '" min="' . $waktu_sekarang_min . '" ' . $required . ' style="border: 2px solid #e0e6ed; color: #1d4197; font-weight: 500;">';
+    // ==============================================================
+    // 5. CETAK HTML KALENDERNYA (Suntikkan atribut min dan max)
+    // ==============================================================
+    // Tambahkan min="..." dan max="..." agar HTML5 mengunci kalendernya
+    $html = '<input type="datetime-local" name="' . $nama_input . '" class="form-control bg-light" 
+              value="' . $waktu_tampil . '" 
+              min="' . $waktu_minimal . '" 
+              max="' . $waktu_maksimal . '" 
+              ' . $required . ' style="border: 2px solid #e0e6ed; color: #1d4197; font-weight: 500;">';
+
+    // Tambahkan teks petunjuk di bawah kotaknya agar mahasiswa tahu batasnya!
+    $html .= '<small class="text-danger mt-1 d-block" style="font-size:11px;">
+                <i class="bi bi-info-circle-fill"></i> Batas akhir peminjaman: <b>' . date('d M Y', strtotime($waktu_maksimal)) . '</b> (Akhir Semester ' . $nama_semester . ').
+              </small>';
 
     return $html;
 }

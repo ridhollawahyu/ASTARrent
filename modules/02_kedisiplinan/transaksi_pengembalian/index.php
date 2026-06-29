@@ -62,7 +62,7 @@ include '../../../components/header.php';
                     $no = 1;
                     while ($data = mysqli_fetch_assoc($queryTransaksi)):
                         $is_terlambat = (int)$data['jam_terlambat'] > 0;
-                        $nama_barang = !empty($data['idAset']) ? '<span class="badge bg-secondary me-1">Aset</span>' . $data['namaAset'] : '<span class="badge bg-secondary me-1">Fasilitas</span>' . $data['namaFasilitas'];
+                        $nama_barang = !empty($data['idAset']) ? '<span class="text-secondary fw-bold me-1">[Aset]</span>' . $data['namaAset'] : '<span class="text-secondary me-1 fw-bold">[Fasilitas]</span>' . $data['namaFasilitas'];
                     ?>
                         <tr>
                             <td class="fw-bold"><?= $no++ ?></td>

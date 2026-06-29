@@ -66,8 +66,41 @@
     </div>
   </div>
 </div>
+
+<!-- ============================================== -->
+<!-- 4. MODAL GLOBAL UNTUK BACA TEKS PANJANG (DETAIL)-->
+<!-- ============================================== -->
+<div class="modal fade" id="detailTeksModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content" style="border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+      <div class="modal-header" style="background-color: #1d4197; color: white; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+        <h5 class="modal-title fw-bold"><i class="bi bi-card-text me-2"></i>Detail Informasi</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <!-- Teks panjangnya akan disuntikkan ke dalam tag P ini oleh JavaScript -->
+        <p id="tempatTeksDetail" class="text-dark mb-0" style="text-align: justify; line-height: 1.6; font-size: 0.95rem;"></p>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-light fw-bold px-4 text-secondary" data-bs-dismiss="modal" style="border-radius: 8px; width: 100%;">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- SCRIPT BOOTSTRAP -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Script Pemanggil Modal Detail -->
+<script>
+  function lihatDetailTeks(teksLengkap) {
+    // Masukkan teks ke dalam modal
+    document.getElementById('tempatTeksDetail').innerText = teksLengkap;
+    // Munculkan modal
+    var myModal = new bootstrap.Modal(document.getElementById('detailTeksModal'));
+    myModal.show();
+  }
+</script>
 
 <!-- SCRIPT LOGIKA POP-UP GLOBAL -->
 <script>

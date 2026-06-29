@@ -51,7 +51,7 @@ if (isset($_POST['submit_pengembalian'])) {
             perbarui_status_barang('fasilitas', $data_pjm['idFasilitas'], $status_barang, $kondisi_fisik);
         }
 
-        // Aksi 3: Terapkan Sanksi ke Mahasiswa (Kecuali SKS-001/Aman)
+        // Aksi 3: Terapkan Sanksi ke Mahasiswa (Kecuali SNK-00001/Aman)
         if ($id_sanksi !== 'NULL') {
             terapkan_sanksi_mahasiswa($data_pjm['nimMahasiswa'], $id_sanksi);
         }
@@ -137,10 +137,10 @@ include '../../../components/header.php';
                         <?php
                         // Logika Cerdas: Beda Aset dan Fasilitas
                         if ($tipe_barang == 'Aset') {
-                            $opsi_kondisi = ['Normal' => '✅ Normal (Aman)', 'Rusak Ringan' => '🟡 Rusak Ringan', 'Rusak Sedang' => '🟠 Rusak Sedang', 'Rusak Berat' => '🔴 Rusak Berat', 'Rusak Total' => '☠️ Rusak Total / Hilang'];
+                            $opsi_kondisi = ['Normal' => 'Normal (Aman)', 'Berfungsi' => 'Berfungsi', 'Tidak Berfungsi' => 'Tidak Berfungsi'];
                         } else {
                             // Fasilitas tidak ada opsi Rusak Total
-                            $opsi_kondisi = ['Normal' => '✅ Normal (Aman)', 'Rusak Ringan' => '🟡 Rusak Ringan', 'Rusak Sedang' => '🟠 Rusak Sedang', 'Rusak Berat' => '🔴 Rusak Berat'];
+                            $opsi_kondisi = ['Normal' => 'Normal (Aman)', 'Berfungsi' => 'Berfungsi', 'Tidak Berfungsi' => 'Tidak Berfungsi'];
                         }
 
                         echo buat_dropdown_astar('kondisi_fisik', $opsi_kondisi, 'Normal');

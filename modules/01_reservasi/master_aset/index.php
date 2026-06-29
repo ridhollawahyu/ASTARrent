@@ -133,7 +133,7 @@ include '../../../components/header.php';
                             <!-- PEWARNAAN KONDISI FISIK -->
                             <td>
                                 <?php if ($data['kondisiAset'] == 'Normal') echo '<span class="text-success fw-bold">Normal</span>';
-                                else if ($data['kondisiAset'] == 'Rusak Total') echo '<span class="text-danger fw-bold">Rusak Total</span>';
+                                else if ($data['kondisiAset'] == 'Tidak Berfungsi') echo '<span class="text-danger fw-bold">Tidak Berfungsi</span>';
                                 else echo '<span class="text-warning text-dark fw-bold">' . $data['kondisiAset'] . '</span>';
                                 ?>
                             </td>

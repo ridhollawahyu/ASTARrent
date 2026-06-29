@@ -22,17 +22,17 @@ include '../../../../components/header.php';
     </div>
     <div class="card-body p-4">
         <div class="table-responsive">
-            <table class="table table-hover align-middle text-center">
-                <thead style="background-color: #f4f6f9; color: #1d4197;">
+            <table class="table table-hover align-middle text-center mb-0">
+                <thead style="background-color: #f4f6f9; color: #1d4197; border-bottom: 2px solid #e0e6ed;">
                     <tr>
-                        <th class="text-center" width="5%">No.</th>
-                        <th>Mahasiswa</th>
-                        <th>Barang yang Dipinjam</th>
-                        <th>Rencana Kembali</th>
-                        <th>Alasan Meminjam</th>
-                        <th>Pengurus (Tendik)</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
+                        <th class="text-center" style="width: 5%;">No.</th>
+                        <th class="text-start" style="width: 18%;">Mahasiswa</th>
+                        <th class="text-start" style="width: 15%;">Barang Dipinjam</th>
+                        <th class="text-center" style="width: 18%;">Rencana Kembali</th>
+                        <th class="text-center" style="width: 10%;">Alasan</th>
+                        <th class="text-center" style="width: 12%;">Pengurus</th>
+                        <th class="text-center" style="width: 10%;">Status</th>
+                        <th class="text-center" style="width: 15%;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,7 +55,7 @@ include '../../../../components/header.php';
                     $no = 1;
 
                     while ($data = mysqli_fetch_array($queryTransaksi)) {
-                        $nama_barang = ($data['idAset'] != NULL) ? "[ASET] " . $data['namaAset'] : "[FASILITAS] " . $data['namaFasilitas'];
+                        $nama_barang = ($data['idAset'] != NULL) ? "[Aset] " . $data['namaAset'] : "[Fasilitas] " . $data['namaFasilitas'];
                         $nama_tendik = ($data['idTendik'] != NULL) ? $data['namaUser'] : "Belum Dikelola";
                         if ($data['statusPeminjaman'] == "Ditolak") {
                             $nama_tendik = "Ditolak";
@@ -64,9 +64,12 @@ include '../../../../components/header.php';
                         <tr>
                             <td class="fw-bold"><?= $no++; ?></td>
                             <td><?= $data['namaMahasiswa']; ?></td>
-                            <td class="text-start fw-bold text-secondary"><?= $nama_barang; ?></td>
+                            <td class="fw-bold text-secondary"><?= $nama_barang; ?></td>
                             <td><?= date('d M Y, H:i', strtotime($data['tanggalRencana_kembali'])); ?></td>
-                            <td><?= $data['keperluan']; ?></td>
+                            <td><button type="button" class="btn btn-sm fw-bold" style="color: #1d4197; background-color: #e8f0fe; border: none; border-radius: 6px;"
+                                    onclick="lihatDetailTeks('<?= htmlspecialchars(addslashes($data['keperluan'])) ?>')">
+                                    <i class="bi bi-eye-fill me-1"></i> Detail
+                                </button></td>
                             <td class="text-center fw-bold text-secondary"><?= $nama_tendik; ?></td>
                             <td>
                                 <?php if ($data['statusPeminjaman'] == 'Menunggu'): ?>
@@ -79,11 +82,13 @@ include '../../../../components/header.php';
                                     <span class="badge bg-danger">Ditolak</span>
                                 <?php endif; ?>
                             </td>
-                            <td>
+                            <td class="text-center">
                                 <?php if ($data['statusPeminjaman'] == 'Menunggu'): ?>
                                     <!-- Tombol Setuju & Tolak yang diarahkan ke proses_approve.php -->
-                                    <a href="proses_approve.php?id=<?= $data['idPeminjaman']; ?>&aksi=setuju" class="btn btn-success btn-sm fw-bold"><i class="bi bi-check-lg"></i> Setuju</a>
-                                    <a href="proses_approve.php?id=<?= $data['idPeminjaman']; ?>&aksi=tolak" class="btn btn-danger btn-sm fw-bold"><i class="bi bi-x-lg"></i> Tolak</a>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="proses_approve.php?id=<?= $data['idPeminjaman']; ?>&aksi=setuju" class="btn btn-success btn-sm fw-bold"><i class="bi bi-check-lg"></i> Setuju</a>
+                                        <a href="proses_approve.php?id=<?= $data['idPeminjaman']; ?>&aksi=tolak" class="btn btn-danger btn-sm fw-bold"><i class="bi bi-x-lg"></i> Tolak</a>
+                                    </div>
                                 <?php else: ?>
                                     <span class="text-muted"><i class="bi bi-lock-fill"></i> Selesai</span>
                                 <?php endif; ?>

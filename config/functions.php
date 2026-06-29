@@ -657,33 +657,35 @@ function cari_id_sanksi_otomatis($kategori_waktu, $kondisi_fisik)
 }
 
 /**
- * FUNGSI 23 (BARU): MATRIKS OTOMATISASI SANKSI KETERLAMBATAN
- * Menghitung ID Sanksi otomatis berdasarkan Jam Telat dan Kondisi Fisik.
+ * FUNGSI 23: MATRIKS OTOMATISASI SANKSI (VERSI REVISI: Normal, Berfungsi, Tidak Berfungsi)
+ * Menghitung Sanksi Tepat Waktu (A) maupun Terlambat (B, C, D)
  */
 function dapatkan_sanksi_otomatis($jam_terlambat, $kondisi_fisik)
 {
-    // Matriks Sanksi (Berdasarkan ID Sanksi Dummy Anda sebelumnya)
+    // Matriks Sanksi (Sesuai ID Sanksi SQL terbaru)
+    // SKS-000 adalah kode bantuan jika Tepat Waktu & Normal (Tidak ada sanksi)
     $matrix = [
-        'A' => ['Normal' => 'SNK-00024', 'Rusak Ringan' => 'SNK-00001', 'Rusak Sedang' => 'SNK-00002', 'Rusak Berat' => 'SNK-00003', 'Rusak Total' => 'SNK-00004'],
-        'B' => ['Normal' => 'SNK-00005', 'Rusak Ringan' => 'SNK-00006', 'Rusak Sedang' => 'SNK-00007', 'Rusak Berat' => 'SNK-00008', 'Rusak Total' => 'SNK-00009'],
-        'C' => ['Normal' => 'SNK-00010', 'Rusak Ringan' => 'SNK-00011', 'Rusak Sedang' => 'SNK-00012', 'Rusak Berat' => 'SNK-00013', 'Rusak Total' => 'SNK-00014'],
-        'D' => ['Normal' => 'SNK-00015', 'Rusak Ringan' => 'SNK-00016', 'Rusak Sedang' => 'SNK-00017', 'Rusak Berat' => 'SNK-00018', 'Rusak Total' => 'SNK-00019']
+        'A' => ['Normal' => 'SNK-00000', 'Berfungsi' => 'SNK-00001', 'Tidak Berfungsi' => 'SNK-00002'],
+        'B' => ['Normal' => 'SNK-00003', 'Berfungsi' => 'SNK-00004', 'Tidak Berfungsi' => 'SNK-00005'],
+        'C' => ['Normal' => 'SNK-00006', 'Berfungsi' => 'SNK-00007', 'Tidak Berfungsi' => 'SNK-00008'],
+        'D' => ['Normal' => 'SNK-00009', 'Berfungsi' => 'SNK-00010', 'Tidak Berfungsi' => 'SNK-00011']
     ];
 
     $hari_telat = floor($jam_terlambat / 24);
 
+    // Penentuan Kategori Waktu
     if ($jam_terlambat <= 0) {
-        $kategori = 'A';
+        $kategori = 'A'; // Tepat waktu
     } elseif ($jam_terlambat < 24) {
-        $kategori = 'B';
+        $kategori = 'B'; // Telat < 24 Jam
     } elseif ($hari_telat >= 1 && $hari_telat <= 3) {
-        $kategori = 'C';
+        $kategori = 'C'; // Telat 1 - 3 Hari
     } else {
-        $kategori = 'D';
+        $kategori = 'D'; // Telat > 3 Hari
     }
 
-    // Kembalikan ID Sanksi sesuai Matriks. Jika kondisi gak ketemu, anggap 'Normal'.
-    return isset($matrix[$kategori][$kondisi_fisik]) ? $matrix[$kategori][$kondisi_fisik] : $matrix[$kategori]['Normal'];
+    // Return ID Sanksi. Jika data tidak wajar/tidak ketemu, kembalikan aman (SNK-000)
+    return isset($matrix[$kategori][$kondisi_fisik]) ? $matrix[$kategori][$kondisi_fisik] : 'SNK-00000';
 }
 
 /**
@@ -700,7 +702,7 @@ function ambil_pilihan_reparasi_rusak_total()
                                      FROM reparasi_fasilitas_aset r
                                      LEFT JOIN aset a ON r.idAset = a.idAset
                                      LEFT JOIN fasilitas f ON r.idFasilitas = f.idFasilitas
-                                     WHERE r.klasifikasiKerusakan = 'Rusak Total'
+                                     WHERE r.klasifikasiKerusakan = 'Tidak Berfungsi'
                                      ORDER BY r.tanggalLapor DESC, r.idReparasi DESC");
 
     while ($row = mysqli_fetch_assoc($query)) {

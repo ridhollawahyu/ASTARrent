@@ -98,18 +98,18 @@ include '../../../components/header.php';
 
                             <!-- BADGE STATUS KETERSEDIAAN (Read-Only) -->
                             <?php if ($data['ketersediaanFasilitas'] == 'Tersedia'): ?>
-                                <span class="badge bg-success px-4 py-2 fs-6 shadow-sm">Tersedia</span>
+                                <span class="text-success fw-bold px-4 py-2 fs-6">Tersedia</span>
 
                             <?php elseif ($data['ketersediaanFasilitas'] == 'Dipinjam'): ?>
                                 <!-- Warna Biru Primary untuk Dipinjam -->
-                                <span class="badge bg-primary px-4 py-2 fs-6 shadow-sm">Dipinjam</span>
+                                <span class="text-primary fw-bold px-4 py-2 fs-6">Dipinjam</span>
 
                             <?php elseif ($data['ketersediaanFasilitas'] == 'Sedang Diperbaiki'): ?>
-                                <span class="badge bg-warning text-dark px-4 py-2 fs-6 shadow-sm">Sedang Diperbaiki</span>
+                                <span class="text-warning fw-bold text-dark px-4 py-2 fs-6">Sedang Diperbaiki</span>
 
                             <?php else: ?>
                                 <!-- Warna Abu-abu Gelap untuk Soft Delete (Tidak Tersedia) -->
-                                <span class="badge bg-secondary px-4 py-2 fs-6 shadow-sm">Tidak Tersedia</span>
+                                <span class="text-secondary fw-bold px-4 py-2 fs-6">Tidak Tersedia</span>
                             <?php endif; ?>
 
                             <small class="d-block text-muted mt-2" style="font-size:11px;">*Berubah otomatis berdasarkan Peminjaman/Reparasi.</small>

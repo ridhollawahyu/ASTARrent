@@ -105,7 +105,7 @@ $tables = [
         idPengadaan VARCHAR(20) NULL,
         namaAset VARCHAR(100) NOT NULL,
         kondisiAset ENUM('Normal', 'Berfungsi', 'Tidak Berfungsi') DEFAULT 'Normal',
-        ketersediaanAset ENUM('Tersedia', 'Dipinjam', 'Tidak Tersedia', 'Sedang Diperbaiki') DEFAULT 'Tersedia',
+        ketersediaanAset ENUM('Tersedia', 'Dipinjam', 'Tidak Tersedia', 'Sedang Diperbaiki', 'Nonaktif') DEFAULT 'Tersedia',
         FOREIGN KEY (idKategori) REFERENCES kategori(idKategori) ON UPDATE CASCADE,
         FOREIGN KEY (idPengadaan) REFERENCES transaksi_pengadaan(idPengadaan) ON UPDATE CASCADE
     )",
@@ -118,7 +118,7 @@ $tables = [
         namaFasilitas VARCHAR(100) NOT NULL,
         lokasiFasilitas VARCHAR(100) NOT NULL,
         kondisiFasilitas ENUM('Normal', 'Berfungsi', 'Tidak Berfungsi') DEFAULT 'Normal',
-        ketersediaanFasilitas ENUM('Tersedia', 'Dipinjam', 'Tidak Tersedia', 'Sedang Diperbaiki') DEFAULT 'Tersedia',
+        ketersediaanFasilitas ENUM('Tersedia', 'Dipinjam', 'Tidak Tersedia', 'Sedang Diperbaiki', 'Nonaktif') DEFAULT 'Tersedia',
         FOREIGN KEY (idTendik) REFERENCES users(idUser) ON UPDATE CASCADE,
         FOREIGN KEY (idKategori) REFERENCES kategori(idKategori) ON UPDATE CASCADE
     )",
@@ -166,7 +166,7 @@ $tables = [
         tanggalReparasi DATETIME NULL,
         tanggalSelesai DATETIME NULL,
         klasifikasiKerusakan ENUM('Rusak Ringan', 'Rusak Sedang', 'Rusak Berat', 'Rusak Total') NOT NULL,
-        catatanReparasi TEXT NULL,
+        catatanReparasi TEXT NOT NULL,
         statusReparasi ENUM('Menunggu GA', 'Sedang Dikerjakan', 'Selesai', 'Dikanibal') DEFAULT 'Menunggu GA',
         FOREIGN KEY (idTendik) REFERENCES users(idUser) ON UPDATE CASCADE,
         FOREIGN KEY (idStaffGA) REFERENCES users(idUser) ON UPDATE CASCADE,

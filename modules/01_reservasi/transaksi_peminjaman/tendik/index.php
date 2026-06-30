@@ -63,8 +63,8 @@ include '../../../../components/header.php';
                     ?>
                         <tr>
                             <td class="fw-bold"><?= $no++; ?></td>
-                            <td><?= $data['namaMahasiswa']; ?></td>
-                            <td class="fw-bold text-secondary"><?= $nama_barang; ?></td>
+                            <td class="text-start"><?= $data['namaMahasiswa']; ?></td>
+                            <td class="text-start fw-bold text-secondary"><?= $nama_barang; ?></td>
                             <td><?= date('d M Y, H:i', strtotime($data['tanggalRencana_kembali'])); ?></td>
                             <td><button type="button" class="btn btn-sm fw-bold" style="color: #1d4197; background-color: #e8f0fe; border: none; border-radius: 6px;"
                                     onclick="lihatDetailTeks('<?= htmlspecialchars(addslashes($data['keperluan'])) ?>')">

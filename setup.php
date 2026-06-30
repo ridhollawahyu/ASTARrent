@@ -165,7 +165,7 @@ $tables = [
         tanggalLapor DATETIME NOT NULL,
         tanggalReparasi DATETIME NULL,
         tanggalSelesai DATETIME NULL,
-        klasifikasiKerusakan ENUM('Rusak Ringan', 'Rusak Sedang', 'Rusak Berat', 'Rusak Total') NOT NULL,
+        klasifikasiKerusakan ENUM('Normal', 'Berfungsi', 'Tidak Berfungsi') NOT NULL,
         catatanReparasi TEXT NOT NULL,
         statusReparasi ENUM('Menunggu GA', 'Sedang Dikerjakan', 'Selesai', 'Dikanibal') DEFAULT 'Menunggu GA',
         FOREIGN KEY (idTendik) REFERENCES users(idUser) ON UPDATE CASCADE,

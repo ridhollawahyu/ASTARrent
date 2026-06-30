@@ -5,9 +5,9 @@ include '../../config/functions.php';
 
 /** @var mysqli $koneksi */
 
-$role_diizinkan = ['Staff GA', 'Kepala GA', 'Finance'];
+$role_diizinkan = ['Staff GA'];
 if (!isset($_SESSION['login']) || !in_array($_SESSION['role'], $role_diizinkan, true)) {
-    set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus karyawan ASTARrent.');
+    set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Staff GA.');
     echo "<script>window.location='../00_auth/login.php';</script>";
     exit;
 } elseif ($_SESSION['status'] === 'Nonaktif') {
@@ -24,7 +24,7 @@ if ($q_komponen) {
     $total_komponen_tersedia = (int) mysqli_fetch_assoc($q_komponen)['total'];
 }
 
-$q_reparasi = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM reparasi_fasilitas_aset WHERE statusReparasi = 'Menunggu GA'");
+$q_reparasi = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM reparasi_fasilitas_aset WHERE statusReparasi = 'Menunggu GA' OR statusReparasi = 'Sedang Dikerjakan'");
 if ($q_reparasi) {
     $total_reparasi_menunggu = (int) mysqli_fetch_assoc($q_reparasi)['total'];
 }

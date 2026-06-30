@@ -5,7 +5,7 @@ include '../../../config/functions.php';
 
 /** @var mysqli $koneksi */
 
-$role_diizinkan = ['Staff GA', 'Super Admin'];
+$role_diizinkan = ['Staff GA'];
 if (!isset($_SESSION['login']) || !in_array($_SESSION['role'], $role_diizinkan, true)) {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Staff GA.');
     header('Location: ../../00_auth/login.php');

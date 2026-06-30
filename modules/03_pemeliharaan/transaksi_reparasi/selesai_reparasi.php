@@ -7,132 +7,173 @@ include '../../../config/functions.php';
 
 /** @var mysqli $koneksi */
 
-// Validasi Hak Akses: Hanya Staff GA
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Staff GA') {
+    set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Staff GA.');
     header('Location: ../../../00_auth/login.php');
     exit;
 }
-
-if (!isset($_GET['id'])) {
+if (empty($_GET['id_rep']) || empty($_GET['tipe']) || empty($_GET['id_brg'])) {
+    set_notifikasi('error', 'Terjadi Kesalahan! Coba lagi.');
     header('Location: index.php');
     exit;
 }
 
-$id_reparasi = mysqli_real_escape_string($koneksi, $_GET['id']);
-$id_staff_ga = $_SESSION['id'];
+$id_rep = mysqli_real_escape_string($koneksi, $_GET['id_rep']);
+$id_brg = mysqli_real_escape_string($koneksi, $_GET['id_brg']);
+$tipe_barang = strtolower(mysqli_real_escape_string($koneksi, $_GET['tipe']));
 
-// Ambil detail reparasi yang sedang dikerjakan
-$query_detail = mysqli_query($koneksi, "
-    SELECT r.*,
-           a.namaAset, f.namaFasilitas,
-           u.namaUser AS namaTendik
-    FROM reparasi_fasilitas_aset r
-    LEFT JOIN aset a ON r.idAset = a.idAset
-    LEFT JOIN fasilitas f ON r.idFasilitas = f.idFasilitas
-    LEFT JOIN users u ON r.idTendik = u.idUser
-    WHERE r.idReparasi = '$id_reparasi' AND r.statusReparasi = 'Sedang Dikerjakan'
-");
-
-if (mysqli_num_rows($query_detail) == 0) {
-    set_notifikasi('error', 'Tiket reparasi tidak ditemukan atau statusnya bukan "Sedang Dikerjakan".');
-    header('Location: index.php');
-    exit;
-}
-
+// Ambil Nama Barang untuk Header
+$query_detail = mysqli_query($koneksi, "SELECT r.*, a.namaAset, f.namaFasilitas FROM reparasi_fasilitas_aset r LEFT JOIN aset a ON r.idAset = a.idAset LEFT JOIN fasilitas f ON r.idFasilitas = f.idFasilitas WHERE r.idReparasi = '$id_rep'");
 $detail = mysqli_fetch_assoc($query_detail);
-$tipe_barang = !empty($detail['idAset']) ? 'Aset' : 'Fasilitas';
-$nama_barang = ($tipe_barang === 'Aset') ? $detail['namaAset'] : $detail['namaFasilitas'];
+$nama_barang = ($tipe_barang === 'aset') ? $detail['namaAset'] : $detail['namaFasilitas'];
 
-// =============================================================
-// PROSES SELESAIKAN REPARASI
-// =============================================================
-if (isset($_POST['submit_selesai'])) {
-    $kondisi_akhir  = mysqli_real_escape_string($koneksi, $_POST['kondisi_akhir']); // Normal atau Berfungsi
-    $catatan_selesai = mysqli_real_escape_string($koneksi, $_POST['catatan_selesai']);
-    $waktu_sekarang  = date('Y-m-d H:i:s');
+// =========================================================================
+// PROSES LOGIKA PENYELESAIAN (PERBAIKI vs KANIBAL)
+// =========================================================================
+if (isset($_POST['selesai'])) {
+    $tindakan_akhir = $_POST['tindakan_akhir']; // 'perbaiki' atau 'kanibal'
+    $catatan = mysqli_real_escape_string($koneksi, $_POST['catatan']);
+    $waktu = date('Y-m-d H:i:s');
 
-    $opsi_valid = ['Normal', 'Berfungsi'];
-    if (!in_array($kondisi_akhir, $opsi_valid)) {
-        set_notifikasi('error', 'Kondisi akhir tidak valid!');
-        header("Location: selesai_reparasi.php?id=$id_reparasi");
-        exit;
-    }
+    if ($tindakan_akhir == 'kanibal') {
+        // ====================================================
+        // JIKA DIKANIBAL: LOOPING DATA KOMPONEN YANG DIINPUT
+        // ====================================================
+        $nama_komp = $_POST['komp_nama'];
+        $spek_komp = $_POST['komp_spek'];
+        $kond_komp = $_POST['komp_kondisi'];
+        $jumlah_masuk = 0;
 
-    // Update status reparasi ke Selesai
-    $q_update = "UPDATE reparasi_fasilitas_aset SET
-                    statusReparasi  = 'Selesai',
-                    tanggalSelesai  = '$waktu_sekarang',
-                    catatanReparasi = CONCAT(IFNULL(catatanReparasi, ''), '\n[Selesai] $catatan_selesai')
-                 WHERE idReparasi = '$id_reparasi'";
+        for ($i = 0; $i < count($nama_komp); $i++) {
+            if (!empty(trim($nama_komp[$i]))) {
+                $id_komp_baru = generate_id('KMP', 'komponen', 'idKomponen');
+                $nama_k = mysqli_real_escape_string($koneksi, $nama_komp[$i]);
+                $spek_k = mysqli_real_escape_string($koneksi, $spek_komp[$i]);
+                $kond_k = mysqli_real_escape_string($koneksi, $kond_komp[$i]);
 
-    if (mysqli_query($koneksi, $q_update)) {
-        // Update kondisi barang dan kembalikan ketersediaan ke Tersedia
-        if ($tipe_barang === 'Aset') {
-            perbarui_status_barang('aset', $detail['idAset'], 'Tersedia', $kondisi_akhir);
-        } else {
-            perbarui_status_barang('fasilitas', $detail['idFasilitas'], 'Tersedia', $kondisi_akhir);
+                $q_komp = "INSERT INTO komponen (idKomponen, idReparasi, namaKomponen, tanggalMasuk, spesifikasiKomponen, kondisiKomponen, statusKomponen) 
+                           VALUES ('$id_komp_baru', '$id_rep', '$nama_k', '$waktu', '$spek_k', '$kond_k', 'Tersedia')";
+                mysqli_query($koneksi, $q_komp);
+                $jumlah_masuk++;
+            }
         }
-        set_notifikasi('success', 'Reparasi selesai! Barang sudah kembali tersedia dengan kondisi ' . $kondisi_akhir . '.');
-        header('Location: index.php');
-        exit;
+
+        // Update Status Reparasi & Aset Induk (Mati Permanen)
+        mysqli_query($koneksi, "UPDATE reparasi_fasilitas_aset SET statusReparasi = 'Dikanibal', tanggalSelesai = '$waktu', catatanReparasi = CONCAT(IFNULL(catatanReparasi, ''), '\n[Dikanibal]: $catatan') WHERE idReparasi = '$id_rep'");
+
+        // Matikan Aset
+        perbarui_status_barang('aset', $id_brg, 'Nonaktif', 'Tidak Berfungsi');
+
+        set_notifikasi('success', "Aset dikanibal! $jumlah_masuk Komponen baru berhasil ditambahkan ke gudang suku cadang.");
+    } else {
+        // ====================================================
+        // JIKA DIPERBAIKI: KEMBALIKAN KE STATUS TERSDIA & NORMAL
+        // ====================================================
+        $kondisi_akhir = $_POST['kondisi_akhir'];
+        mysqli_query($koneksi, "UPDATE reparasi_fasilitas_aset SET statusReparasi = 'Selesai', tanggalSelesai = '$waktu', catatanReparasi = CONCAT(IFNULL(catatanReparasi, ''), '\n[Diperbaiki]: $catatan') WHERE idReparasi = '$id_rep'");
+
+        // Barang hidup lagi!
+        perbarui_status_barang($tipe_barang, $id_brg, 'Tersedia', $kondisi_akhir);
+
+        set_notifikasi('success', "Reparasi Selesai! Barang kembali ke status Tersedia dengan kondisi $kondisi_akhir.");
     }
 
-    set_notifikasi('error', 'Gagal menyelesaikan reparasi!');
+    echo "<script>window.location='index.php';</script>";
+    exit;
 }
 
 include '../../../components/header.php';
 ?>
 
 <div class="row justify-content-center mb-5 mt-4">
-    <div class="col-md-7">
+    <div class="col-md-9">
         <div class="card shadow-sm border-0" style="border-radius: 15px;">
-            <div class="card-header text-white d-flex align-items-center justify-content-between" style="background-color: #198754; border-radius: 15px 15px 0 0;">
-                <h5 class="mb-0 fw-bold"><i class="bi bi-check2-circle me-2"></i>Selesaikan Reparasi</h5>
-                <a href="index.php" class="btn btn-outline-light btn-sm fw-bold"><i class="bi bi-arrow-left"></i> Kembali</a>
+            <div class="card-header text-white d-flex align-items-center" style="background-color: #1d4197; border-radius: 15px 15px 0 0;">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-check2-circle me-2"></i>Selesaikan Pengerjaan: <?= htmlspecialchars($nama_barang) ?></h5>
             </div>
             <div class="card-body p-4">
 
-                <!-- INFO REPARASI -->
-                <div class="bg-light p-3 rounded border mb-4">
-                    <p class="mb-1"><strong>ID Reparasi:</strong> <code class="text-primary"><?= htmlspecialchars($detail['idReparasi']) ?></code></p>
-                    <p class="mb-1"><strong>Barang:</strong>
-                        <span class="badge bg-secondary"><?= $tipe_barang ?></span>
-                        <?= htmlspecialchars($nama_barang) ?>
-                    </p>
-                    <p class="mb-1"><strong>Klasifikasi:</strong>
-                        <span class="badge bg-dark"><?= htmlspecialchars($detail['klasifikasiKerusakan']) ?></span>
-                    </p>
-                    <p class="mb-0"><strong>Mulai Reparasi:</strong> <?= date('d M Y, H:i', strtotime($detail['tanggalReparasi'])) ?></p>
-                </div>
-
                 <form action="" method="POST">
 
-                    <!-- Kondisi Akhir Barang -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-astar">Kondisi Akhir Barang Setelah Diperbaiki <span class="text-danger">*</span></label>
-                        <?php
-                        $opsi_kondisi_akhir = [
-                            'Normal'    => '✅ Normal (Sudah kembali normal sepenuhnya)',
-                            'Berfungsi' => '🟡 Berfungsi (Sudah bisa dipakai meski ada keterbatasan)',
-                        ];
-                        echo buat_dropdown_astar('kondisi_akhir', $opsi_kondisi_akhir, 'Normal');
-                        ?>
-                        <small class="text-muted mt-1 d-block">Kondisi ini akan tersimpan di data master barang.</small>
+                    <!-- PILIHAN KEPUTUSAN (RADIO BUTTON) -->
+                    <div class="mb-4 p-4 rounded" style="background-color: #f4f6f9; border: 2px dashed #c2d5ff;">
+                        <label class="form-label fw-bold text-astar mb-3"><i class="bi bi-hammer me-2"></i>Keputusan Akhir Pekerjaan <span class="text-danger">*</span></label>
+                        <div class="row g-3">
+                            <?php
+                            // LOGIKA VALIDASI KANIBAL (Sangat Cerdas!)
+                            // Kanibal HANYA diizinkan jika Tipe = Aset DAN Klasifikasi Kerusakannya = 'Tidak Berfungsi'
+                            $bisa_kanibal = ($tipe_barang === 'aset' && $detail['klasifikasiKerusakan'] === 'Tidak Berfungsi');
+
+                            // Jika bisa kanibal, tombol dibagi dua (col-md-6). Jika tidak, tombol perbaiki jadi full (col-md-12).
+                            $kolom_class = $bisa_kanibal ? 'col-md-6' : 'col-md-12';
+                            $detail = $bisa_kanibal ? 'btn btn-outline-astar w-100 py-3 fw-bold text-start' : 'btn btn-outline-astar w-100 py-3 fw-bold text-center';
+                            ?>
+                            <div class="<?= $kolom_class ?>">
+                                <input type="radio" class="btn-check" name="tindakan_akhir" id="aksi_perbaiki" value="perbaiki" checked onchange="toggleTindakan()">
+                                <label class="<?= $detail ?>" for="aksi_perbaiki" style="border-radius: 10px; border-width: 2px;">
+                                    <i class="bi bi-tools fs-4 d-block mb-1"></i> Berhasil Diperbaiki
+                                </label>
+                            </div>
+                            <?php if ($bisa_kanibal): ?>
+                                <div class="col-md-6">
+                                    <input type="radio" class="btn-check" name="tindakan_akhir" id="aksi_kanibal" value="kanibal" onchange="toggleTindakan()">
+                                    <label class="btn btn-outline-danger w-100 py-3 fw-bold text-start" for="aksi_kanibal" style="border-radius: 10px; border-width: 2px;">
+                                        <i class="bi bi-recycle fs-4 d-block mb-1"></i> Gagal Diperbaiki (Dikanibal)
+                                    </label>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
 
-                    <!-- Catatan Penyelesaian -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-astar">Catatan Penyelesaian</label>
-                        <textarea name="catatan_selesai" class="form-control" rows="3"
-                            placeholder="Tuliskan apa yang sudah diperbaiki, komponen yang diganti, dll..."></textarea>
+                    <!-- PANEL 1: JIKA DIPERBAIKI -->
+                    <div id="panel_perbaiki">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-astar">Kondisi Fisik Pasca Servis <span class="text-danger">*</span></label>
+                            <?php
+                            $opsi_kondisi_akhir = ['Normal' => 'Normal Sempurna', 'Berfungsi' => 'Berfungsi (Masih ada minus)'];
+                            // Panggil dropdown tema dari functions.php
+                            echo buat_dropdown_astar('kondisi_akhir', $opsi_kondisi_akhir, 'Normal');
+                            ?>
+                        </div>
                     </div>
 
-                    <div class="d-flex justify-content-between mt-4">
+                    <!-- PANEL 2: JIKA DIKANIBAL -->
+                    <div id="panel_kanibal" style="display: none;">
+                        <div class="alert alert-danger fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i> PERHATIAN: Aset akan di-Soft Delete (Ketersediaan: Nonaktif)!</div>
+
+                        <label class="form-label fw-bold text-danger">Input Komponen yang Diselamatkan:</label>
+
+                        <div id="komponen_container">
+                            <div class="row g-2 mb-3 komponen-row align-items-center">
+                                <div class="col-md-4">
+                                    <input type="text" name="komp_nama[]" class="form-control" style="border: 2px solid #e0e6ed;" placeholder="Nama Komponen (Misal: RAM 8GB)">
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" name="komp_spek[]" class="form-control" style="border: 2px solid #e0e6ed;" placeholder="Spesifikasi">
+                                </div>
+                                <div class="col-md-3">
+                                    <?php
+                                    $opsi_kondisi_komponen = ['Sangat Baik' => 'Sangat Baik', 'Layak Pakai' => 'Layak Pakai'];
+                                    echo buat_dropdown_astar('komp_kondisi[]', $opsi_kondisi_komponen, 'Sangat Baik');
+                                    ?>
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-outline-danger w-100 fw-bold" onclick="hapusBaris(this)"><i class="bi bi-x-lg"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-danger btn-sm fw-bold mb-4 px-4 py-2 shadow-sm" onclick="tambahBaris()"><i class="bi bi-plus-circle-fill me-2"></i>Tambah Form Komponen</button>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-astar">Catatan Penyelesaian <span class="text-danger">*</span></label>
+                        <textarea name="catatan" class="form-control" rows="3" required placeholder="Catat detail perbaikan, atau alasan kenapa barang harus dikanibal..."></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4 border-top pt-3">
                         <a href="index.php" class="btn btn-light border fw-bold text-secondary px-4">Batal</a>
-                        <button type="button" class="btn btn-success px-5 fw-bold" data-bs-toggle="modal" data-bs-target="#modalKonfirmasiSelesai">
-                            Tandai Selesai <i class="bi bi-check-circle ms-1"></i>
-                        </button>
-                        <button type="submit" name="submit_selesai" id="btnSubmitSelesai" class="d-none"></button>
+                        <button type="submit" name="selesai" class="btn btn-astar px-5 fw-bold shadow">Selesaikan Pekerjaan</button>
                     </div>
                 </form>
 
@@ -141,28 +182,52 @@ include '../../../components/header.php';
     </div>
 </div>
 
-<!-- MODAL KONFIRMASI -->
-<div class="modal fade" id="modalKonfirmasiSelesai" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
-            <div class="modal-header text-white" style="background-color: #198754; border-radius: 15px 15px 0 0;">
-                <h5 class="modal-title fw-bold"><i class="bi bi-question-diamond-fill me-2"></i>Konfirmasi Penyelesaian</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+<script>
+    function toggleTindakan() {
+        let isKanibal = document.getElementById('aksi_kanibal').checked;
+        document.getElementById('panel_kanibal').style.display = isKanibal ? 'block' : 'none';
+        document.getElementById('panel_perbaiki').style.display = isKanibal ? 'none' : 'block';
+    }
+
+    function tambahBaris() {
+        let container = document.getElementById('komponen_container');
+        let idUnik = 'drop_' + Math.floor(Math.random() * 9000 + 1000);
+
+        // Replika HTML Dropdown Tema ASTARrent untuk JavaScript
+        let dropdown_html = `
+        <div class="custom-dropdown-container" id="container_${idUnik}">
+            <input type="hidden" name="komp_kondisi[]" id="input_${idUnik}" value="Sangat Baik">
+            <div class="custom-dropdown-selected" onclick="toggleDropdown('${idUnik}')">
+                <span id="text_${idUnik}">Sangat Baik</span>
+                <i class="bi bi-chevron-down float-end"></i>
             </div>
-            <div class="modal-body text-center p-4">
-                <i class="bi bi-check-circle text-success mb-3" style="font-size: 3rem;"></i>
-                <h5 class="text-dark fw-bold mb-2">Tandai Reparasi Selesai?</h5>
-                <p class="text-secondary mb-0">Barang akan otomatis dikembalikan ke status <strong>Tersedia</strong> dan bisa dipinjam kembali oleh mahasiswa.</p>
+            <div class="custom-dropdown-options shadow" id="options_${idUnik}">
+                <div class="custom-dropdown-item active" onclick="selectOption('${idUnik}', 'Sangat Baik', 'Sangat Baik')">Sangat Baik</div>
+                <div class="custom-dropdown-item" onclick="selectOption('${idUnik}', 'Layak Pakai', 'Layak Pakai')">Layak Pakai</div>
             </div>
-            <div class="modal-footer justify-content-center border-0 pb-4 px-4">
-                <button type="button" class="btn btn-light fw-bold px-4 text-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Periksa Lagi</button>
-                <button type="button" class="btn btn-success text-white fw-bold px-4" style="border-radius: 8px;"
-                    onclick="document.getElementById('btnSubmitSelesai').click();">
-                    Ya, Selesaikan
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+        </div>`;
+
+        let html_baru = `
+            <div class="row g-2 mb-3 komponen-row align-items-center">
+                <div class="col-md-4"><input type="text" name="komp_nama[]" class="form-control" style="border: 2px solid #e0e6ed;" placeholder="Nama Komponen" required></div>
+                <div class="col-md-4"><input type="text" name="komp_spek[]" class="form-control" style="border: 2px solid #e0e6ed;" placeholder="Spesifikasi" required></div>
+                <div class="col-md-3">${dropdown_html}</div>
+                <div class="col-md-1"><button type="button" class="btn btn-outline-danger w-100 fw-bold" onclick="hapusBaris(this)"><i class="bi bi-x-lg"></i></button></div>
+            </div>`;
+
+        container.insertAdjacentHTML('beforeend', html_baru);
+    }
+
+    function hapusBaris(btn) {
+        let row = btn.closest('.komponen-row');
+        if (document.querySelectorAll('.komponen-row').length > 1) {
+            row.remove();
+        } else {
+            // Gunakan fungsi alert bawaan browser jika fungsi JS Global belum ada, 
+            // ATAU panggil pop-up Bootstrap jika Anda sudah menaruhnya di footer.
+            alert('Minimal harus ada 1 komponen yang diselamatkan jika memilih Kanibal!');
+        }
+    }
+</script>
 
 <?php include '../../../components/footer.php'; ?>

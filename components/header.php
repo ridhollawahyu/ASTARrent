@@ -123,6 +123,26 @@
             outline: 0;
         }
 
+        .btn-outline-astar {
+            color: #1d4197 !important;
+            background-color: #ffffff !important;
+            border: 2px solid #1d4197 !important;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-astar:hover {
+            color: #1d4197 !important;
+            background-color: #ffffff !important;
+            border: 2px solid #1d4197 !important;
+        }
+
+        .btn-check:checked+.btn-outline-astar {
+            color: #fff !important;
+            background-color: #1d4197 !important;
+            border: 2px solid #1d4197 !important;
+            box-shadow: 0 4px 12px rgba(29, 65, 151, 0.3) !important;
+        }
+
         /* Custom Dropdown Container (Anti-Safari Bug) */
         .custom-dropdown-container {
             position: relative;

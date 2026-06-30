@@ -92,8 +92,8 @@ include '../../../../components/header.php';
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label text-astar fw-bold">Keperluan Peminjaman</label>
-                        <textarea name="keperluan" class="form-control" rows="3" placeholder="Jelaskan untuk kegiatan apa..."></textarea>
+                        <label class="form-label text-astar fw-bold">Keperluan Peminjaman <span class="text-danger">*</span></label>
+                        <textarea name="keperluan" class="form-control" required rows="3" placeholder="Jelaskan untuk kegiatan apa..."></textarea>
                     </div>
 
                     <div class="d-flex justify-content-between mt-4">

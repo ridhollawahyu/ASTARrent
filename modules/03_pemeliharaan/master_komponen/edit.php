@@ -120,6 +120,7 @@ if (!$nama_barang) {
                             $opsi_status = [
                                 'Tersedia' => 'Tersedia',
                                 'Sudah Dipakai' => 'Sudah Dipakai',
+                                'Nonaktif' => 'Nonaktif'
                             ];
                             echo buat_dropdown_astar('statusKomponen', $opsi_status, $data['statusKomponen']);
                             ?>

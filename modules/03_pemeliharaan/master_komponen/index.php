@@ -59,7 +59,8 @@ include '../../../components/header.php';
                 $opsi_status = [
                     '' => '-- Status Default (Aktif) --',
                     'Tersedia' => 'Tersedia',
-                    'Sudah Dipakai' => 'Arsip (Sudah Dipakai)',
+                    'Sudah Dipakai' => 'Sudah Dipakai',
+                    'Nonaktif' => 'Arsip (Soft Delete)',
                     'Semua_Termasuk_Arsip' => 'Tampilkan Semua Data'
                 ];
                 echo buat_dropdown_astar('status', $opsi_status, $status_terpilih, false);
@@ -137,8 +138,10 @@ include '../../../components/header.php';
                             <td>
                                 <?php if ($data['statusKomponen'] == 'Tersedia'): ?>
                                     <span class="badge bg-success rounded-pill px-3">Tersedia</span>
+                                <?php elseif ($data['statusKomponen'] == 'Sudah Dipakai'): ?>
+                                    <span class="badge bg-warning text-dark rounded-pill px-3">Sudah Dipakai</span>
                                 <?php else: ?>
-                                    <span class="badge bg-secondary text-dark rounded-pill px-3">Sudah Dipakai</span>
+                                    <span class="badge bg-secondary rounded-pill px-3">Nonaktif</span>
                                 <?php endif; ?>
                             </td>
                             <td>

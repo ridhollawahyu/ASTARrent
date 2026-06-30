@@ -44,7 +44,7 @@ if (isset($_POST['submit_pengembalian'])) {
         mysqli_query($koneksi, "UPDATE transaksi_peminjaman SET statusPeminjaman = 'Selesai' WHERE idPeminjaman = '$id_peminjaman'");
 
         // Aksi 2: Update Ketersediaan Barang
-        $status_barang = ($kondisi_fisik == 'Normal') ? 'Tersedia' : 'Tidak Tersedia';
+        $status_barang = ($kondisi_fisik == 'Normal' || $kondisi_fisik == 'Berfungsi') ? 'Tersedia' : 'Tidak Tersedia';
         if (!empty($data_pjm['idAset'])) {
             perbarui_status_barang('aset', $data_pjm['idAset'], $status_barang, $kondisi_fisik);
         } else {
@@ -59,7 +59,7 @@ if (isset($_POST['submit_pengembalian'])) {
         // Aksi 4: Lempar ke GA jika barang rusak
         buat_tiket_reparasi_otomatis($id_tendik, $data_pjm['idAset'], $data_pjm['idFasilitas'], $kondisi_fisik, $catatan);
 
-        set_notifikasi('success', 'Transaksi berhasil ditutup! Sistem Pakar telah menyesuaikan sanksi dan status barang.');
+        set_notifikasi('success', 'Transaksi berhasil ditutup! Sistem telah menyesuaikan sanksi dan status barang.');
         echo "<script>window.location='index.php';</script>";
         exit;
     } else {

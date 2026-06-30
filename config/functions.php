@@ -571,28 +571,68 @@ function terapkan_sanksi_mahasiswa($nim, $id_sanksi)
 }
 
 /**
- * FUNGSI 20: ROBOT PEMBUAT TIKET REPARASI OTOMATIS
- * Akan berjalan HANYA JIKA barang dikembalikan dalam keadaan rusak.
+ * FUNGSI 20: ROBOT PEMBUAT / PEMBARUI TIKET REPARASI OTOMATIS
+ * Mencegah Tiket Ganda: 1 Barang hanya boleh punya 1 Tiket 'Menunggu GA'.
  */
 function buat_tiket_reparasi_otomatis($id_pelapor, $id_aset, $id_fasilitas, $tingkat_rusak, $catatan_kerusakan = '')
 {
     global $koneksi;
+
+    // Kalau barangnya Normal, robot mati (gak usah lapor)
     if ($tingkat_rusak == 'Normal') {
         return;
     }
 
-    $id_reparasi_baru = generate_id('REP', 'reparasi_fasilitas_aset', 'idReparasi');
     $waktu_lapor = date('Y-m-d H:i:s');
-    $val_aset = !empty($id_aset) ? "'$id_aset'" : "NULL";
-    $val_fasilitas = !empty($id_fasilitas) ? "'$id_fasilitas'" : "NULL";
 
-    // Sisipkan catatan kerusakan di kolom klasifikasi (atau jika ada kolom khusus catatan)
-    $query = "INSERT INTO reparasi_fasilitas_aset 
-              (idReparasi, idTendik, idAset, idFasilitas, tanggalLapor, klasifikasiKerusakan, statusReparasi) 
-              VALUES 
-              ('$id_reparasi_baru', '$id_pelapor', $val_aset, $val_fasilitas, '$waktu_lapor', '$tingkat_rusak', 'Menunggu GA')";
+    // Logika XOR untuk mencari barang di database
+    $kolom_cari = !empty($id_aset) ? "idAset = '$id_aset'" : "idFasilitas = '$id_fasilitas'";
 
-    mysqli_query($koneksi, $query);
+    // =========================================================================
+    // 🔍 LANGKAH 1: CEK APAKAH BARANG INI SUDAH PUNYA TIKET 'MENUNGGU GA' ?
+    // =========================================================================
+    $cek_tiket = mysqli_query($koneksi, "
+        SELECT idReparasi, klasifikasiKerusakan, catatanReparasi 
+        FROM reparasi_fasilitas_aset 
+        WHERE $kolom_cari AND statusReparasi = 'Menunggu GA'
+        LIMIT 1
+    ");
+
+    if (mysqli_num_rows($cek_tiket) > 0) {
+        // =========================================================================
+        // 🔄 LANGKAH 2A: TIKET SUDAH ADA (LAKUKAN UPDATE, JANGAN INSERT!)
+        // =========================================================================
+        $data_tiket = mysqli_fetch_assoc($cek_tiket);
+        $id_reparasi_lama = $data_tiket['idReparasi'];
+
+        // Gabungkan catatan lama dengan catatan baru biar GA tahu sejarahnya
+        $catatan_baru = $data_tiket['catatanReparasi'] . "\n[Laporan Baru $waktu_lapor]: " . $catatan_kerusakan;
+
+        // Update klasifikasinya (Misal tadinya 'Berfungsi', sekarang jebol jadi 'Tidak Berfungsi')
+        $query_update = "UPDATE reparasi_fasilitas_aset 
+                         SET klasifikasiKerusakan = '$tingkat_rusak', 
+                             tanggalLapor = '$waktu_lapor', 
+                             idUser_Pelapor = '$id_pelapor', 
+                             catatanReparasi = '$catatan_baru' 
+                         WHERE idReparasi = '$id_reparasi_lama'";
+
+        mysqli_query($koneksi, $query_update);
+    } else {
+        // =========================================================================
+        // 🆕 LANGKAH 2B: TIKET BELUM ADA (LAKUKAN INSERT TIKET BARU)
+        // =========================================================================
+        $id_reparasi_baru = generate_id('REP', 'reparasi_fasilitas_aset', 'idReparasi');
+
+        $val_aset = !empty($id_aset) ? "'$id_aset'" : "NULL";
+        $val_fasilitas = !empty($id_fasilitas) ? "'$id_fasilitas'" : "NULL";
+
+        $query_insert = "INSERT INTO reparasi_fasilitas_aset 
+                  (idReparasi, idTendik, idAset, idFasilitas, tanggalLapor, klasifikasiKerusakan, statusReparasi, catatanReparasi) 
+                  VALUES 
+                  ('$id_reparasi_baru', '$id_pelapor', $val_aset, $val_fasilitas, '$waktu_lapor', '$tingkat_rusak', 'Menunggu GA', '$catatan_kerusakan')";
+
+        mysqli_query($koneksi, $query_insert);
+    }
 }
 
 /**

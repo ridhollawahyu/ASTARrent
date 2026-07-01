@@ -76,7 +76,7 @@
 
             <!-- TAMBAHAN: DROPDOWN TIPE AKUN -->
             <div class="mb-3 text-start">
-                <label class="form-label fw-bold" style="color: var(--primary-blue);">ID User / NIM</label>
+                <label class="form-label fw-bold" style="color: var(--primary-blue);">ID / NIM / Email</label>
                 <input type="text" name="username" class="form-control" placeholder="Masukkan ID atau NIM" required>
             </div>
 

@@ -285,6 +285,38 @@ function buat_dropdown_astar($nama_input, $array_pilihan, $nilai_lama = '', $waj
     return $html;
 }
 
+function buat_dropdown_danger($nama_input, $array_pilihan, $nilai_lama = '', $wajib = true)
+{
+    $label_terpilih = "-- Pilih --";
+    foreach ($array_pilihan as $val => $label) {
+        if ($val == $nilai_lama) {
+            $label_terpilih = $label;
+            break;
+        }
+    }
+    $id_unik = "drop_" . rand(1000, 9999);
+
+    $html = '
+    <div class="custom-dropdanger-container" id="container_' . $id_unik . '">
+        <!-- PERBAIKAN: Hapus kata required di sini -->
+        <input type="hidden" name="' . $nama_input . '" id="input_' . $id_unik . '" value="' . $nilai_lama . '">
+        
+        <div class="custom-dropdanger-selected" onclick="toggleDropdown(\'' . $id_unik . '\')">
+            <span id="text_' . $id_unik . '">' . $label_terpilih . '</span>
+            <i class="bi bi-chevron-down float-end"></i>
+        </div>
+        <div class="custom-dropdanger-options shadow" id="options_' . $id_unik . '">';
+    foreach ($array_pilihan as $val => $label) {
+        $aktif = ($val == $nilai_lama) ? 'active' : '';
+        $html .= '<div class="custom-dropdanger-item ' . $aktif . '" onclick="selectOption(\'' . $id_unik . '\', \'' . $val . '\', \'' . $label . '\')">' . $label . '</div>';
+    }
+    $html .= '
+        </div>
+    </div>
+    ';
+    return $html;
+}
+
 /**
  * FUNGSI 11: CEK EMAIL GANDA (CROSS-TABLE VALIDATION)
  * Mengecek apakah email sudah dipakai di tabel Mahasiswa, Users, atau Supplier.

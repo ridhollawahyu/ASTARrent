@@ -20,6 +20,7 @@
             --secondary-blue: #2a5bd4;
             --white: #FFFFFF;
             --light-bg: #f4f6f9;
+            --danger: #dc3545
         }
 
         body {
@@ -193,6 +194,57 @@
             color: #ffffff;
             font-weight: bold;
         }
+
+        /* Custom Dropdown Danger Container (Anti-Safari Bug) */
+        .custom-dropdanger-container {
+            position: relative;
+            width: 100%;
+            user-select: none;
+        }
+
+        .custom-dropdanger-selected {
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: #dc3545;
+            font-weight: 500;
+            background-color: #f9fbfd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .custom-dropdanger-selected:hover {
+            border-color: var(--danger);
+        }
+
+        .custom-dropdanger-options {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            border: 1px solid #e0e6ed;
+            border-radius: 8px;
+            margin-top: 5px;
+            z-index: 999;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .custom-dropdanger-item {
+            padding: 10px 15px;
+            color: #333;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .custom-dropdanger-item:hover,
+        .custom-dropdanger-item.active {
+            background-color: var(--danger);
+            color: #ffffff;
+            font-weight: bold;
+        }
     </style>
     <script>
         window.onpageshow = function(event) {
@@ -210,7 +262,8 @@
             if (opsibox.style.display === 'block') {
                 opsibox.style.display = 'none';
             } else {
-                document.querySelectorAll('.custom-dropdown-options').forEach(el => el.style.display = 'none');
+                // Tutup semua jenis dropdown (biru maupun merah)
+                document.querySelectorAll('.custom-dropdown-options, .custom-dropdanger-options').forEach(el => el.style.display = 'none');
                 opsibox.style.display = 'block';
             }
         }
@@ -219,15 +272,18 @@
             document.getElementById('text_' + id).innerText = label;
             document.getElementById('input_' + id).value = nilai;
             document.getElementById('options_' + id).style.display = 'none';
+
             let opsi = document.getElementById('options_' + id).children;
             for (let i = 0; i < opsi.length; i++) {
                 opsi[i].classList.remove('active');
             }
             event.target.classList.add('active');
         }
+
         document.addEventListener('click', function(event) {
-            if (!event.target.closest('.custom-dropdown-container')) {
-                document.querySelectorAll('.custom-dropdown-options').forEach(el => el.style.display = 'none');
+            // Deteksi jika klik BUKAN di elemen dropdown biru ATAU merah
+            if (!event.target.closest('.custom-dropdown-container') && !event.target.closest('.custom-dropdanger-container')) {
+                document.querySelectorAll('.custom-dropdown-options, .custom-dropdanger-options').forEach(el => el.style.display = 'none');
             }
         });
     </script>

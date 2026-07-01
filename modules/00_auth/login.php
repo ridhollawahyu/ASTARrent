@@ -69,7 +69,7 @@
         <!-- LOGO PROJECT ANDA DI SINI -->
         <img src="../../assets/images/full_logo_blue.png" alt="Logo ASTARrent" style="max-height: 80px; margin-bottom: 20px;">
 
-        <h4 style="color: var(--primary-blue); font-weight: bold;">SSO Login</h4>
+        <h4 style="color: var(--primary-blue); font-weight: bold;">Halaman Login</h4>
         <p class="text-muted mb-4">Sistem Manajemen Aset & Fasilitas ASTRAtech</p>
 
         <form action="proses_login.php" method="POST">

@@ -118,7 +118,7 @@ include '../../../components/header.php';
                                 <div class="col-md-6">
                                     <input type="radio" class="btn-check" name="tindakan_akhir" id="aksi_kanibal" value="kanibal" onchange="toggleTindakan()">
                                     <label class="btn btn-outline-danger w-100 py-3 fw-bold text-start" for="aksi_kanibal" style="border-radius: 10px; border-width: 2px;">
-                                        <i class="bi bi-recycle fs-4 d-block mb-1"></i> Gagal Diperbaiki (Dikanibal)
+                                        <i class="bi bi-recycle fs-4 d-block mb-1"></i> Gagal Diperbaiki (Dibongkar)
                                     </label>
                                 </div>
                             <?php endif; ?>
@@ -141,20 +141,22 @@ include '../../../components/header.php';
                     <div id="panel_kanibal" style="display: none;">
                         <div class="alert alert-danger fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i> PERHATIAN: Aset akan di-Soft Delete (Ketersediaan: Nonaktif)!</div>
 
-                        <label class="form-label fw-bold text-danger">Input Komponen yang Diselamatkan:</label>
+                        <label class="form-label fw-bold text-danger">Input Komponen yang Diselamatkan: <span class="text-danger">*</span></label>
 
                         <div id="komponen_container">
                             <div class="row g-2 mb-3 komponen-row align-items-center">
                                 <div class="col-md-4">
-                                    <input type="text" name="komp_nama[]" class="form-control" style="border: 2px solid #e0e6ed;" placeholder="Nama Komponen (Misal: RAM 8GB)">
+                                    <!-- HAPUS REQUIRED HARDCODE DI SINI, AKAN DIATUR OLEH JS -->
+                                    <input type="text" name="komp_nama[]" class="form-control komp-input" style="border: 2px solid #e0e6ed;" placeholder="Nama Komponen (Misal: RAM 8GB)">
                                 </div>
                                 <div class="col-md-4">
-                                    <input type="text" name="komp_spek[]" class="form-control" style="border: 2px solid #e0e6ed;" placeholder="Spesifikasi">
+                                    <!-- HAPUS REQUIRED HARDCODE DI SINI, AKAN DIATUR OLEH JS -->
+                                    <input type="text" name="komp_spek[]" class="form-control komp-input" style="border: 2px solid #e0e6ed;" placeholder="Spesifikasi">
                                 </div>
                                 <div class="col-md-3">
                                     <?php
                                     $opsi_kondisi_komponen = ['Sangat Baik' => 'Sangat Baik', 'Layak Pakai' => 'Layak Pakai'];
-                                    echo buat_dropdown_astar('komp_kondisi[]', $opsi_kondisi_komponen, 'Sangat Baik');
+                                    echo buat_dropdown_danger('komp_kondisi[]', $opsi_kondisi_komponen, 'Sangat Baik');
                                     ?>
                                 </div>
                                 <div class="col-md-1">
@@ -166,6 +168,7 @@ include '../../../components/header.php';
                         <button type="button" class="btn btn-danger btn-sm fw-bold mb-4 px-4 py-2 shadow-sm" onclick="tambahBaris()"><i class="bi bi-plus-circle-fill me-2"></i>Tambah Form Komponen</button>
                     </div>
 
+                    <!-- CATATAN DIGABUNG DI LUAR PANEL AGAR SELALU MUNCUL & TIDAK BENTROK -->
                     <div class="mb-4">
                         <label class="form-label fw-bold text-astar">Catatan Penyelesaian <span class="text-danger">*</span></label>
                         <textarea name="catatan" class="form-control" rows="3" required placeholder="Catat detail perbaikan, atau alasan kenapa barang harus dikanibal..."></textarea>
@@ -183,34 +186,58 @@ include '../../../components/header.php';
 </div>
 
 <script>
+    function tampilkanAlertJS(tipe, pesan) {
+        let bgColor = (tipe === 'success') ? '#198754' : '#dc3545';
+        let iconClass = (tipe === 'success') ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger';
+        let title = (tipe === 'success') ? 'Berhasil!' : 'Terjadi Kesalahan!';
+
+        document.getElementById('alertHeader').style.backgroundColor = bgColor;
+        document.getElementById('alertTitle').innerText = title;
+        document.getElementById('alertIcon').className = iconClass;
+        document.getElementById('alertMessage').innerText = pesan;
+
+        var alertModal = new bootstrap.Modal(document.getElementById('alertModal'));
+        alertModal.show();
+    }
+
     function toggleTindakan() {
-        let isKanibal = document.getElementById('aksi_kanibal').checked;
+        let isKanibal = document.getElementById('aksi_kanibal') ? document.getElementById('aksi_kanibal').checked : false;
+
         document.getElementById('panel_kanibal').style.display = isKanibal ? 'block' : 'none';
         document.getElementById('panel_perbaiki').style.display = isKanibal ? 'none' : 'block';
+
+        // LOGIKA CERDAS: Cabut atau pasang atribut required tergantung panel yang aktif
+        let kompInputs = document.querySelectorAll('.komp-input');
+        kompInputs.forEach(function(input) {
+            if (isKanibal) {
+                input.setAttribute('required', 'required');
+            } else {
+                input.removeAttribute('required');
+            }
+        });
     }
 
     function tambahBaris() {
         let container = document.getElementById('komponen_container');
         let idUnik = 'drop_' + Math.floor(Math.random() * 9000 + 1000);
 
-        // Replika HTML Dropdown Tema ASTARrent untuk JavaScript
         let dropdown_html = `
-        <div class="custom-dropdown-container" id="container_${idUnik}">
+        <div class="custom-dropdanger-container" id="container_${idUnik}">
             <input type="hidden" name="komp_kondisi[]" id="input_${idUnik}" value="Sangat Baik">
-            <div class="custom-dropdown-selected" onclick="toggleDropdown('${idUnik}')">
+            <div class="custom-dropdanger-selected" onclick="toggleDropdown('${idUnik}')">
                 <span id="text_${idUnik}">Sangat Baik</span>
                 <i class="bi bi-chevron-down float-end"></i>
             </div>
-            <div class="custom-dropdown-options shadow" id="options_${idUnik}">
-                <div class="custom-dropdown-item active" onclick="selectOption('${idUnik}', 'Sangat Baik', 'Sangat Baik')">Sangat Baik</div>
-                <div class="custom-dropdown-item" onclick="selectOption('${idUnik}', 'Layak Pakai', 'Layak Pakai')">Layak Pakai</div>
+            <div class="custom-dropdanger-options shadow" id="options_${idUnik}">
+                <div class="custom-dropdanger-item active" onclick="selectOption('${idUnik}', 'Sangat Baik', 'Sangat Baik')">Sangat Baik</div>
+                <div class="custom-dropdanger-item" onclick="selectOption('${idUnik}', 'Layak Pakai', 'Layak Pakai')">Layak Pakai</div>
             </div>
         </div>`;
 
         let html_baru = `
             <div class="row g-2 mb-3 komponen-row align-items-center">
-                <div class="col-md-4"><input type="text" name="komp_nama[]" class="form-control" style="border: 2px solid #e0e6ed;" placeholder="Nama Komponen" required></div>
-                <div class="col-md-4"><input type="text" name="komp_spek[]" class="form-control" style="border: 2px solid #e0e6ed;" placeholder="Spesifikasi" required></div>
+                <div class="col-md-4"><input type="text" name="komp_nama[]" class="form-control komp-input" style="border: 2px solid #e0e6ed;" placeholder="Nama Komponen" required></div>
+                <div class="col-md-4"><input type="text" name="komp_spek[]" class="form-control komp-input" style="border: 2px solid #e0e6ed;" placeholder="Spesifikasi" required></div>
                 <div class="col-md-3">${dropdown_html}</div>
                 <div class="col-md-1"><button type="button" class="btn btn-outline-danger w-100 fw-bold" onclick="hapusBaris(this)"><i class="bi bi-x-lg"></i></button></div>
             </div>`;
@@ -223,11 +250,14 @@ include '../../../components/header.php';
         if (document.querySelectorAll('.komponen-row').length > 1) {
             row.remove();
         } else {
-            // Gunakan fungsi alert bawaan browser jika fungsi JS Global belum ada, 
-            // ATAU panggil pop-up Bootstrap jika Anda sudah menaruhnya di footer.
-            alert('Minimal harus ada 1 komponen yang diselamatkan jika memilih Kanibal!');
+            tampilkanAlertJS('error', 'Minimal harus ada 1 komponen yang diselamatkan jika memilih Kanibal!');
         }
     }
+
+    // Panggil saat pertama kali load agar menyesuaikan state default (Perbaiki)
+    window.onload = function() {
+        toggleTindakan();
+    };
 </script>
 
 <?php include '../../../components/footer.php'; ?>

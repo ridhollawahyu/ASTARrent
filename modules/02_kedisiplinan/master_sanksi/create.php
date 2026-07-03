@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 include '../../../config/database.php';
 include '../../../config/functions.php';
@@ -20,6 +22,14 @@ if (isset($_POST['submit'])) {
     $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
     $jamMinus = mysqli_real_escape_string($koneksi, $_POST['jamMinus']);
     $denda = mysqli_real_escape_string($koneksi, $_POST['denda']);
+
+    if ($jamMinus == NULL) {
+        $jamMinus = 0;
+    }
+
+    if ($denda == NULL) {
+        $denda = 0;
+    }
 
     // 3. INSERT KE DATABASE (Kondisi & Ketersediaan diisi Default oleh MySQL)
     $query_simpan = "INSERT INTO sanksi (idSanksi, namaSanksi, sanksi_jamMinus, sanksi_denda) 
@@ -57,14 +67,14 @@ if (isset($_POST['submit'])) {
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label text-astar fw-bold">Jam Minus (jam/hour) <span class="text-danger">*</span></label>
-                        <input type="number" name="jamMinus" class="form-control" required>
+                        <label class="form-label text-astar fw-bold">Jam Minus (jam/hour)</label>
+                        <input type="number" name="jamMinus" class="form-control">
                         <small class="text-secondary mt-1 d-block" style="font-size:11px;">*Boleh kosong/0.</small>
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label text-astar fw-bold">Denda (Rp) <span class="text-danger">*</span></label>
-                        <input type="number" name="denda" class="form-control" required>
+                        <label class="form-label text-astar fw-bold">Denda (Rp)</label>
+                        <input type="number" name="denda" class="form-control">
                         <small class="text-secondary mt-1 d-block" style="font-size:11px;">*Boleh kosong/0.</small>
                     </div>
 

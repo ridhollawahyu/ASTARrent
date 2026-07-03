@@ -14,28 +14,34 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Tenaga Pendidik') {
     exit;
 }
 
-$where_sql = "WHERE aset.ketersediaanAset != 'Tidak Tersedia'";
+$where_sql = "WHERE statusKategori != 'Nonaktif'";
 
 $status_terpilih = "";
 $kategori_terpilih = "";
 
 // 1. Cek Filter Status Ketersediaan
-if (isset($_GET['ketersediaan']) && $_GET['ketersediaan'] != '') {
-    $status_terpilih = mysqli_real_escape_string($koneksi, $_GET['ketersediaan']);
+if (isset($_GET['filter']) && $_GET['filter'] != '') {
+    $status_terpilih = mysqli_real_escape_string($koneksi, $_GET['filter']);
 
     if ($status_terpilih == 'Semua_Termasuk_Arsip') {
         // Tampilkan semua data, override default
         $where_sql = "WHERE 1=1";
+    } elseif ($status_terpilih == 'Aset') {
+        // Tampilkan semua data, override default
+        $where_sql = "WHERE tipeKategori = '$status_terpilih'";
+    } elseif ($status_terpilih == 'Fasilitas') {
+        // Tampilkan semua data, override default
+        $where_sql = "WHERE tipeKategori = '$status_terpilih'";
     } else {
         // Tampilkan sesuai yang dipilih user
-        $where_sql = "WHERE aset.ketersediaanAset = '$status_terpilih'";
+        $where_sql = "WHERE statusKategori = '$status_terpilih'";
     }
 }
 
 // 2. Cek Filter Kategori (Ditambahkan dengan AND)
 if (isset($_GET['kategori']) && $_GET['kategori'] != '') {
     $kategori_terpilih = mysqli_real_escape_string($koneksi, $_GET['kategori']);
-    $where_sql .= " AND aset.idKategori = '$kategori_terpilih'";
+    $where_sql .= " AND kategori.idKategori = '$kategori_terpilih'";
 }
 
 // Panggil header HTML setelah semua logika selesai
@@ -46,10 +52,10 @@ include '../../../components/header.php';
 
     <!-- Bagian Header Card -->
     <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #1d4197; border-top-left-radius: 15px; border-top-right-radius: 15px;">
-        <h5 class="mb-0 text-white fw-bold"><i class="bi bi-pc-display me-2"></i>Data Master Aset</h5>
+        <h5 class="mb-0 text-white fw-bold"><i class="bi bi-pc-display me-2"></i>Data Master Kategori</h5>
         <div>
             <a href="../../dashboards/tendik_home.php" class="btn btn-outline-light btn-sm fw-bold me-2"><i class="bi bi-arrow-left"></i> Dashboard</a>
-            <a href="create.php" class="btn btn-light btn-sm fw-bold text-astar">+ Tambah Aset Manual</a>
+            <a href="create/create_fasilitas.php" class="btn btn-light btn-sm fw-bold text-astar">+ Tambah Kategori Fasilitas</a>
         </div>
     </div>
 
@@ -66,27 +72,15 @@ include '../../../components/header.php';
             <!-- 1. Dropdown Filter Status Ketersediaan -->
             <div class="col-md-3 col-sm-6">
                 <?php
-                $opsi_status = [
+                $opsi_filter = [
                     '' => '-- Status Default (Aktif) --',
-                    'Tersedia' => 'Hanya Tersedia',
-                    'Dipinjam' => 'Sedang Dipinjam',
-                    'Sedang Diperbaiki' => 'Sedang Diperbaiki (Reparasi)',
-                    'Tidak Tersedia' => 'Arsip (Soft Delete)',
+                    'Aset' => 'Aset',
+                    'Fasilitas' => 'Fasilitas',
+                    'Nonaktif' => 'Arsip (Soft Delete)',
                     'Semua_Termasuk_Arsip' => 'Tampilkan Semua Data'
                 ];
                 // Panggil fungsi Custom Dropdown kita (Tanpa wajib diisi/false)
-                echo buat_dropdown_astar('ketersediaan', $opsi_status, $status_terpilih, false);
-                ?>
-            </div>
-
-            <!-- 2. Dropdown Filter Kategori -->
-            <div class="col-md-3 col-sm-6">
-                <?php
-                // Ambil list Kategori Tipe 'Aset' dari Database
-                $pilihan_kategori = ambil_pilihan_kategori('Aset');
-                $pilihan_filter_kategori = ['' => '-- Semua Kategori --'] + $pilihan_kategori;
-
-                echo buat_dropdown_astar('kategori', $pilihan_filter_kategori, $kategori_terpilih, false);
+                echo buat_dropdown_astar('filter', $opsi_filter, $status_terpilih, false);
                 ?>
             </div>
 
@@ -105,22 +99,19 @@ include '../../../components/header.php';
             <table class="table table-hover table-striped mb-0 text-center align-middle">
                 <thead style="background-color: #f4f6f9; color: #1d4197;">
                     <tr>
-                        <th class="text-center" width="5%">No.</th>
-                        <th>Kategori</th>
-                        <th class="text-start">Nama Aset</th>
-                        <th>Kondisi Fisik</th>
-                        <th>Ketersediaan</th>
+                        <th class="text-center pe-5" width="10%">No.</th>
+                        <th class="text-start">Nama Kategori</th>
+                        <th>Tipe</th>
+                        <th>Status</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    // QUERY UTAMA (JOIN Aset dan Kategori + Filter + Ascending)
-                    $query_sql = "SELECT aset.*, kategori.namaKategori 
-                                  FROM aset 
-                                  JOIN kategori ON aset.idKategori = kategori.idKategori "
+                    // QUERY UTAMA (JOIN Kategori dan Kategori + Filter + Ascending)
+                    $query_sql = "SELECT * FROM kategori "
                         . $where_sql .
-                        " ORDER BY aset.idAset ASC";
+                        " ORDER BY idKategori ASC";
                     $query = mysqli_query($koneksi, $query_sql);
 
                     $no = 1;
@@ -128,38 +119,28 @@ include '../../../components/header.php';
                     while ($data = mysqli_fetch_array($query)) {
                     ?>
                         <tr>
-                            <td class="fw-bold"><?= $no++; ?></td>
-                            <td><span class="badge bg-secondary"><?= $data['namaKategori']; ?></span></td>
-                            <td class="text-start"><?= $data['namaAset']; ?></td>
+                            <td class="fw-bold pe-5"><?= $no++; ?></td>
+                            <td class="text-start"><?= $data['namaKategori']; ?></td>
 
                             <!-- PEWARNAAN KONDISI FISIK -->
-                            <td>
-                                <?php if ($data['kondisiAset'] == 'Normal') echo '<span class="text-success fw-bold">Normal</span>';
-                                else if ($data['kondisiAset'] == 'Tidak Berfungsi') echo '<span class="text-danger fw-bold">Tidak Berfungsi</span>';
-                                else echo '<span class="text-warning text-dark fw-bold">' . $data['kondisiAset'] . '</span>';
-                                ?>
-                            </td>
+                            <td class="text-secondary"><?= $data['tipeKategori']; ?></td>
 
                             <!-- PEWARNAAN KETERSEDIAAN (Sesuai Logika Terbaru Anda) -->
                             <td>
-                                <?php if ($data['ketersediaanAset'] == 'Tersedia'): ?>
-                                    <span class="badge bg-success rounded-pill px-3">Tersedia</span>
-                                <?php elseif ($data['ketersediaanAset'] == 'Dipinjam'): ?>
-                                    <span class="badge bg-primary rounded-pill px-3">Dipinjam</span>
-                                <?php elseif ($data['ketersediaanAset'] == 'Sedang Diperbaiki'): ?>
-                                    <span class="badge bg-warning text-dark rounded-pill px-3">Sedang Diperbaiki</span>
+                                <?php if ($data['statusKategori'] == 'Aktif'): ?>
+                                    <span class="badge bg-success rounded-pill px-3">Aktif</span>
                                 <?php else: ?>
-                                    <span class="badge bg-secondary rounded-pill px-3">Tidak Tersedia</span>
+                                    <span class="badge bg-secondary rounded-pill px-3">Nonaktif</span>
                                 <?php endif; ?>
                             </td>
 
                             <td>
-                                <?php if ($data['ketersediaanAset'] != 'Tidak Tersedia'): ?>
+                                <?php if ($data['statusKategori'] != 'Nonaktif'): ?>
                                     <!-- Tombol Edit -->
-                                    <a href="edit.php?id=<?= $data['idAset']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
+                                    <a href="edit.php?id=<?= $data['idKategori']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
 
                                     <!-- Tombol Soft Delete (Memanggil fungsi dari footer) -->
-                                    <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?id=<?= $data['idAset']; ?>')">
+                                    <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?id=<?= $data['idKategori']; ?>')">
                                         <i class="bi bi-trash-fill"></i>
                                     </button>
                                 <?php endif; ?>
@@ -170,7 +151,7 @@ include '../../../components/header.php';
                     <!-- Jika data kosong -->
                     <?php if (mysqli_num_rows($query) == 0): ?>
                         <tr>
-                            <td colspan="6" class="py-4 text-muted fst-italic">Tidak ada data aset yang ditemukan.</td>
+                            <td colspan="5" class="py-4 text-muted fst-italic">Tidak ada data kategori yang ditemukan.</td>
                         </tr>
                     <?php endif; ?>
 

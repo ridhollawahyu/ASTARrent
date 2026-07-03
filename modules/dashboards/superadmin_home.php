@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 // Panggil header global
 include '../../config/functions.php';
@@ -93,13 +95,13 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
                         <i class="bi bi-mortarboard-fill"></i>
                     </div>
                     <h5 class="fw-bold text-dark mb-3">Kelola Mahasiswa</h5>
-                    <p class="text-secondary mb-4 flex-grow-1">Kelola data mahasiswa, program studi, dan hapus sanksi pembekuan jika diperlukan.</p>
+                    <p class="text-secondary mb-4 flex-grow-1">Kelola data mahasiswa, program studi, dan pembekuan jika diperlukan.</p>
                     <a href="../01_reservasi/master_mahasiswa/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Mahasiswa <i class="bi bi-arrow-right ms-2"></i></a>
                 </div>
             </div>
         </div>
 
-        <!-- Menu 3: Master Karyawan (Tugas Super Admin) -->
+        <!-- Menu 3: Master Users (Tugas Super Admin) -->
         <div class="col-md-6 col-lg-4">
             <div class="card menu-card h-100 p-4">
                 <div class="card-body d-flex flex-column">
@@ -110,6 +112,21 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
                     <p class="text-secondary mb-4 flex-grow-1">Kelola akun Tendik, Kepala GA, Staff GA, dan Finance (Hak Akses Pengelolaan Pegawai).</p>
                     <!-- Link ini bisa diarahkan ke folder master_users nanti -->
                     <a href="../03_pemeliharaan/master_users/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Pengguna <i class="bi bi-arrow-right ms-2"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu 4: Master Supplier (Tugas Super Admin) -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card menu-card h-100 p-4">
+                <div class="card-body d-flex flex-column">
+                    <div class="icon-box">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-3">Kelola Supplier (Pencari Vendor)</h5>
+                    <p class="text-secondary mb-4 flex-grow-1">Kelola Data Supplier dan Supplier (Hak Akses Pengelolaan Supplier).</p>
+                    <!-- Link ini bisa diarahkan ke folder master_users nanti -->
+                    <a href="../04_rantai_pasok//master_supplier/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Pengguna <i class="bi bi-arrow-right ms-2"></i></a>
                 </div>
             </div>
         </div>

@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 include '../../../config/database.php';
 include '../../../config/functions.php';
@@ -16,8 +18,8 @@ $where_sql = "WHERE sanksi.statusSanksi != 'Nonaktif'";
 $status_terpilih = "";
 
 // 1. Cek Filter Status Ketersediaan
-if (isset($_GET['ketersediaan']) && $_GET['ketersediaan'] != '') {
-    $status_terpilih = mysqli_real_escape_string($koneksi, $_GET['ketersediaan']);
+if (isset($_GET['status_sanksi']) && $_GET['status_sanksi'] != '') {
+    $status_terpilih = mysqli_real_escape_string($koneksi, $_GET['status_sanksi']);
 
     if ($status_terpilih == 'Semua_Termasuk_Arsip') {
         // Tampilkan semua data, override default
@@ -61,7 +63,7 @@ include '../../../components/header.php';
                     'Semua_Termasuk_Arsip' => 'Tampilkan Semua Data'
                 ];
                 // Panggil fungsi Custom Dropdown kita (Tanpa wajib diisi/false)
-                echo buat_dropdown_astar('ketersediaan', $opsi_status, $status_terpilih, false);
+                echo buat_dropdown_astar('status_sanksi', $opsi_status, $status_terpilih, false);
                 ?>
             </div>
 
@@ -80,8 +82,8 @@ include '../../../components/header.php';
             <table class="table table-hover table-striped mb-0 text-center align-middle">
                 <thead style="background-color: #f4f6f9; color: #1d4197;">
                     <tr>
-                        <th class="text-center" width="5%">No.</th>
-                        <th>Nama Sanksi</th>
+                        <th class="text-center pe-5" width="10%">No.</th>
+                        <th class="text-start">Nama Sanksi</th>
                         <th>Jam Minus (Jam/Hour)</th>
                         <th>Denda (Rp)</th>
                         <th>Aksi</th>
@@ -98,8 +100,8 @@ include '../../../components/header.php';
                     while ($data = mysqli_fetch_array($query)) {
                     ?>
                         <tr>
-                            <td class="fw-bold"><?= $no++; ?></td>
-                            <td class="text-center"><?= $data['namaSanksi']; ?></td>
+                            <td class="fw-bold pe-5"><?= $no++; ?></td>
+                            <td class="text-start"><?= $data['namaSanksi']; ?></td>
                             <td class="text-center"><?= $data['sanksi_jamMinus']; ?></td>
                             <td class="text-center"><?= $data['sanksi_denda']; ?></td>
 

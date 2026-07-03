@@ -20,9 +20,16 @@ if (!isset($_GET['id'])) {
     exit;
 }
 $id = mysqli_real_escape_string($koneksi, $_GET['id']);
+$sesi_id = $_SESSION['id'];
 
-if ($id === 'SA-001') {
-    set_notifikasi('error', 'Akses Ditolak! Akun Root (SA-001) tidak boleh diubah oleh siapapun.');
+if ($id === 'SA-00000') {
+    set_notifikasi('error', 'Akses Ditolak! Akun Root (SA-00000) tidak boleh diubah oleh siapapun.');
+    header("Location: index.php");
+    exit;
+}
+
+if ($id === $sesi_id) {
+    set_notifikasi('error', 'Akses Ditolak! Kamu tidak boleh mengubah akunmu sendiri.');
     header("Location: index.php");
     exit;
 }

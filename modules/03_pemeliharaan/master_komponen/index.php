@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 include '../../../config/database.php';
 include '../../../config/functions.php';
@@ -39,7 +41,7 @@ include '../../../components/header.php';
         <h5 class="mb-0 text-white fw-bold"><i class="bi bi-cpu-fill me-2"></i>Data Master Komponen</h5>
         <div>
             <a href="../../dashboards/staffga_home.php" class="btn btn-outline-light btn-sm fw-bold me-2"><i class="bi bi-arrow-left"></i> Dashboard</a>
-            <a href="create.php" class="btn btn-light btn-sm fw-bold text-astar">+ Tambah Komponen</a>
+            <!-- <a href="create.php" class="btn btn-light btn-sm fw-bold text-astar">+ Tambah Komponen</a> -->
         </div>
     </div>
 

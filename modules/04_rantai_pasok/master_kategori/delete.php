@@ -7,20 +7,20 @@ include '../../../config/functions.php';
 
 /** @var mysqli $koneksi */
 
-if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
-    set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Super Admin.');
+if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Tenaga Pendidik') {
+    set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Tenaga Pendidik.');
     header("Location: ../../00_auth/login.php");
     exit;
 }
 
-if (isset($_GET['nim'])) {
-    $id = mysqli_real_escape_string($koneksi, $_GET['nim']);
+if (isset($_GET['id'])) {
+    $id = mysqli_real_escape_string($koneksi, $_GET['id']);
 
     // PERBAIKAN CERDAS: Kita TIDAK menghapus datanya, kita "Soft Delete" dengan UPDATE!
-    $query_soft_delete = "UPDATE mahasiswa SET statusMahasiswa = 'Nonaktif' WHERE nimMahasiswa = '$id'";
+    $query_soft_delete = "UPDATE kategori SET statusKategori = 'Nonaktif' WHERE idKategori = '$id'";
 
     if (mysqli_query($koneksi, $query_soft_delete)) {
-        set_notifikasi('success', 'Berhasil! data Mahasiswa dipindahkan ke arsip (Nonaktif).');
+        set_notifikasi('success', 'Berhasil! Kategori dipindahkan ke arsip (Nonaktif).');
     } else {
         set_notifikasi('error', 'Terjadi kesalahan pada database!');
     }

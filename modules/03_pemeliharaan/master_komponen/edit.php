@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 include '../../../config/database.php';
 include '../../../config/functions.php';
@@ -119,8 +121,7 @@ if (!$nama_barang) {
                             <?php
                             $opsi_status = [
                                 'Tersedia' => 'Tersedia',
-                                'Sudah Dipakai' => 'Sudah Dipakai',
-                                'Nonaktif' => 'Nonaktif'
+                                'Sudah Dipakai' => 'Sudah Dipakai'
                             ];
                             echo buat_dropdown_astar('statusKomponen', $opsi_status, $data['statusKomponen']);
                             ?>

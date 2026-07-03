@@ -7,8 +7,6 @@ include '../../../config/functions.php';
 
 /** @var mysqli $koneksi */
 
-$sesi_id = $_SESSION['id'];
-
 if (!isset($_GET['id'])) {
     header('Location: index.php');
     exit;
@@ -16,20 +14,14 @@ if (!isset($_GET['id'])) {
 if (isset($_GET['id'])) {
     $id = mysqli_real_escape_string($koneksi, $_GET['id']);
 
-    if ($id === 'SA-00000') {
+    if ($id === 'SA-001') {
         set_notifikasi('error', 'Akses Ditolak! Akun Root (SA-001) tidak boleh diubah oleh siapapun.');
         header("Location: index.php");
         exit;
     }
 
-    if ($id === $sesi_id) {
-        set_notifikasi('error', 'Akses Ditolak! Kamu tidak boleh soft delete akunmu sendiri.');
-        header("Location: index.php");
-        exit;
-    }
-
-    if (mysqli_query($koneksi, "UPDATE users SET statusUser = 'Nonaktif' WHERE idUser = '$id'")) {
-        set_notifikasi('success', 'User berhasil dinonaktifkan (Arsip).');
+    if (mysqli_query($koneksi, "UPDATE supplier SET statusSupplier = 'Nonaktif' WHERE idSupplier = '$id'")) {
+        set_notifikasi('success', 'Supplier berhasil dinonaktifkan (Arsip).');
     }
 }
 

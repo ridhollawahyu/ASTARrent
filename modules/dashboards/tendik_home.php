@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 
 // 1. WAJIB PANGGIL KONEKSI & FUNGSI SEBELUM QUERY (Perbaikan Fatal Error!)
@@ -29,7 +31,6 @@ $data_antrean = mysqli_fetch_assoc($hitung_request);
 $total_antrean = $data_antrean['total_antrean'];
 
 // 3. QUERY PENGHITUNG ANTREAN PENGEMBALIAN
-$dept_tendik = $_SESSION['departemen'];
 $hitung_request = mysqli_query($koneksi, "
     SELECT COUNT(tp.idPeminjaman) AS total_antrean 
     FROM transaksi_peminjaman tp 
@@ -96,7 +97,19 @@ include '../../components/header.php';
 
     <!-- Pilihan Menu Utama -->
     <div class="row g-4">
-        <!-- Menu 1: Master Aset -->
+        <!-- Menu 1: Master Kategori (Fasilitas) -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card menu-card h-100 p-4">
+                <div class="card-body d-flex flex-column">
+                    <div class="icon-box"><i class="bi bi-pc-display"></i></div>
+                    <h5 class="fw-bold text-dark mb-3">Pengelolaan Kategori Fasilitas</h5>
+                    <p class="text-secondary mb-4 flex-grow-1">Kelola data inventaris barang elektronik, cek ketersediaan, dan update kondisi aset.</p>
+                    <a href="../04_rantai_pasok/master_kategori/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Aset <i class="bi bi-arrow-right ms-2"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu 2: Master Aset -->
         <div class="col-md-6 col-lg-4">
             <div class="card menu-card h-100 p-4">
                 <div class="card-body d-flex flex-column">
@@ -108,7 +121,7 @@ include '../../components/header.php';
             </div>
         </div>
 
-        <!-- Menu 2: Master Aset -->
+        <!-- Menu 3: Master Fasilitas -->
         <div class="col-md-6 col-lg-4">
             <div class="card menu-card h-100 p-4">
                 <div class="card-body d-flex flex-column">
@@ -144,7 +157,7 @@ include '../../components/header.php';
             </div>
         </div>
 
-        <!-- Menu 4: Approval Peminjaman -->
+        <!-- Menu 5: Approval Pengembalian -->
         <div class="col-md-6 col-lg-4">
             <div class="card menu-card h-100 p-4">
                 <div class="card-body d-flex flex-column">
@@ -154,6 +167,30 @@ include '../../components/header.php';
 
                     <!-- PERBAIKAN: Tombol Dengan Badge Notifikasi Angka Merah -->
                     <a href="../02_kedisiplinan/transaksi_pengembalian/index.php" class="btn btn-astar mt-auto py-2 fw-bold position-relative">
+                        Lihat Data <i class="bi bi-arrow-right ms-2"></i>
+
+                        <?php if ($total_antreanP > 0): ?>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white shadow-sm" style="font-size: 0.85rem;">
+                                <?= $total_antreanP; ?>
+                                <span class="visually-hidden">request baru</span>
+                            </span>
+                        <?php endif; ?>
+
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu 6: Transaksi Pengadaan -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card menu-card h-100 p-4">
+                <div class="card-body d-flex flex-column">
+                    <div class="icon-box"><i class="bi bi-check-circle-fill"></i></div>
+                    <h5 class="fw-bold text-dark mb-3">Request Pengadaan</h5>
+                    <p class="text-secondary mb-4 flex-grow-1">Tinjau dan berikan persetujuan (Approve) untuk Pengembalian mahasiswa.</p>
+
+                    <!-- PERBAIKAN: Tombol Dengan Badge Notifikasi Angka Merah -->
+                    <a href="../04_rantai_pasok/transaksi_pengadaan/tendik/" class="btn btn-astar mt-auto py-2 fw-bold position-relative">
                         Lihat Data <i class="bi bi-arrow-right ms-2"></i>
 
                         <?php if ($total_antreanP > 0): ?>

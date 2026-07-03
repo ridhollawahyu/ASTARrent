@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start(); // Wajib ada untuk set notifikasi
 include '../../../config/database.php';
 include '../../../config/functions.php';

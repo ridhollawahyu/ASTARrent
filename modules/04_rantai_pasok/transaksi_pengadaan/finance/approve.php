@@ -58,7 +58,7 @@ if (isset($_POST['submit_cairkan'])) {
         mysqli_query($koneksi, "UPDATE transaksi_pengadaan 
                                 SET statusPengadaan = 'Ditolak', 
                                     idFinance = '$id_finance',
-                                    alasanPenolakan_pengadaan = '$alasan_tolak' 
+                                    alasanTolak = '$alasan_tolak' 
                                 WHERE idPengadaan = '$id_pengadaan'");
 
         if ($data['statusKategori'] === 'Draft') {
@@ -69,42 +69,63 @@ if (isset($_POST['submit_cairkan'])) {
 
         $vendor_terpilih = isset($_POST['vendor_check']) ? $_POST['vendor_check'] : [];
 
-        // Hitung total stok dari toko yang dicentang
         $total_dibeli_server = 0;
-        foreach ($vendor_terpilih as $idx) {
-            $total_dibeli_server += (int)$array_vendor[$idx]['stok']; // Langsung ambil stok asli
+        $total_uang_keluar = 0;
+
+        // 1. MANIPULASI JSON VENDOR UNTUK MENYIMPAN RIWAYAT ACC & HITUNG UANG
+        foreach ($array_vendor as $idx => $v) {
+            // Jika toko ini dicentang
+            if (in_array($idx, $vendor_terpilih)) {
+
+                // PERBAIKAN: Karena memborong, kita ambil langsung dari stok tokonya
+                $qty_acc = (int)$v['stok'];
+
+                $array_vendor[$idx]['is_selected'] = true;
+                $array_vendor[$idx]['qty_acc'] = $qty_acc;
+
+                $total_dibeli_server += $qty_acc;
+                $total_uang_keluar += ($qty_acc * (int)$v['harga']);
+            } else {
+                // Toko tidak dipilih (Ditolak)
+                $array_vendor[$idx]['is_selected'] = false;
+                $array_vendor[$idx]['qty_acc'] = 0;
+            }
         }
 
-        // Backend Validation
+        // Backend Validation (Sekarang Pasti Berhasil!)
         if ($total_dibeli_server < $kebutuhan_jumlah) {
             set_notifikasi('error', 'Total stok toko yang dipilih tidak memenuhi syarat request minimal (' . $kebutuhan_jumlah . ' Unit).');
             echo "<script>window.location='approve.php?id=$id_pengadaan';</script>";
             exit;
         }
 
-        // 1. UBAH STATUS TRANSAKSI
+        // 2. SIMPAN BALIK JSON YANG SUDAH DIUPDATE KE DATABASE
+        $json_baru = json_encode($array_vendor);
+        $alasan_lama = explode('|||VENDOR|||', $data['alasanKebutuhan'])[0];
+        $alasan_baru_aman = mysqli_real_escape_string($koneksi, $alasan_lama . "|||VENDOR|||" . $json_baru);
+
+        // 3. UBAH STATUS TRANSAKSI & SIMPAN TOTAL BIAYA
         mysqli_query($koneksi, "UPDATE transaksi_pengadaan 
                                 SET statusPengadaan = 'Disetujui Finance', 
-                                    idFinance = '$id_finance' 
+                                    idFinance = '$id_finance',
+                                    totalBiaya = $total_uang_keluar,
+                                    alasanKebutuhan = '$alasan_baru_aman'
                                 WHERE idPengadaan = '$id_pengadaan'");
 
-        // 2. SAHKAN KATEGORI JIKA DRAFT
+        // 4. SAHKAN KATEGORI JIKA DRAFT
         if ($data['statusKategori'] === 'Draft') {
             mysqli_query($koneksi, "UPDATE kategori SET statusKategori = 'Aktif' WHERE idKategori = '$id_kategori_aset'");
         }
 
-        // 3. SIHIR LOOPING: KELAHIRAN ASET BARU!
+        // 5. SIHIR LOOPING: KELAHIRAN ASET BARU!
         $jumlah_aset_lahir = 0;
         foreach ($vendor_terpilih as $idx) {
             $qty_beli = (int)$array_vendor[$idx]['stok'];
             $nama_toko = mysqli_real_escape_string($koneksi, $array_vendor[$idx]['toko']);
-
-            // Format Nama Aset: "Proyektor Epson FHD (Toko ABC)"
             $nama_aset_baru = $nama_kebutuhan_aset . " (" . $nama_toko . ")";
 
             for ($i = 0; $i < $qty_beli; $i++) {
                 $id_aset_baru = generate_id('AST', 'aset', 'idAset');
-
                 $q_lahir = "INSERT INTO aset (idAset, idKategori, idPengadaan, namaAset, kondisiAset, ketersediaanAset) 
                             VALUES ('$id_aset_baru', '$id_kategori_aset', '$id_pengadaan', '$nama_aset_baru', 'Normal', 'Tersedia')";
                 mysqli_query($koneksi, $q_lahir);
@@ -112,11 +133,13 @@ if (isset($_POST['submit_cairkan'])) {
             }
         }
 
-        // 4. GENERATE ULANG KEDUA PDF UNTUK TANDA TANGAN FINANCE
+        // 6. GENERATE ULANG KEDUA PDF UNTUK TANDA TANGAN FINANCE
         buat_pdf_pengajuan($id_pengadaan);
         buat_pdf_penawaran($id_pengadaan);
 
-        set_notifikasi('success', "Sukses! Dana dicairkan dan $jumlah_aset_lahir Aset baru berhasil ditambahkan ke database otomatis.");
+        // Format uang untuk Notifikasi Pop-up
+        $total_rp_cair = "Rp " . number_format($total_uang_keluar, 0, ',', '.');
+        set_notifikasi('success', "Sukses! Dana sebesar $total_rp_cair telah dicairkan dan $jumlah_aset_lahir Aset baru telah ditambahkan ke gudang.");
     }
 
     echo "<script>window.location='index.php';</script>";
@@ -199,7 +222,7 @@ include '../../../../components/header.php';
                                             <td class="text-start fw-bold text-secondary"><?= $v['toko'] ?></td>
                                             <td class="text-muted">Rp <?= number_format($v['harga'], 0, ',', '.') ?></td>
                                             <td><span class="badge bg-secondary" style="font-size: 14px;"><?= $v['stok'] ?> Unit</span></td>
-                                            <td class="fw-bold text-primary">Rp <?= number_format($total_harga, 0, ',', '.') ?></td>
+                                            <td class="fw-bold text-astar">Rp <?= number_format($total_harga, 0, ',', '.') ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -242,74 +265,6 @@ include '../../../../components/header.php';
     </div>
 </div>
 
-<script>
-    const targetKebutuhan = parseInt(<?= $kebutuhan_jumlah ?>);
-
-    function toggleKeputusan() {
-        let isSetuju = document.getElementById('aksi_setuju').checked;
-        let panelVendor = document.getElementById('panel_vendor');
-        let panelTolak = document.getElementById('panel_tolak');
-        let inputAlasanTolak = document.getElementById('input_alasan_tolak');
-        let btnSubmit = document.getElementById('btn_submit');
-
-        if (isSetuju) {
-            panelVendor.style.display = 'block';
-            panelTolak.style.display = 'none';
-            inputAlasanTolak.removeAttribute('required');
-            updateTotal(); // Jalankan validasi JS
-        } else {
-            panelVendor.style.display = 'none';
-            panelTolak.style.display = 'block';
-            inputAlasanTolak.setAttribute('required', 'required');
-
-            // Tombol selalu aktif jika tolak
-            btnSubmit.disabled = false;
-            // Bersihkan class warna sebelumnya agar rapi
-            btnSubmit.classList.remove('btn-secondary', 'btn-astar');
-            btnSubmit.classList.add('btn-danger');
-            btnSubmit.innerHTML = 'Tolak Pengadaan <i class="bi bi-x-lg ms-1"></i>';
-        }
-    }
-
-    function updateTotal() {
-        let checkboxes = document.querySelectorAll('.chk-vendor');
-        let totalUnit = 0;
-        let totalRp = 0;
-
-        checkboxes.forEach(function(chk) {
-            if (chk.checked) {
-                totalUnit += parseInt(chk.getAttribute('data-stok')) || 0;
-                totalRp += parseInt(chk.getAttribute('data-harga')) || 0;
-            }
-        });
-
-        // Tampilkan Unit & Rupiah
-        document.getElementById('display_total_unit').value = totalUnit + " Unit";
-        document.getElementById('display_total_rp').value = "Rp " + new Intl.NumberFormat('id-ID').format(totalRp);
-
-        let btnSubmit = document.getElementById('btn_submit');
-        let peringatan = document.getElementById('peringatan_qty');
-
-        // VALIDASI JS
-        if (totalUnit < targetKebutuhan) {
-            btnSubmit.disabled = true;
-            btnSubmit.classList.remove('btn-astar', 'btn-danger');
-            btnSubmit.classList.add('btn-secondary');
-
-            // Tampilkan peringatan merah
-            peringatan.style.display = 'block';
-        } else {
-            btnSubmit.disabled = false;
-            btnSubmit.classList.remove('btn-secondary', 'btn-danger');
-            btnSubmit.classList.add('btn-astar');
-
-            // Sembunyikan peringatan merah
-            peringatan.style.display = 'none';
-            btnSubmit.innerHTML = 'Cairkan & Lahirkan Aset <i class="bi bi-magic ms-1"></i>';
-        }
-    }
-
-    window.onload = toggleKeputusan;
-</script>
+<?= script_dinamis_finance_approve($kebutuhan_jumlah); ?>
 
 <?php include '../../../../components/footer.php'; ?>

@@ -3,21 +3,20 @@ error_reporting(0);
 ini_set('display_errors', 0);
 session_start();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi']) && $_POST['aksi'] === 'tolak') {
-    ob_start();
-    require '../../../../config/database.php';
-    require '../../../../config/functions.php';
+if (isset($_POST['submit_tolak'])) {
+    global $koneksi;
+    $id_peminjaman = mysqli_real_escape_string($koneksi, $_POST['id_peminjaman']);
+    $alasan_tolak = mysqli_real_escape_string($koneksi, trim($_POST['alasan_tolak']));
+    $idTendik = $_SESSION['id'];
+    $dept_tendik = $_SESSION['departemen'];
 
-    if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Tenaga Pendidik') {
-        $response = ['status' => 'error', 'pesan' => 'Akses Ditolak!'];
+    if (!validasi_otoritas_tendik($id_peminjaman, $dept_tendik)) {
+        set_notifikasi('error', 'Akses Ditolak! Mahasiswa bukan dari Prodi Anda.');
     } else {
-        // Panggil fungsi murni dari functions.php
-        $response = proses_tolak_peminjaman_ajax($_POST['id_peminjaman'], $_POST['alasan_tolak'], $_SESSION['id'], $_SESSION['departemen']);
+        mysqli_query($koneksi, "UPDATE transaksi_peminjaman SET statusPeminjaman = 'Ditolak', idPenyetuju = '$idTendik', alasanPenolakan_peminjaman = '$alasan_tolak' WHERE idPeminjaman = '$id_peminjaman'");
+        set_notifikasi('success', 'Peminjaman berhasil ditolak.');
     }
-
-    ob_end_clean();
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode($response);
+    header('Location: index.php');
     exit;
 }
 

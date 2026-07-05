@@ -191,47 +191,6 @@ $has_supplier = !empty($pilihan_supplier) ? 'true' : 'false';
     </div>
 </div>
 
-<!-- SCRIPT JS: MENGONTROL PANEL & TOMBOL SUBMIT -->
-<script>
-    // Menyimpan status apakah ada supplier dari PHP ke variabel JS
-    const hasSupplier = <?= $has_supplier ?>;
-
-    function toggleKeputusan() {
-        let isSetuju = document.getElementById('aksi_setuju').checked;
-        let panelSupplier = document.getElementById('panel_supplier');
-        let panelTolak = document.getElementById('panel_tolak');
-        let btnSubmit = document.getElementById('btn_submit');
-        let inputAlasanTolak = document.getElementById('input_alasan_tolak');
-
-        if (isSetuju) {
-            // JIKA MEMILIH SETUJU
-            panelSupplier.style.display = 'block';
-            panelTolak.style.display = 'none';
-            inputAlasanTolak.removeAttribute('required'); // Cabut kewajiban isi form tolak
-
-            // Kunci tombol submit JIKA daftar supplier ternyata kosong
-            if (!hasSupplier) {
-                btnSubmit.disabled = true;
-                btnSubmit.classList.replace('btn-astar', 'btn-secondary');
-            } else {
-                btnSubmit.disabled = false;
-                btnSubmit.classList.replace('btn-secondary', 'btn-astar');
-            }
-
-        } else {
-            // JIKA MEMILIH TOLAK
-            panelSupplier.style.display = 'none';
-            panelTolak.style.display = 'block';
-            inputAlasanTolak.setAttribute('required', 'required'); // Wajib isi alasan tolak
-
-            // BEBASKAN TOMBOL SUBMIT (Karena menolak tidak butuh supplier)
-            btnSubmit.disabled = false;
-            btnSubmit.classList.replace('btn-secondary', 'btn-astar'); // Ubah tombol jadi merah biar keren!
-        }
-    }
-
-    // Inisialisasi saat load pertama kali
-    window.onload = toggleKeputusan;
-</script>
+<?= script_dinamis_kepalaga_approve($has_supplier); ?>
 
 <?php include '../../../../components/footer.php'; ?>

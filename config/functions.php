@@ -907,36 +907,6 @@ function script_dinamis_jabatan_dept()
 }
 
 /**
- * FUNGSI 30: TAMBAH KATEGORI DRAFT (UNTUK AJAX PENGADAAN)
- */
-function tambah_kategori_draft($nama_kategori, $id_pembuat)
-{
-    global $koneksi;
-    $nama = mysqli_real_escape_string($koneksi, trim($nama_kategori));
-
-    if (empty($nama)) {
-        return ['status' => 'error', 'pesan' => 'Nama kategori tidak boleh kosong!'];
-    }
-
-    $id_otomatis = generate_id('KTG', 'kategori', 'idKategori');
-
-    // Insert sekarang membawa tipe Aset dan idPembuat
-    $query = "INSERT INTO kategori (idKategori, namaKategori, statusKategori, tipeKategori, idPembuat) 
-              VALUES ('$id_otomatis', '$nama', 'Draft', 'Aset', '$id_pembuat')";
-
-    if (mysqli_query($koneksi, $query)) {
-        $_SESSION['draft_kategori_id'] = $id_otomatis;
-        $_SESSION['draft_kategori_nama'] = $nama;
-        $_SESSION['notif_tipe'] = 'success';
-        $_SESSION['notif_pesan'] = 'Kategori berhasil dibuat. Form otomatis dikunci ke Draft baru.';
-
-        return ['status' => 'success', 'id' => $id_otomatis, 'nama' => $nama];
-    }
-
-    return ['status' => 'error', 'pesan' => 'Gagal menyimpan ke database MySQL!'];
-}
-
-/**
  * FUNGSI 31: AMBIL PILIHAN SUPPLIER (Karyawan Internal)
  * Ditampilkan di Dropdown Kepala GA. Diurutkan dari yang tugasnya paling sedikit.
  */
@@ -1048,7 +1018,8 @@ function buat_pdf_pengajuan($id_pengadaan)
 }
 
 /**
- * FUNGSI 33: GENERATE ULANG PDF PENAWARAN (SUPPLIER + FINANCE)
+ * FUNGSI 34: GENERATE ULANG PDF PENAWARAN (SUPPLIER + FINANCE)
+ * Dinamis: Jika sudah di-ACC Finance, PDF berubah wujud menampilkan rincian total dana.
  */
 function buat_pdf_penawaran($id_pengadaan)
 {
@@ -1066,6 +1037,7 @@ function buat_pdf_penawaran($id_pengadaan)
 
     $nama_supplier = $data['namaSupplier'] ? $data['namaSupplier'] : "(........................................)";
     $nama_finance = !empty($data['namaFinance']) ? $data['namaFinance'] : "(........................................)";
+    $is_finance_acc = ($data['statusPengadaan'] === 'Disetujui Finance');
 
     // Ambil Data JSON Vendor
     $explode = explode('|||VENDOR|||', $data['alasanKebutuhan']);
@@ -1073,30 +1045,72 @@ function buat_pdf_penawaran($id_pengadaan)
     $array_vendor = json_decode($json_vendor, true);
 
     $html_baris = '';
-    $grand_total = 0;
+    $tfoot_html = '';
+    $grand_total_pengeluaran = 0;
+    $total_unit_acc = 0;
 
     if (is_array($array_vendor)) {
         foreach ($array_vendor as $index => $v) {
             $harga_rp = "Rp " . number_format($v['harga'], 0, ',', '.');
 
-            // Hitung Total Harga per Toko
-            $total_harga = $v['stok'] * $v['harga'];
-            $total_rp = "Rp " . number_format($total_harga, 0, ',', '.');
-            $grand_total += $total_harga;
+            // LOGIKA JIKA PDF DICETAK ULANG OLEH FINANCE
+            if ($is_finance_acc) {
+                $is_selected = isset($v['is_selected']) && $v['is_selected'];
+                $qty_acc = isset($v['qty_acc']) ? $v['qty_acc'] : 0;
 
-            $html_baris .= "
-            <tr>
-                <td style='text-align:center;'>" . ($index + 1) . "</td>
-                <td><strong>{$v['toko']}</strong></td>
-                <td>{$v['spek']}</td>
-                <td style='text-align:center;'>{$v['stok']} Unit</td>
-                <td style='text-align:right;'>{$harga_rp}</td>
-                <td style='text-align:right; font-weight:bold; color:#1d4197;'>{$total_rp}</td>
-            </tr>";
+                if ($is_selected) {
+                    $status_html = "<span style='color:#198754; font-weight:bold;'>Disetujui ($qty_acc Unit)</span>";
+                    $subtotal_acc = $qty_acc * $v['harga'];
+                    $grand_total_pengeluaran += $subtotal_acc;
+                    $total_unit_acc += $qty_acc;
+
+                    $total_rp_tampil = "Rp " . number_format($subtotal_acc, 0, ',', '.');
+                } else {
+                    $status_html = "<span style='color:#dc3545; font-weight:bold;'>Ditolak</span>";
+                    $total_rp_tampil = "-";
+                }
+
+                $html_baris .= "
+                <tr>
+                    <td style='text-align:center;'>" . ($index + 1) . "</td>
+                    <td><strong>{$v['toko']}</strong></td>
+                    <td>{$v['spek']}</td>
+                    <td style='text-align:right;'>{$harga_rp}</td>
+                    <td style='text-align:center;'>{$status_html}</td>
+                    <td style='text-align:right; font-weight:bold; color:#1d4197;'>{$total_rp_tampil}</td>
+                </tr>";
+            }
+            // LOGIKA JIKA PDF DIBUAT PERTAMA KALI OLEH SUPPLIER
+            else {
+                $total_stok_rp = "Rp " . number_format($v['stok'] * $v['harga'], 0, ',', '.');
+                $html_baris .= "
+                <tr>
+                    <td style='text-align:center;'>" . ($index + 1) . "</td>
+                    <td><strong>{$v['toko']}</strong></td>
+                    <td>{$v['spek']}</td>
+                    <td style='text-align:center;'>{$v['stok']} Unit</td>
+                    <td style='text-align:right;'>{$harga_rp}</td>
+                    <td style='text-align:right; font-weight:bold; color:#1d4197;'>{$total_stok_rp}</td>
+                </tr>";
+            }
         }
     }
 
-    $grand_total_rp = "Rp " . number_format($grand_total, 0, ',', '.');
+    // Header & Footer dinamis berdasarkan status
+    if ($is_finance_acc) {
+        $header_tabel = '<tr><th width="5%">No.</th><th width="20%">Nama Toko/Vendor</th><th width="25%">Spesifikasi</th><th width="15%">Harga Satuan</th><th width="15%">Keputusan</th><th width="20%">Total Harga</th></tr>';
+        $grand_total_rp = "Rp " . number_format($grand_total_pengeluaran, 0, ',', '.');
+        $tfoot_html = "
+        <tfoot>
+            <tr style='background-color:#e8f0fe;'>
+                <td colspan='4' style='text-align:right; font-weight:bold; color:#dc3545;'>TOTAL DANA DICAIRKAN :</td>
+                <td style='text-align:center; font-weight:bold; color:#1d4197;'>{$total_unit_acc} Unit</td>
+                <td style='text-align:right; font-weight:bold; color:#dc3545;'>{$grand_total_rp}</td>
+            </tr>
+        </tfoot>";
+    } else {
+        $header_tabel = '<tr><th width="5%">No.</th><th width="20%">Nama Toko/Vendor</th><th width="30%">Spesifikasi / Keterangan</th><th width="10%">Stok</th><th width="15%">Harga Satuan</th><th width="20%">Total Harga (Max)</th></tr>';
+    }
 
     $html = '
     <!DOCTYPE html>
@@ -1124,25 +1138,13 @@ function buat_pdf_penawaran($id_pengadaan)
         
         <div class="info-box">
             <p style="margin:0;"><strong>ID Pengadaan :</strong> ' . $id_pengadaan . '</p>
-            <p style="margin:5px 0;"><strong>Kebutuhan :</strong> ' . $data['namaKategori'] . ' - ' . $data['namaKebutuhan'] . ' (' . $data['jumlah'] . ' Unit)</p>
+            <p style="margin:5px 0;"><strong>Kebutuhan :</strong> ' . $data['namaKategori'] . ' - ' . $data['namaKebutuhan'] . ' (' . $data['jumlah'] . ' Unit Diajukan)</p>
         </div>
 
-        <p>Berdasarkan survei pasar yang telah dilakukan, berikut adalah perbandingan harga dari beberapa vendor eksternal untuk diputuskan oleh Departemen Finance:</p>
-
         <table class="table-vendor">
-            <thead>
-                <tr>
-                    <th width="5%">No.</th>
-                    <th width="20%">Nama Toko/Vendor</th>
-                    <th width="30%">Spesifikasi / Keterangan</th>
-                    <th width="10%">Stok</th>
-                    <th width="15%">Harga Satuan</th>
-                    <th width="20%">Total Harga</th>
-                </tr>
-            </thead>
-            <tbody>
-                ' . $html_baris . '
-            </tbody>
+            <thead>' . $header_tabel . '</thead>
+            <tbody>' . $html_baris . '</tbody>
+            ' . $tfoot_html . '
         </table>
 
         <table class="tabel-ttd">
@@ -1152,7 +1154,7 @@ function buat_pdf_penawaran($id_pengadaan)
             </tr>
         </table>
 
-        <div class="footer">Dokumen ini dicetak otomatis dan dilampirkan sebagai bahan pertimbangan Finance.</div>
+        <div class="footer">Dokumen ini dicetak otomatis dan dilampirkan sebagai dokumen resmi pencairan dana.</div>
     </body>
     </html>';
 
@@ -1168,35 +1170,185 @@ function buat_pdf_penawaran($id_pengadaan)
 }
 
 /**
- * FUNGSI 34: PROSES PENOLAKAN PEMINJAMAN DENGAN ALASAN (AJAX)
+ * FUNGSI 35: SCRIPT DINAMIS KEPALA GA (VALIDASI)
  */
-function proses_tolak_peminjaman_ajax($id_peminjaman, $alasan_tolak, $id_tendik, $dept_tendik)
+function script_dinamis_kepalaga_approve($has_supplier)
 {
-    global $koneksi;
+    $supplier_bool = $has_supplier ? 'true' : 'false';
+    return "
+    <script>
+        const hasSupplier = {$supplier_bool};
+        function toggleKeputusan() {
+            let isSetuju = document.getElementById('aksi_setuju').checked;
+            let panelSupplier = document.getElementById('panel_supplier');
+            let panelTolak = document.getElementById('panel_tolak');
+            let inputAlasanTolak = document.getElementById('input_alasan_tolak');
+            let btnSubmit = document.getElementById('btn_submit');
 
-    $id = mysqli_real_escape_string($koneksi, $id_peminjaman);
-    $alasan = mysqli_real_escape_string($koneksi, trim($alasan_tolak));
+            if (isSetuju) {
+                panelSupplier.style.display = 'block'; panelTolak.style.display = 'none';
+                inputAlasanTolak.removeAttribute('required');
+                if (!hasSupplier) {
+                    btnSubmit.disabled = true; btnSubmit.classList.replace('btn-astar', 'btn-secondary');
+                } else {
+                    btnSubmit.disabled = false; btnSubmit.classList.replace('btn-secondary', 'btn-astar');
+                }
+            } else {
+                panelSupplier.style.display = 'none'; panelTolak.style.display = 'block';
+                inputAlasanTolak.setAttribute('required', 'required');
+                btnSubmit.disabled = false; btnSubmit.classList.replace('btn-secondary', 'btn-astar');
+            }
+        }
+        window.onload = toggleKeputusan;
+    </script>";
+}
 
-    if (empty($alasan)) {
-        return ['status' => 'error', 'pesan' => 'Alasan penolakan tidak boleh kosong!'];
-    }
+/**
+ * FUNGSI 36: SCRIPT DINAMIS SUPPLIER (INPUT HARGA & STOK)
+ */
+function script_dinamis_supplier_input($kebutuhan_jumlah)
+{
+    return "
+    <script>
+        const targetKebutuhan = {$kebutuhan_jumlah};
+        function cekTotalStok() {
+            let inputs = document.querySelectorAll('.input-stok');
+            let totalStok = 0;
+            inputs.forEach(function(input) { totalStok += parseInt(input.value) || 0; });
+            document.getElementById('teks_total_stok').innerText = totalStok;
+            let btnSubmit = document.getElementById('btn_submit');
+            let peringatan = document.getElementById('peringatan_stok');
+            if (totalStok < targetKebutuhan) {
+                btnSubmit.disabled = true; btnSubmit.classList.replace('btn-astar', 'btn-secondary');
+                peringatan.style.display = 'block';
+            } else {
+                btnSubmit.disabled = false; btnSubmit.classList.replace('btn-secondary', 'btn-astar');
+                peringatan.style.display = 'none';
+            }
+        }
+        function tambahBaris() {
+            let container = document.getElementById('vendor_container');
+            let html_baru = `
+                <div class=\"row g-2 mb-3 vendor-row align-items-start\">
+                    <div class=\"col-md-3\"><input type=\"text\" name=\"nama_toko[]\" class=\"form-control\" style=\"border: 2px solid #e0e6ed;\" required placeholder=\"Nama Toko\"></div>
+                    <div class=\"col-md-4\"><input type=\"text\" name=\"spek_toko[]\" class=\"form-control\" style=\"border: 2px solid #e0e6ed;\" required placeholder=\"Keterangan\"></div>
+                    <div class=\"col-md-1\"><input type=\"number\" name=\"stok_toko[]\" class=\"form-control fw-bold border-danger input-stok\" required min=\"1\" placeholder=\"...\" oninput=\"cekTotalStok()\"></div>
+                    <div class=\"col-md-3\">
+                        <div class=\"input-group\"><span class=\"input-group-text bg-light fw-bold\">Rp</span><input type=\"number\" name=\"harga_toko[]\" class=\"form-control fw-bold\" style=\"border: 2px solid #e0e6ed;\" required placeholder=\"1000\" min=\"1000\"></div>
+                    </div>
+                    <div class=\"col-md-1\"><button type=\"button\" class=\"btn btn-outline-danger w-100 fw-bold\" onclick=\"hapusBaris(this)\"><i class=\"bi bi-x-lg\"></i></button></div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', html_baru); cekTotalStok();
+        }
+        function hapusBaris(btn) {
+            let row = btn.closest('.vendor-row');
+            if (document.querySelectorAll('.vendor-row').length > 1) { row.remove(); cekTotalStok(); } 
+            else { alert('Minimal harus ada 2 vendor perbandingan!'); }
+        }
+        window.onload = cekTotalStok;
+    </script>";
+}
 
-    if (!validasi_otoritas_tendik($id, $dept_tendik)) {
-        return ['status' => 'error', 'pesan' => 'Akses Ditolak! Mahasiswa ini bukan dari Program Studi Anda.'];
-    }
+/**
+ * FUNGSI 37: SCRIPT DINAMIS FINANCE (ACC PENCAIRAN)
+ */
+function script_dinamis_finance_approve($kebutuhan_jumlah)
+{
+    return "
+    <script>
+        const targetKebutuhan = parseInt({$kebutuhan_jumlah});
+        function toggleKeputusan() {
+            let isSetuju = document.getElementById('aksi_setuju').checked;
+            let panelVendor = document.getElementById('panel_vendor');
+            let panelTolak = document.getElementById('panel_tolak');
+            let inputAlasanTolak = document.getElementById('input_alasan_tolak');
+            let btnSubmit = document.getElementById('btn_submit');
+            
+            if (isSetuju) {
+                panelVendor.style.display = 'block'; panelTolak.style.display = 'none';
+                inputAlasanTolak.removeAttribute('required'); updateTotal();
+            } else {
+                panelVendor.style.display = 'none'; panelTolak.style.display = 'block';
+                inputAlasanTolak.setAttribute('required', 'required');
+                btnSubmit.disabled = false; btnSubmit.classList.remove('btn-secondary', 'btn-astar');
+                btnSubmit.classList.add('btn-danger'); btnSubmit.innerHTML = 'Tolak Pengadaan <i class=\"bi bi-x-lg ms-1\"></i>';
+            }
+        }
+        function updateTotal() {
+            let checkboxes = document.querySelectorAll('.chk-vendor');
+            let totalUnit = 0; let totalRp = 0;
+            checkboxes.forEach(function(chk) {
+                if (chk.checked) {
+                    totalUnit += parseInt(chk.getAttribute('data-stok')) || 0;
+                    totalRp += parseInt(chk.getAttribute('data-harga')) || 0;
+                }
+            });
+            document.getElementById('display_total_unit').value = totalUnit + ' Unit';
+            document.getElementById('display_total_rp').value = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalRp);
 
-    $query = "UPDATE transaksi_peminjaman 
-              SET statusPeminjaman = 'Ditolak', 
-                  idTendik = '$id_tendik',
-                  alasanPenolakan_peminjaman = '$alasan' 
-              WHERE idPeminjaman = '$id'";
+            let btnSubmit = document.getElementById('btn_submit');
+            let peringatan = document.getElementById('peringatan_qty');
 
-    if (mysqli_query($koneksi, $query)) {
-        // Set notifikasi sukses untuk ditampilkan setelah halaman refresh
-        $_SESSION['notif_tipe'] = 'success';
-        $_SESSION['notif_pesan'] = 'Peminjaman berhasil ditolak dan alasan telah dikirim ke mahasiswa.';
-        return ['status' => 'success'];
-    }
+            if (totalUnit < targetKebutuhan) {
+                btnSubmit.disabled = true; btnSubmit.classList.remove('btn-astar', 'btn-danger');
+                btnSubmit.classList.add('btn-secondary'); peringatan.style.display = 'block';
+            } else {
+                btnSubmit.disabled = false; btnSubmit.classList.remove('btn-secondary', 'btn-danger');
+                btnSubmit.classList.add('btn-astar'); peringatan.style.display = 'none';
+                btnSubmit.innerHTML = 'Cairkan & Lahirkan Aset <i class=\"bi bi-magic ms-1\"></i>';
+            }
+        }
+        window.onload = toggleKeputusan;
+    </script>";
+}
 
-    return ['status' => 'error', 'pesan' => 'Gagal menyimpan ke database!'];
+/**
+ * FUNGSI 38: SCRIPT DINAMIS REPARASI (STAFF GA)
+ */
+function script_dinamis_reparasi()
+{
+    return "
+    <script>
+        function toggleTindakan() {
+            let isKanibal = document.getElementById('aksi_kanibal') ? document.getElementById('aksi_kanibal').checked : false;
+            document.getElementById('panel_kanibal').style.display = isKanibal ? 'block' : 'none';
+            document.getElementById('panel_perbaiki').style.display = isKanibal ? 'none' : 'block';
+
+            let kompInputs = document.querySelectorAll('.komp-input');
+            kompInputs.forEach(function(input) {
+                if (isKanibal) input.setAttribute('required', 'required');
+                else input.removeAttribute('required');
+            });
+        }
+        function tambahBaris() {
+            let container = document.getElementById('komponen_container');
+            let idUnik = 'drop_' + Math.floor(Math.random() * 9000 + 1000);
+            let dropdown_html = `
+            <div class=\"custom-dropdanger-container\" id=\"container_\${idUnik}\">
+                <input type=\"hidden\" name=\"komp_kondisi[]\" id=\"input_\${idUnik}\" value=\"Sangat Baik\">
+                <div class=\"custom-dropdanger-selected\" onclick=\"toggleDropdown('\${idUnik}')\">
+                    <span id=\"text_\${idUnik}\">Sangat Baik</span>
+                    <i class=\"bi bi-chevron-down float-end\"></i>
+                </div>
+                <div class=\"custom-dropdanger-options shadow\" id=\"options_\${idUnik}\">
+                    <div class=\"custom-dropdanger-item active\" onclick=\"selectOption('\${idUnik}', 'Sangat Baik', 'Sangat Baik')\">Sangat Baik</div>
+                    <div class=\"custom-dropdanger-item\" onclick=\"selectOption('\${idUnik}', 'Layak Pakai', 'Layak Pakai')\">Layak Pakai</div>
+                </div>
+            </div>`;
+            let html_baru = `
+                <div class=\"row g-2 mb-3 komponen-row align-items-center\">
+                    <div class=\"col-md-4\"><input type=\"text\" name=\"komp_nama[]\" class=\"form-control komp-input\" style=\"border: 2px solid #e0e6ed;\" placeholder=\"Nama Komponen\" required></div>
+                    <div class=\"col-md-4\"><input type=\"text\" name=\"komp_spek[]\" class=\"form-control komp-input\" style=\"border: 2px solid #e0e6ed;\" placeholder=\"Spesifikasi\" required></div>
+                    <div class=\"col-md-3\">\${dropdown_html}</div>
+                    <div class=\"col-md-1\"><button type=\"button\" class=\"btn btn-outline-danger w-100 fw-bold\" onclick=\"hapusBaris(this)\"><i class=\"bi bi-x-lg\"></i></button></div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', html_baru);
+        }
+        function hapusBaris(btn) {
+            let row = btn.closest('.komponen-row');
+            if (document.querySelectorAll('.komponen-row').length > 1) row.remove();
+            else alert('Minimal harus ada 1 komponen yang diselamatkan jika memilih Kanibal!');
+        }
+        window.onload = toggleTindakan;
+    </script>";
 }

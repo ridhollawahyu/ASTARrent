@@ -176,62 +176,6 @@ include '../../../../components/header.php';
     </div>
 </div>
 
-<script>
-    const targetKebutuhan = <?= $kebutuhan_jumlah ?>;
-
-    function cekTotalStok() {
-        let inputs = document.querySelectorAll('.input-stok');
-        let totalStok = 0;
-
-        inputs.forEach(function(input) {
-            totalStok += parseInt(input.value) || 0;
-        });
-
-        document.getElementById('teks_total_stok').innerText = totalStok;
-
-        let btnSubmit = document.getElementById('btn_submit');
-        let peringatan = document.getElementById('peringatan_stok');
-
-        // VALIDASI: Kunci jika stok kurang
-        if (totalStok < targetKebutuhan) {
-            btnSubmit.disabled = true;
-            btnSubmit.classList.replace('btn-astar', 'btn-secondary');
-            peringatan.style.display = 'block';
-        } else {
-            btnSubmit.disabled = false;
-            btnSubmit.classList.replace('btn-secondary', 'btn-astar');
-            peringatan.style.display = 'none';
-        }
-    }
-
-    function tambahBaris() {
-        let container = document.getElementById('vendor_container');
-        let html_baru = `
-            <div class="row g-2 mb-3 vendor-row align-items-start">
-                <div class="col-md-3"><input type="text" name="nama_toko[]" class="form-control" style="border: 2px solid #e0e6ed;" required placeholder="Nama Toko"></div>
-                <div class="col-md-4"><input type="text" name="spek_toko[]" class="form-control" style="border: 2px solid #e0e6ed;" required placeholder="Keterangan"></div>
-                <div class="col-md-1"><input type="number" name="stok_toko[]" class="form-control fw-bold border-danger input-stok" required min="0" value="0" oninput="cekTotalStok()"></div>
-                <div class="col-md-3">
-                    <div class="input-group"><span class="input-group-text bg-light fw-bold">Rp</span><input type="number" name="harga_toko[]" class="form-control fw-bold" style="border: 2px solid #e0e6ed;" required min="1000"></div>
-                </div>
-                <div class="col-md-1"><button type="button" class="btn btn-outline-danger w-100 fw-bold" onclick="hapusBaris(this)"><i class="bi bi-x-lg"></i></button></div>
-            </div>`;
-        container.insertAdjacentHTML('beforeend', html_baru);
-        cekTotalStok(); // Hitung ulang setelah nambah
-    }
-
-    function hapusBaris(btn) {
-        let row = btn.closest('.vendor-row');
-        if (document.querySelectorAll('.vendor-row').length > 1) {
-            row.remove();
-            cekTotalStok(); // Hitung ulang setelah hapus
-        } else {
-            alert('Minimal harus ada 2 vendor perbandingan!');
-        }
-    }
-
-    // Inisialisasi hitungan awal
-    window.onload = cekTotalStok;
-</script>
+<?= script_dinamis_supplier_input($kebutuhan_jumlah); ?>
 
 <?php include '../../../../components/footer.php'; ?>

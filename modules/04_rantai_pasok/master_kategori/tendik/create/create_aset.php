@@ -1,24 +1,34 @@
 <?php
-// --- FILE: modules/04_rantai_pasok/master_kategori/create/create_aset.php ---
-error_reporting(0);
-ini_set('display_errors', 0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
-
-ob_start();
 require '../../../../../config/database.php';
 require '../../../../../config/functions.php';
 
-$response = ['status' => 'error', 'pesan' => 'Unknown Error'];
-
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Tenaga Pendidik') {
-    $response['pesan'] = 'Akses Ditolak!';
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    // Panggil fungsi dengan mengirimkan nama dan ID Tendik
-    $response = tambah_kategori_draft($_POST['nama_kategori'], $_SESSION['id']);
+    header('Location: ../../../../00_auth/login.php');
+    exit;
 }
 
-ob_end_clean();
-header('Content-Type: application/json; charset=utf-8');
-echo json_encode($response);
-exit;
+if (isset($_POST['submit_kategori_draft'])) {
+    global $koneksi;
+    $nama = mysqli_real_escape_string($koneksi, trim($_POST['nama_kategori']));
+    $id_pembuat = $_SESSION['id'];
+
+    if (!empty($nama)) {
+        $id_otomatis = generate_id('KTG', 'kategori', 'idKategori');
+        $query = "INSERT INTO kategori (idKategori, namaKategori, statusKategori, tipeKategori, idPembuat) 
+                  VALUES ('$id_otomatis', '$nama', 'Draft', 'Aset', '$id_pembuat')";
+
+        if (mysqli_query($koneksi, $query)) {
+            $_SESSION['draft_kategori_id'] = $id_otomatis;
+            $_SESSION['draft_kategori_nama'] = $nama;
+            set_notifikasi('success', 'Kategori baru berhasil dibuat. Form otomatis dikunci ke Draft baru.');
+        } else {
+            set_notifikasi('error', 'Gagal menyimpan ke database MySQL!');
+        }
+    }
+    // Langsung redirect ke halaman sebelumnya!
+    header('Location: ../../../transaksi_pengadaan/tendik/create.php');
+    exit;
+}

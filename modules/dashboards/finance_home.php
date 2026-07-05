@@ -7,15 +7,58 @@ include '../../config/functions.php';
 
 /** @var mysqli $koneksi */
 
+// Validasi Keamanan (Hanya Finance)
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Finance') {
-    set_notifikasi('error', 'Akses Ditolak!');
+    set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Finance.');
+    echo "<script>window.location='../00_auth/login.php';</script>";
+    exit;
+} elseif ($_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
     echo "<script>window.location='../00_auth/login.php';</script>";
     exit;
 }
 $q_tugas = mysqli_query($koneksi, "SELECT COUNT(idPengadaan) AS total FROM transaksi_pengadaan WHERE statusPengadaan = 'Harga Diinput Supplier'");
 $total_tugas = mysqli_fetch_assoc($q_tugas)['total'];
+
 include '../../components/header.php';
 ?>
+
+<style>
+    .welcome-banner {
+        background: linear-gradient(135deg, #1d4197 0%, #2a5bd4 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 30px 40px;
+        margin-bottom: 40px;
+        box-shadow: 0 10px 20px rgba(29, 65, 151, 0.2);
+    }
+
+    .menu-card {
+        border: none;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .menu-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(29, 65, 151, 0.15);
+    }
+
+    .icon-box {
+        width: 70px;
+        height: 70px;
+        background-color: #e8f0fe;
+        color: #1d4197;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        margin-bottom: 20px;
+    }
+</style>
+
 <div class="container mt-4 mb-5">
     <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #1d4197 0%, #2a5bd4 100%); color: white; border-radius: 15px; padding: 30px 40px; margin-bottom: 40px;">
         <div class="row align-items-center">
@@ -27,14 +70,18 @@ include '../../components/header.php';
     </div>
     <div class="row g-4">
         <div class="col-md-6 col-lg-4">
-            <div class="card h-100 p-4 border-0 shadow-sm" style="border-radius: 15px;">
+            <div class="card menu-card h-100 p-4">
                 <div class="card-body d-flex flex-column">
                     <div class="icon-box"><i class="bi bi-file-earmark-check-fill"></i></div>
                     <h5 class="fw-bold text-dark mb-3">Pencairan Dana Pengadaan</h5>
                     <p class="text-secondary mb-4 flex-grow-1">Tinjau proposal dari Tendik dan Supplier, setujui, dan cairkan dana untuk proses Pengadaan.</p>
-                    <a href="../04_rantai_pasok/transaksi_pengadaan/finance/index.php" class="btn btn-astar mt-auto py-2 fw-bold">
-                        Cek Antrean
-                        <?php if ($total_tugas > 0) echo "<span class='badge bg-danger ms-2'>$total_tugas</span>"; ?>
+                    <a href="../04_rantai_pasok/transaksi_pengadaan/finance/index.php" class="btn btn-astar mt-auto py-2 fw-bold position-relative">
+                        Lihat Antrean Pengajuan <i class="bi bi-arrow-right ms-2"></i>
+                        <?php if ($total_tugas > 0): ?>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white shadow-sm" style="font-size: 0.85rem;">
+                                <?= $total_tugas; ?>
+                            </span>
+                        <?php endif; ?>
                     </a>
                 </div>
             </div>

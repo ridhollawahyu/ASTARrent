@@ -60,7 +60,7 @@ if (isset($_POST['mulai'])) {
 
     // UPDATE TIKET LAMA MENJADI 'SEDANG DIKERJAKAN'
     $q_update = "UPDATE reparasi_fasilitas_aset SET 
-                 idStaffGA = '$id_staff_ga', 
+                 idTeknisi = '$id_staff_ga', 
                  tanggalReparasi = '$waktu_sekarang', 
                  statusReparasi = 'Sedang Dikerjakan', 
                  catatanReparasi = '$catatan_baru' 

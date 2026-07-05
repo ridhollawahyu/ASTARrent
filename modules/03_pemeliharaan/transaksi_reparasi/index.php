@@ -36,7 +36,7 @@ $query_sql = "
     FROM reparasi_fasilitas_aset r
     LEFT JOIN aset a ON r.idAset = a.idAset
     LEFT JOIN fasilitas f ON r.idFasilitas = f.idFasilitas
-    LEFT JOIN users u ON r.idTendik = u.idUser
+    LEFT JOIN users u ON r.idPelapor = u.idUser
     WHERE 1=1 $filter_status
     ORDER BY r.tanggalLapor ASC
 ";

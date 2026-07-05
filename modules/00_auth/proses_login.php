@@ -39,7 +39,22 @@ if (isset($_POST["login"])) {
             exit;
         }
     }
-    // 2. JIKA BUKAN USER, CEK DI TABEL MAHASISWA
+
+    // 2. JIKA BUKAN USER, CEK TABEL SUPPLIER (BARU!)
+    $cek_supplier = mysqli_query($koneksi, "SELECT * FROM supplier WHERE idSupplier = '$id_login' OR emailSupplier = '$id_login'");
+    if (mysqli_num_rows($cek_supplier) === 1) {
+        $row = mysqli_fetch_assoc($cek_supplier);
+        if (password_verify($password, $row["passSupplier"])) {
+            $_SESSION["login"] = true;
+            $_SESSION["role"] = "Supplier";
+            $_SESSION["id"] = $row["idSupplier"];
+            $_SESSION["status"] = $row["statusSupplier"];
+            header("Location: ../dashboards/supplier_home.php");
+            exit;
+        }
+    }
+
+    // 3. JIKA BUKAN USER, CEK DI TABEL MAHASISWA
     else {
         $cek_mhs = mysqli_query($koneksi, "SELECT * FROM mahasiswa WHERE nimMahasiswa = '$id_login' OR emailMahasiswa = '$id_login'");
 

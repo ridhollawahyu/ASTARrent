@@ -24,8 +24,9 @@ $dept_tendik = $_SESSION['departemen'];
 $hitung_request = mysqli_query($koneksi, "
     SELECT COUNT(tp.idPeminjaman) AS total_antrean 
     FROM transaksi_peminjaman tp 
-    JOIN mahasiswa m ON tp.nimMahasiswa = m.nimMahasiswa 
-    WHERE tp.statusPeminjaman = 'Menunggu' AND m.kodeProdi_mahasiswa = '$dept_tendik'
+    JOIN mahasiswa m ON tp.nimMahasiswa = m.nimMahasiswa
+    JOIN fasilitas f ON tp.idFasilitas = f.idFasilitas
+    WHERE tp.statusPeminjaman = 'Menunggu' AND m.kodeProdi_mahasiswa = '$dept_tendik' AND f.tipeFasilitas != 'Non-Akademik'
 ");
 $data_antrean = mysqli_fetch_assoc($hitung_request);
 $total_antrean = $data_antrean['total_antrean'];
@@ -35,12 +36,12 @@ $hitung_request = mysqli_query($koneksi, "
     SELECT COUNT(tp.idPeminjaman) AS total_antrean 
     FROM transaksi_peminjaman tp 
     JOIN mahasiswa m ON tp.nimMahasiswa = m.nimMahasiswa 
-    WHERE tp.statusPeminjaman = 'Disetujui' AND m.kodeProdi_mahasiswa = '$dept_tendik'
+    JOIN fasilitas f ON tp.idFasilitas = f.idFasilitas
+    WHERE tp.statusPeminjaman = 'Disetujui' AND m.kodeProdi_mahasiswa = '$dept_tendik' AND f.tipeFasilitas != 'Non-Akademik'
 ");
 $data_antreanP = mysqli_fetch_assoc($hitung_request);
 $total_antreanP = $data_antreanP['total_antrean'];
 
-// 4. PANGGIL HEADER HTML SETELAH LOGIKA SELESAI
 include '../../components/header.php';
 ?>
 
@@ -104,7 +105,7 @@ include '../../components/header.php';
                     <div class="icon-box"><i class="bi bi-pc-display"></i></div>
                     <h5 class="fw-bold text-dark mb-3">Pengelolaan Kategori Fasilitas</h5>
                     <p class="text-secondary mb-4 flex-grow-1">Kelola data inventaris barang elektronik, cek ketersediaan, dan update kondisi aset.</p>
-                    <a href="../04_rantai_pasok/master_kategori/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Aset <i class="bi bi-arrow-right ms-2"></i></a>
+                    <a href="../04_rantai_pasok/master_kategori/tendik/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Aset <i class="bi bi-arrow-right ms-2"></i></a>
                 </div>
             </div>
         </div>
@@ -128,7 +129,7 @@ include '../../components/header.php';
                     <div class="icon-box"><i class="bi bi-house-up-fill"></i></div>
                     <h5 class="fw-bold text-dark mb-3">Pengelolaan Fasilitas</h5>
                     <p class="text-secondary mb-4 flex-grow-1">Kelola data Fasilitas ruangan, lapangan, lalu cek ketersediaan, dan update kondisi fasilitas.</p>
-                    <a href="../02_kedisiplinan/master_fasilitas/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Aset <i class="bi bi-arrow-right ms-2"></i></a>
+                    <a href="../02_kedisiplinan/master_fasilitas/tendik/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Aset <i class="bi bi-arrow-right ms-2"></i></a>
                 </div>
             </div>
         </div>
@@ -166,7 +167,7 @@ include '../../components/header.php';
                     <p class="text-secondary mb-4 flex-grow-1">Tinjau dan berikan persetujuan (Approve) untuk Pengembalian mahasiswa.</p>
 
                     <!-- PERBAIKAN: Tombol Dengan Badge Notifikasi Angka Merah -->
-                    <a href="../02_kedisiplinan/transaksi_pengembalian/index.php" class="btn btn-astar mt-auto py-2 fw-bold position-relative">
+                    <a href="../02_kedisiplinan/transaksi_pengembalian/tendik/index.php" class="btn btn-astar mt-auto py-2 fw-bold position-relative">
                         Lihat Data <i class="bi bi-arrow-right ms-2"></i>
 
                         <?php if ($total_antreanP > 0): ?>
@@ -190,8 +191,8 @@ include '../../components/header.php';
                     <p class="text-secondary mb-4 flex-grow-1">Tinjau dan berikan persetujuan (Approve) untuk Pengembalian mahasiswa.</p>
 
                     <!-- PERBAIKAN: Tombol Dengan Badge Notifikasi Angka Merah -->
-                    <a href="../04_rantai_pasok/transaksi_pengadaan/tendik/" class="btn btn-astar mt-auto py-2 fw-bold position-relative">
-                        Lihat Data <i class="bi bi-arrow-right ms-2"></i>
+                    <a href="../04_rantai_pasok/transaksi_pengadaan/tendik/index.php" class="btn btn-astar mt-auto py-2 fw-bold position-relative">
+                        Request <i class="bi bi-arrow-right ms-2"></i>
 
                         <?php if ($total_antreanP > 0): ?>
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white shadow-sm" style="font-size: 0.85rem;">

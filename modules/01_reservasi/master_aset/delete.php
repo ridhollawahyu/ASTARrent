@@ -17,7 +17,7 @@ if (isset($_GET['id'])) {
     $id = mysqli_real_escape_string($koneksi, $_GET['id']);
 
     // PERBAIKAN CERDAS: Kita TIDAK menghapus datanya, kita "Soft Delete" dengan UPDATE!
-    $query_soft_delete = "UPDATE aset SET ketersediaanAset = 'Tidak Tersedia', kondisiAset = 'Rusak Total' WHERE idAset = '$id'";
+    $query_soft_delete = "UPDATE aset SET ketersediaanAset = 'Nonaktif', kondisiAset = 'Tidak Berfungsi' WHERE idAset = '$id'";
 
     if (mysqli_query($koneksi, $query_soft_delete)) {
         set_notifikasi('success', 'Berhasil! Aset dipindahkan ke arsip (Tidak Tersedia).');

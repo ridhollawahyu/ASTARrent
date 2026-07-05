@@ -48,7 +48,7 @@ if (isset($_POST['submit'])) {
               VALUES ('$id_otomatis', '$tgl_pengajuan', '$tgl_kembali', '$keperluan', '$nim', $idAset, $idFasilitas)";
 
     if (mysqli_query($koneksi, $query)) {
-        set_notifikasi('success', "Request terkirim! Menunggu persetujuan Tendik.");
+        set_notifikasi('success', "Request terkirim! Menunggu persetujuan.");
         echo "<script>window.location='index.php';</script>";
         exit;
     } else {

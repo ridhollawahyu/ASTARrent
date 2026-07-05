@@ -1,0 +1,140 @@
+.
+├── assets
+│   ├── css
+│   ├── images
+│   │   ├── bg_kampus.png
+│   │   ├── full_logo_blue.png
+│   │   └── full_logo_white.png
+│   ├── js
+│   └── media
+│       └── bg_login_sso.mp4
+├── components
+│   ├── footer.php
+│   └── header.php
+├── composer.json
+├── composer.lock
+├── config
+│   ├── database.php
+│   └── functions.php
+├── index.php
+├── modules
+│   ├── 00_auth
+│   │   ├── login.php
+│   │   ├── logout.php
+│   │   └── proses_login.php
+│   ├── 01_reservasi
+│   │   ├── master_aset
+│   │   │   ├── create.php
+│   │   │   ├── delete.php
+│   │   │   ├── edit.php
+│   │   │   └── index.php
+│   │   ├── master_mahasiswa
+│   │   │   ├── create.php
+│   │   │   ├── delete.php
+│   │   │   ├── edit.php
+│   │   │   └── index.php
+│   │   └── transaksi_peminjaman
+│   │       ├── mahasiswa
+│   │       │   ├── create.php
+│   │       │   └── index.php
+│   │       ├── staffga
+│   │       │   ├── index.php
+│   │       │   └── proses_approve.php
+│   │       └── tendik
+│   │           ├── index.php
+│   │           └── proses_approve.php
+│   ├── 02_kedisiplinan
+│   │   ├── master_fasilitas
+│   │   │   ├── staffga
+│   │   │   │   ├── create.php
+│   │   │   │   ├── delete.php
+│   │   │   │   ├── edit.php
+│   │   │   │   └── index.php
+│   │   │   └── tendik
+│   │   │       ├── create.php
+│   │   │       ├── delete.php
+│   │   │       ├── edit.php
+│   │   │       └── index.php
+│   │   ├── master_sanksi
+│   │   │   ├── create.php
+│   │   │   ├── delete.php
+│   │   │   ├── edit.php
+│   │   │   └── index.php
+│   │   └── transaksi_pengembalian
+│   │       ├── staffga
+│   │       │   ├── index.php
+│   │       │   ├── proses_approve.php
+│   │       │   └── read.php
+│   │       └── tendik
+│   │           ├── index.php
+│   │           ├── proses_approve.php
+│   │           └── read.php
+│   ├── 03_pemeliharaan
+│   │   ├── master_komponen
+│   │   │   ├── create.php
+│   │   │   ├── delete.php
+│   │   │   ├── edit.php
+│   │   │   └── index.php
+│   │   ├── master_users
+│   │   │   ├── create.php
+│   │   │   ├── delete.php
+│   │   │   ├── edit.php
+│   │   │   └── index.php
+│   │   └── transaksi_reparasi
+│   │       ├── index.php
+│   │       ├── proses_inspeksi.php
+│   │       └── selesai_reparasi.php
+│   ├── 04_rantai_pasok
+│   │   ├── master_kategori
+│   │   │   ├── staffga
+│   │   │   │   ├── create_fasilitas.php
+│   │   │   │   ├── delete.php
+│   │   │   │   ├── edit.php
+│   │   │   │   └── index.php
+│   │   │   └── tendik
+│   │   │       ├── create
+│   │   │       │   ├── create_aset.php
+│   │   │       │   └── create_fasilitas.php
+│   │   │       ├── delete.php
+│   │   │       ├── edit.php
+│   │   │       └── index.php
+│   │   ├── master_supplier
+│   │   │   ├── create.php
+│   │   │   ├── delete.php
+│   │   │   ├── edit.php
+│   │   │   └── index.php
+│   │   └── transaksi_pengadaan
+│   │       ├── finance
+│   │       │   ├── approve.php
+│   │       │   └── index.php
+│   │       ├── kepala_ga
+│   │       │   ├── approve.php
+│   │       │   └── index.php
+│   │       ├── supplier
+│   │       │   ├── index.php
+│   │       │   └── input_harga.php
+│   │       └── tendik
+│   │           ├── create.php
+│   │           └── index.php
+│   ├── 05_laporan_sistem
+│   └── dashboards
+│       ├── finance_home.php
+│       ├── kepalaga_home.php
+│       ├── mahasiswa_home.php
+│       ├── staffga_home.php
+│       ├── superadmin_home.php
+│       ├── supplier_home.php
+│       └── tendik_home.php
+├── node_modules
+├── package-lock.json
+├── package.json
+├── setup.php
+├── tree_project.txt
+├── uploads
+│   ├── dokumen_penawaran
+│   │   └── Penawaran_PGD-00001_20260704.pdf
+│   └── dokumen_pengajuan
+│       └── Pengajuan_PGD-00001_20260703.pdf
+└── vendor
+
+47 directories, 91 files

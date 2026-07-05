@@ -644,7 +644,7 @@ function buat_tiket_reparasi_otomatis($id_pelapor, $id_aset, $id_fasilitas, $tin
         $query_update = "UPDATE reparasi_fasilitas_aset 
                          SET klasifikasiKerusakan = '$tingkat_rusak', 
                              tanggalLapor = '$waktu_lapor', 
-                             idUser_Pelapor = '$id_pelapor', 
+                             idPelapor = '$id_pelapor', 
                              catatanReparasi = '$catatan_baru' 
                          WHERE idReparasi = '$id_reparasi_lama'";
 
@@ -659,7 +659,7 @@ function buat_tiket_reparasi_otomatis($id_pelapor, $id_aset, $id_fasilitas, $tin
         $val_fasilitas = !empty($id_fasilitas) ? "'$id_fasilitas'" : "NULL";
 
         $query_insert = "INSERT INTO reparasi_fasilitas_aset 
-                  (idReparasi, idTendik, idAset, idFasilitas, tanggalLapor, klasifikasiKerusakan, statusReparasi, catatanReparasi) 
+                  (idReparasi, idPelapor, idAset, idFasilitas, tanggalLapor, klasifikasiKerusakan, statusReparasi, catatanReparasi) 
                   VALUES 
                   ('$id_reparasi_baru', '$id_pelapor', $val_aset, $val_fasilitas, '$waktu_lapor', '$tingkat_rusak', 'Menunggu GA', '$catatan_kerusakan')";
 
@@ -904,4 +904,299 @@ function script_dinamis_jabatan_dept()
     </script>
     ';
     return $html;
+}
+
+/**
+ * FUNGSI 30: TAMBAH KATEGORI DRAFT (UNTUK AJAX PENGADAAN)
+ */
+function tambah_kategori_draft($nama_kategori, $id_pembuat)
+{
+    global $koneksi;
+    $nama = mysqli_real_escape_string($koneksi, trim($nama_kategori));
+
+    if (empty($nama)) {
+        return ['status' => 'error', 'pesan' => 'Nama kategori tidak boleh kosong!'];
+    }
+
+    $id_otomatis = generate_id('KTG', 'kategori', 'idKategori');
+
+    // Insert sekarang membawa tipe Aset dan idPembuat
+    $query = "INSERT INTO kategori (idKategori, namaKategori, statusKategori, tipeKategori, idPembuat) 
+              VALUES ('$id_otomatis', '$nama', 'Draft', 'Aset', '$id_pembuat')";
+
+    if (mysqli_query($koneksi, $query)) {
+        $_SESSION['draft_kategori_id'] = $id_otomatis;
+        $_SESSION['draft_kategori_nama'] = $nama;
+        $_SESSION['notif_tipe'] = 'success';
+        $_SESSION['notif_pesan'] = 'Kategori berhasil dibuat. Form otomatis dikunci ke Draft baru.';
+
+        return ['status' => 'success', 'id' => $id_otomatis, 'nama' => $nama];
+    }
+
+    return ['status' => 'error', 'pesan' => 'Gagal menyimpan ke database MySQL!'];
+}
+
+/**
+ * FUNGSI 31: AMBIL PILIHAN SUPPLIER (Karyawan Internal)
+ * Ditampilkan di Dropdown Kepala GA. Diurutkan dari yang tugasnya paling sedikit.
+ */
+function ambil_pilihan_supplier()
+{
+    global $koneksi;
+    // Mengurutkan dari tugas paling sedikit agar pembagian tugas merata
+    $query = mysqli_query($koneksi, "SELECT idSupplier, namaSupplier, jumlahTugas_aktif 
+                                     FROM supplier 
+                                     WHERE statusSupplier = 'Aktif' 
+                                     ORDER BY jumlahTugas_aktif ASC");
+
+    $pilihan = [];
+    while ($row = mysqli_fetch_assoc($query)) {
+        // Tampilan di dropdown: "Budi Santoso (Tugas Aktif: 2)"
+        $pilihan[$row['idSupplier']] = $row['namaSupplier'] . " (Tugas Aktif: " . $row['jumlahTugas_aktif'] . ")";
+    }
+    return $pilihan;
+}
+
+/**
+ * FUNGSI 32: GENERATE ULANG PDF PENGAJUAN (TENDIK + GA + FINANCE)
+ * Fungsi ini dipanggil 3x: Saat Tendik buat, GA setuju, dan Finance setuju.
+ */
+function buat_pdf_pengajuan($id_pengadaan)
+{
+    global $koneksi;
+
+    // Ambil data transaksi beserta nama Tendik, GA, dan Finance
+    $q = "SELECT tp.*, k.namaKategori, 
+                 ut.namaUser AS namaTendik, ut.kodeDepartemen AS deptTendik,
+                 uga.namaUser AS namaGA, 
+                 uf.namaUser AS namaFinance
+          FROM transaksi_pengadaan tp
+          JOIN kategori k ON tp.idKategori = k.idKategori
+          LEFT JOIN users ut ON tp.idTendik = ut.idUser
+          LEFT JOIN users uga ON tp.idKepalaGA = uga.idUser
+          LEFT JOIN users uf ON tp.idFinance = uf.idUser
+          WHERE tp.idPengadaan = '$id_pengadaan'";
+    $data = mysqli_fetch_assoc(mysqli_query($koneksi, $q));
+
+    // Logika Tanda Tangan Dinamis
+    $nama_tendik = $data['namaTendik'];
+    $nama_ga = !empty($data['namaGA']) ? $data['namaGA'] : "(........................................)";
+    $nama_finance = !empty($data['namaFinance']) ? $data['namaFinance'] : "(........................................)";
+
+    // Bersihkan Alasan dari String Vendor (jika Supplier sudah input)
+    $alasan_full = $data['alasanKebutuhan'];
+    $explode = explode('|||VENDOR|||', $alasan_full);
+    $alasan_murni = trim($explode[0]);
+
+    $html = '
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body { font-family: "Helvetica", "Arial", sans-serif; font-size: 14px; color: #333; line-height: 1.6; }
+            .kop-surat { text-align: center; border-bottom: 3px solid #1d4197; padding-bottom: 15px; margin-bottom: 30px; }
+            .kop-surat h2 { margin: 0; color: #1d4197; font-size: 20px; text-transform: uppercase; }
+            .kop-surat p { margin: 5px 0 0 0; font-size: 12px; color: #555; }
+            .tabel-info { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+            .tabel-info td { padding: 8px; vertical-align: top; }
+            .tabel-info td:first-child { width: 30%; font-weight: bold; }
+            .alasan-box { background-color: #f9f9f9; border: 1px solid #ddd; padding: 15px; text-align: justify; }
+            .tabel-ttd { width: 100%; text-align: center; margin-top: 50px; font-size: 14px; }
+            .tabel-ttd td { width: 33.33%; vertical-align: bottom; }
+            .footer { position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 10px; }
+        </style>
+    </head>
+    <body>
+        <div class="kop-surat">
+            <h2>FORMULIR PENGAJUAN PENGADAAN ASET</h2>
+            <p>Sistem Manajemen Aset & Fasilitas Terpadu (ASTARrent) - ASTRAtech</p>
+        </div>
+        <p>Bersama surat ini, kami mengajukan permohonan pengadaan aset baru dengan rincian sebagai berikut:</p>
+        <table class="tabel-info">
+            <tr><td>ID Pengadaan</td><td>: <strong>' . $id_pengadaan . '</strong></td></tr>
+            <tr><td>Tanggal Pengajuan</td><td>: ' . date('d F Y', strtotime($data['tanggalPengadaan'])) . '</td></tr>
+            <tr><td>Kategori Aset</td><td>: ' . $data['namaKategori'] . '</td></tr>
+            <tr><td>Nama Kebutuhan</td><td>: <strong>' . $data['namaKebutuhan'] . '</strong></td></tr>
+            <tr><td>Jumlah Diminta</td><td>: <strong>' . $data['jumlah'] . ' Unit</strong></td></tr>
+        </table>
+        <h4>Alasan Kebutuhan & Tujuan Penggunaan:</h4>
+        <div class="alasan-box">' . nl2br($alasan_murni) . '</div>
+
+        <table class="tabel-ttd">
+            <tr>
+                <td>Pemohon,<br><br><br><br><br><b><u>' . $nama_tendik . '</u></b></td>
+                <td>Menyetujui (Ka. GA),<br><br><br><br><br><b><u>' . $nama_ga . '</u></b></td>
+                <td>Mengetahui (Finance),<br><br><br><br><br><b><u>' . $nama_finance . '</u></b></td>
+            </tr>
+        </table>
+
+        <div class="footer">Dokumen ini dihasilkan secara elektronik oleh sistem ASTARrent.</div>
+    </body>
+    </html>';
+
+    $options = new \Dompdf\Options();
+    $options->set('isHtml5ParserEnabled', true);
+    $dompdf = new \Dompdf\Dompdf($options);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+
+    // __DIR__ memastikan lokasi path absolute dari folder config/
+    $path_file = __DIR__ . '/../uploads/dokumen_pengajuan/' . $data['dokumen_pengajuan'];
+    file_put_contents($path_file, $dompdf->output());
+}
+
+/**
+ * FUNGSI 33: GENERATE ULANG PDF PENAWARAN (SUPPLIER + FINANCE)
+ */
+function buat_pdf_penawaran($id_pengadaan)
+{
+    global $koneksi;
+
+    $q = "SELECT tp.*, k.namaKategori, 
+                 us.namaSupplier AS namaSupplier, 
+                 uf.namaUser AS namaFinance
+          FROM transaksi_pengadaan tp
+          JOIN kategori k ON tp.idKategori = k.idKategori
+          LEFT JOIN supplier us ON tp.idSupplier = us.idSupplier
+          LEFT JOIN users uf ON tp.idFinance = uf.idUser
+          WHERE tp.idPengadaan = '$id_pengadaan'";
+    $data = mysqli_fetch_assoc(mysqli_query($koneksi, $q));
+
+    $nama_supplier = $data['namaSupplier'] ? $data['namaSupplier'] : "(........................................)";
+    $nama_finance = !empty($data['namaFinance']) ? $data['namaFinance'] : "(........................................)";
+
+    // Ambil Data JSON Vendor
+    $explode = explode('|||VENDOR|||', $data['alasanKebutuhan']);
+    $json_vendor = isset($explode[1]) ? trim($explode[1]) : '[]';
+    $array_vendor = json_decode($json_vendor, true);
+
+    $html_baris = '';
+    $grand_total = 0;
+
+    if (is_array($array_vendor)) {
+        foreach ($array_vendor as $index => $v) {
+            $harga_rp = "Rp " . number_format($v['harga'], 0, ',', '.');
+
+            // Hitung Total Harga per Toko
+            $total_harga = $v['stok'] * $v['harga'];
+            $total_rp = "Rp " . number_format($total_harga, 0, ',', '.');
+            $grand_total += $total_harga;
+
+            $html_baris .= "
+            <tr>
+                <td style='text-align:center;'>" . ($index + 1) . "</td>
+                <td><strong>{$v['toko']}</strong></td>
+                <td>{$v['spek']}</td>
+                <td style='text-align:center;'>{$v['stok']} Unit</td>
+                <td style='text-align:right;'>{$harga_rp}</td>
+                <td style='text-align:right; font-weight:bold; color:#1d4197;'>{$total_rp}</td>
+            </tr>";
+        }
+    }
+
+    $grand_total_rp = "Rp " . number_format($grand_total, 0, ',', '.');
+
+    $html = '
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body { font-family: "Helvetica", "Arial", sans-serif; font-size: 13px; color: #333; line-height: 1.6; }
+            .kop-surat { text-align: center; border-bottom: 3px solid #1d4197; padding-bottom: 15px; margin-bottom: 30px; }
+            .kop-surat h2 { margin: 0; color: #1d4197; font-size: 20px; text-transform: uppercase; }
+            .info-box { background-color: #f4f6f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+            .table-vendor { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            .table-vendor th, .table-vendor td { border: 1px solid #ddd; padding: 8px; }
+            .table-vendor th { background-color: #1d4197; color: white; text-align: center; }
+            .tabel-ttd { width: 100%; text-align: center; margin-top: 50px; font-size: 14px; }
+            .tabel-ttd td { width: 50%; vertical-align: bottom; }
+            .footer { position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 10px; }
+        </style>
+    </head>
+    <body>
+        <div class="kop-surat">
+            <h2>DOKUMEN PENAWARAN & PERBANDINGAN HARGA VENDOR</h2>
+            <p>Sistem Manajemen Aset & Fasilitas Terpadu (ASTARrent) - ASTRAtech</p>
+        </div>
+        
+        <div class="info-box">
+            <p style="margin:0;"><strong>ID Pengadaan :</strong> ' . $id_pengadaan . '</p>
+            <p style="margin:5px 0;"><strong>Kebutuhan :</strong> ' . $data['namaKategori'] . ' - ' . $data['namaKebutuhan'] . ' (' . $data['jumlah'] . ' Unit)</p>
+        </div>
+
+        <p>Berdasarkan survei pasar yang telah dilakukan, berikut adalah perbandingan harga dari beberapa vendor eksternal untuk diputuskan oleh Departemen Finance:</p>
+
+        <table class="table-vendor">
+            <thead>
+                <tr>
+                    <th width="5%">No.</th>
+                    <th width="20%">Nama Toko/Vendor</th>
+                    <th width="30%">Spesifikasi / Keterangan</th>
+                    <th width="10%">Stok</th>
+                    <th width="15%">Harga Satuan</th>
+                    <th width="20%">Total Harga</th>
+                </tr>
+            </thead>
+            <tbody>
+                ' . $html_baris . '
+            </tbody>
+        </table>
+
+        <table class="tabel-ttd">
+            <tr>
+                <td>Disurvei Oleh (Supplier),<br><br><br><br><br><b><u>' . $nama_supplier . '</u></b></td>
+                <td>Disetujui Oleh (Finance),<br><br><br><br><br><b><u>' . $nama_finance . '</u></b></td>
+            </tr>
+        </table>
+
+        <div class="footer">Dokumen ini dicetak otomatis dan dilampirkan sebagai bahan pertimbangan Finance.</div>
+    </body>
+    </html>';
+
+    $options = new \Dompdf\Options();
+    $options->set('isHtml5ParserEnabled', true);
+    $dompdf = new \Dompdf\Dompdf($options);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+
+    $path_file = __DIR__ . '/../uploads/dokumen_penawaran/' . $data['dokumen_penawaran'];
+    file_put_contents($path_file, $dompdf->output());
+}
+
+/**
+ * FUNGSI 34: PROSES PENOLAKAN PEMINJAMAN DENGAN ALASAN (AJAX)
+ */
+function proses_tolak_peminjaman_ajax($id_peminjaman, $alasan_tolak, $id_tendik, $dept_tendik)
+{
+    global $koneksi;
+
+    $id = mysqli_real_escape_string($koneksi, $id_peminjaman);
+    $alasan = mysqli_real_escape_string($koneksi, trim($alasan_tolak));
+
+    if (empty($alasan)) {
+        return ['status' => 'error', 'pesan' => 'Alasan penolakan tidak boleh kosong!'];
+    }
+
+    if (!validasi_otoritas_tendik($id, $dept_tendik)) {
+        return ['status' => 'error', 'pesan' => 'Akses Ditolak! Mahasiswa ini bukan dari Program Studi Anda.'];
+    }
+
+    $query = "UPDATE transaksi_peminjaman 
+              SET statusPeminjaman = 'Ditolak', 
+                  idTendik = '$id_tendik',
+                  alasanPenolakan_peminjaman = '$alasan' 
+              WHERE idPeminjaman = '$id'";
+
+    if (mysqli_query($koneksi, $query)) {
+        // Set notifikasi sukses untuk ditampilkan setelah halaman refresh
+        $_SESSION['notif_tipe'] = 'success';
+        $_SESSION['notif_pesan'] = 'Peminjaman berhasil ditolak dan alasan telah dikirim ke mahasiswa.';
+        return ['status' => 'success'];
+    }
+
+    return ['status' => 'error', 'pesan' => 'Gagal menyimpan ke database!'];
 }

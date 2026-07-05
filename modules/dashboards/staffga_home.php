@@ -31,6 +31,26 @@ if ($q_reparasi) {
     $total_reparasi_menunggu = (int) mysqli_fetch_assoc($q_reparasi)['total'];
 }
 
+$dept_tendik = $_SESSION['departemen'];
+$hitung_request = mysqli_query($koneksi, "
+    SELECT COUNT(tp.idPeminjaman) AS total_antrean 
+    FROM transaksi_peminjaman tp 
+    JOIN fasilitas f ON tp.idFasilitas = f.idFasilitas
+    WHERE tp.statusPeminjaman = 'Menunggu' AND f.tipeFasilitas = 'Non-Akademik'
+");
+$data_antrean = mysqli_fetch_assoc($hitung_request);
+$total_antrean = $data_antrean['total_antrean'];
+
+// 3. QUERY PENGHITUNG ANTREAN PENGEMBALIAN
+$hitung_request = mysqli_query($koneksi, "
+    SELECT COUNT(tp.idPeminjaman) AS total_antrean 
+    FROM transaksi_peminjaman tp 
+    JOIN fasilitas f ON tp.idFasilitas = f.idFasilitas
+    WHERE tp.statusPeminjaman = 'Disetujui' AND f.tipeFasilitas = 'Non-Akademik'
+");
+$data_antreanP = mysqli_fetch_assoc($hitung_request);
+$total_antreanP = $data_antreanP['total_antrean'];
+
 include '../../components/header.php';
 ?>
 
@@ -86,6 +106,8 @@ include '../../components/header.php';
     </div>
 
     <div class="row g-4">
+
+        <!-- Menu 1: Master Komponen -->
         <div class="col-md-6 col-lg-4">
             <div class="card menu-card h-100 p-4">
                 <div class="card-body d-flex flex-column">
@@ -105,6 +127,79 @@ include '../../components/header.php';
             </div>
         </div>
 
+        <!-- Menu 2: Master Kategori (Fasilitas) -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card menu-card h-100 p-4">
+                <div class="card-body d-flex flex-column">
+                    <div class="icon-box"><i class="bi bi-pc-display"></i></div>
+                    <h5 class="fw-bold text-dark mb-3">Pengelolaan Kategori Fasilitas</h5>
+                    <p class="text-secondary mb-4 flex-grow-1">Kelola data inventaris barang elektronik, cek ketersediaan, dan update kondisi aset.</p>
+                    <a href="../04_rantai_pasok/master_kategori/staffga/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Aset <i class="bi bi-arrow-right ms-2"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu 3: Master Fasilitas -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card menu-card h-100 p-4">
+                <div class="card-body d-flex flex-column">
+                    <div class="icon-box"><i class="bi bi-house-up-fill"></i></div>
+                    <h5 class="fw-bold text-dark mb-3">Pengelolaan Fasilitas</h5>
+                    <p class="text-secondary mb-4 flex-grow-1">Kelola data Fasilitas ruangan, lapangan, lalu cek ketersediaan, dan update kondisi fasilitas.</p>
+                    <a href="../02_kedisiplinan/master_fasilitas/staffga/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Aset <i class="bi bi-arrow-right ms-2"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu 4: Approval Peminjaman -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card menu-card h-100 p-4">
+                <div class="card-body d-flex flex-column">
+                    <div class="icon-box"><i class="bi bi-check-circle-fill"></i></div>
+                    <h5 class="fw-bold text-dark mb-3">Persetujuan Peminjaman</h5>
+                    <p class="text-secondary mb-4 flex-grow-1">Tinjau dan berikan persetujuan (Approve) untuk permintaan peminjaman mahasiswa.</p>
+
+                    <!-- PERBAIKAN: Tombol Dengan Badge Notifikasi Angka Merah -->
+                    <a href="../01_reservasi/transaksi_peminjaman/staffga/index.php" class="btn btn-astar mt-auto py-2 fw-bold position-relative">
+                        Lihat Request <i class="bi bi-arrow-right ms-2"></i>
+
+                        <?php if ($total_antrean > 0): ?>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white shadow-sm" style="font-size: 0.85rem;">
+                                <?= $total_antrean; ?>
+                                <span class="visually-hidden">request baru</span>
+                            </span>
+                        <?php endif; ?>
+
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu 5: Approval Pengembalian -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card menu-card h-100 p-4">
+                <div class="card-body d-flex flex-column">
+                    <div class="icon-box"><i class="bi bi-check-circle-fill"></i></div>
+                    <h5 class="fw-bold text-dark mb-3">Persetujuan Pengembalian</h5>
+                    <p class="text-secondary mb-4 flex-grow-1">Tinjau dan berikan persetujuan (Approve) untuk Pengembalian mahasiswa.</p>
+
+                    <!-- PERBAIKAN: Tombol Dengan Badge Notifikasi Angka Merah -->
+                    <a href="../02_kedisiplinan/transaksi_pengembalian/staffga/index.php" class="btn btn-astar mt-auto py-2 fw-bold position-relative">
+                        Lihat Data <i class="bi bi-arrow-right ms-2"></i>
+
+                        <?php if ($total_antreanP > 0): ?>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white shadow-sm" style="font-size: 0.85rem;">
+                                <?= $total_antreanP; ?>
+                                <span class="visually-hidden">request baru</span>
+                            </span>
+                        <?php endif; ?>
+
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu 6: Transaksi Reparasi -->
         <div class="col-md-6 col-lg-4">
             <div class="card menu-card h-100 p-4">
                 <div class="card-body d-flex flex-column">

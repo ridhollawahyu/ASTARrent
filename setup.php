@@ -72,8 +72,10 @@ $tables = [
     "CREATE TABLE IF NOT EXISTS kategori (
         idKategori VARCHAR(20) PRIMARY KEY NOT NULL,
         namaKategori VARCHAR(100) NOT NULL,
-        statusKategori ENUM('Aktif', 'Nonaktif') DEFAULT 'Aktif' NOT NULL,
-        tipeKategori ENUM('Aset', 'Fasilitas') NOT NULL
+        statusKategori ENUM('Aktif', 'Nonaktif', 'Draft') DEFAULT 'Aktif' NOT NULL,
+        tipeKategori ENUM('Aset', 'Fasilitas Akademik', 'Fasilitas Non-Akademik') NOT NULL,
+        idPembuat VARCHAR(20) NOT NULL,
+        FOREIGN KEY (idPembuat) REFERENCES users(idUsers) ON UPDATE CASCADE,
     )",
 
     // 6. TRANSAKSI PENGADAAN
@@ -81,7 +83,7 @@ $tables = [
         idPengadaan VARCHAR(20) PRIMARY KEY NOT NULL,
         idKategori VARCHAR(20) NOT NULL,
         idTendik VARCHAR(20) NOT NULL,
-        idKepalaGA VARCHAR(20) NULL,
+        idKepalaGA VARCHAR(20) NOT NULL,
         idSupplier VARCHAR(20) NULL,
         idFinance VARCHAR(20) NULL,
         namaKebutuhan VARCHAR(255) NOT NULL,
@@ -91,6 +93,7 @@ $tables = [
         statusPengadaan ENUM('Draft', 'Disetujui GA', 'Harga Diinput Supplier', 'Disetujui Finance', 'Ditolak') DEFAULT 'Draft' NOT NULL,
         dokumen_pengajuan VARCHAR(255) NULL,
         dokumen_penawaran VARCHAR(255) NULL,
+        alasanPenolakan_pengadaan TEXT NOT NULL,
         FOREIGN KEY (idKategori) REFERENCES kategori(idKategori) ON UPDATE CASCADE,
         FOREIGN KEY (idTendik) REFERENCES users(idUser) ON UPDATE CASCADE,
         FOREIGN KEY (idKepalaGA) REFERENCES users(idUser) ON UPDATE CASCADE,
@@ -113,13 +116,14 @@ $tables = [
     // 8. MASTER FASILITAS
     "CREATE TABLE IF NOT EXISTS fasilitas (
         idFasilitas VARCHAR(20) PRIMARY KEY NOT NULL,
-        idTendik VARCHAR(20) NOT NULL,
+        idPengelola VARCHAR(20) NOT NULL,
         idKategori VARCHAR(20) NOT NULL,
         namaFasilitas VARCHAR(100) NOT NULL,
         lokasiFasilitas VARCHAR(100) NOT NULL,
+        tipeFasilitas ENUM('Akademik', 'Non-Akademik') NOT NULL,
         kondisiFasilitas ENUM('Normal', 'Berfungsi', 'Tidak Berfungsi') DEFAULT 'Normal' NOT NULL,
         ketersediaanFasilitas ENUM('Tersedia', 'Dipinjam', 'Tidak Tersedia', 'Sedang Diperbaiki', 'Nonaktif') DEFAULT 'Tersedia' NOT NULL,
-        FOREIGN KEY (idTendik) REFERENCES users(idUser) ON UPDATE CASCADE,
+        FOREIGN KEY (idPengelola) REFERENCES users(idUser) ON UPDATE CASCADE,
         FOREIGN KEY (idKategori) REFERENCES kategori(idKategori) ON UPDATE CASCADE
     )",
 
@@ -127,7 +131,7 @@ $tables = [
     "CREATE TABLE IF NOT EXISTS transaksi_peminjaman (
         idPeminjaman VARCHAR(20) PRIMARY KEY NOT NULL,
         nimMahasiswa VARCHAR(20) NOT NULL,
-        idTendik VARCHAR(20) NULL,
+        idPenyetuju VARCHAR(20) NULL,
         idAset VARCHAR(20) NULL,
         idFasilitas VARCHAR(20) NULL,
         tanggalPengajuan DATETIME NOT NULL,
@@ -145,21 +149,21 @@ $tables = [
     "CREATE TABLE IF NOT EXISTS transaksi_pengembalian (
         idPengembalian VARCHAR(20) PRIMARY KEY NOT NULL,
         idPeminjaman VARCHAR(20) NOT NULL UNIQUE,
-        idTendik VARCHAR(20) NOT NULL,
+        idPengurus VARCHAR(20) NOT NULL,
         idSanksi VARCHAR(20) NULL,
         tanggalPengembalian DATETIME NOT NULL,
         kondisiFisik ENUM('Normal', 'Berfungsi', 'Tidak Berfungsi') NOT NULL,
         catatanPengembalian TEXT NULL,
         FOREIGN KEY (idPeminjaman) REFERENCES transaksi_peminjaman(idPeminjaman) ON UPDATE CASCADE,
-        FOREIGN KEY (idTendik) REFERENCES users(idUser) ON UPDATE CASCADE,
+        FOREIGN KEY (idPengurus) REFERENCES users(idUser) ON UPDATE CASCADE,
         FOREIGN KEY (idSanksi) REFERENCES sanksi(idSanksi) ON UPDATE CASCADE
     )",
 
     // 11. TRANSAKSI REPARASI
     "CREATE TABLE IF NOT EXISTS reparasi_fasilitas_aset (
         idReparasi VARCHAR(20) PRIMARY KEY NOT NULL,
-        idTendik VARCHAR(20) NOT NULL,
-        idStaffGA VARCHAR(20) NULL,
+        idPelapor VARCHAR(20) NOT NULL,
+        idTeknisi VARCHAR(20) NULL,
         idAset VARCHAR(20) NULL,
         idFasilitas VARCHAR(20) NULL,
         tanggalLapor DATETIME NOT NULL,
@@ -168,8 +172,8 @@ $tables = [
         klasifikasiKerusakan ENUM('Normal', 'Berfungsi', 'Tidak Berfungsi') NOT NULL,
         catatanReparasi TEXT NOT NULL,
         statusReparasi ENUM('Menunggu GA', 'Sedang Dikerjakan', 'Selesai', 'Dikanibal') DEFAULT 'Menunggu GA' NOT NULL,
-        FOREIGN KEY (idTendik) REFERENCES users(idUser) ON UPDATE CASCADE,
-        FOREIGN KEY (idStaffGA) REFERENCES users(idUser) ON UPDATE CASCADE,
+        FOREIGN KEY (idPelapor) REFERENCES users(idUser) ON UPDATE CASCADE,
+        FOREIGN KEY (idTeknisi) REFERENCES users(idUser) ON UPDATE CASCADE,
         FOREIGN KEY (idAset) REFERENCES aset(idAset) ON UPDATE CASCADE,
         FOREIGN KEY (idFasilitas) REFERENCES fasilitas(idFasilitas) ON UPDATE CASCADE
     )",
@@ -211,9 +215,9 @@ $q_users = "INSERT IGNORE INTO users (idUser, namaUser, noTelp_user, jabatanUser
 mysqli_query($conn, $q_users);
 
 // A. Insert Supplier
-$q_users = "INSERT IGNORE INTO supplier (idSupplier, namaSupplier, noTelp_supplier, emailUser, passUser) VALUES 
-('TDK-00001', 'Dola', '+62813313333', 'dola@astratech.ac.id', '$password_default')";
-mysqli_query($conn, $q_users);
+$q_suppliers = "INSERT IGNORE INTO supplier (idSupplier, namaSupplier, noTelp_supplier, emailSupplier, passSupplier) VALUES 
+('SPL-00001', 'Dola', '+62813313333', 'dola@astratech.ac.id', '$password_default')";
+mysqli_query($conn, $q_suppliers);
 
 // B. Insert Mahasiswa TRPL
 $q_mhs = "INSERT IGNORE INTO mahasiswa (nimMahasiswa, namaMahasiswa, kodeProdi_mahasiswa, noTelp_mahasiswa, emailMahasiswa, passMahasiswa) VALUES 

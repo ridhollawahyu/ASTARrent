@@ -14,7 +14,7 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Tenaga Pendidik') {
     exit;
 }
 
-$where_sql = "WHERE aset.ketersediaanAset != 'Tidak Tersedia'";
+$where_sql = "WHERE aset.ketersediaanAset != 'Tidak Tersedia' AND aset.ketersediaanAset != 'Nonaktif'";
 
 $status_terpilih = "";
 $kategori_terpilih = "";
@@ -67,11 +67,12 @@ include '../../../components/header.php';
             <div class="col-md-3 col-sm-6">
                 <?php
                 $opsi_status = [
-                    '' => '-- Status Default (Aktif) --',
+                    '' => 'Status Default (Tersedia)',
                     'Tersedia' => 'Hanya Tersedia',
                     'Dipinjam' => 'Sedang Dipinjam',
                     'Sedang Diperbaiki' => 'Sedang Diperbaiki (Reparasi)',
-                    'Tidak Tersedia' => 'Arsip (Soft Delete)',
+                    'Tidak Tersedia' => 'Tidak Tersedia',
+                    'Nonaktif' => 'Arsip (Soft Delete)',
                     'Semua_Termasuk_Arsip' => 'Tampilkan Semua Data'
                 ];
                 // Panggil fungsi Custom Dropdown kita (Tanpa wajib diisi/false)
@@ -148,8 +149,10 @@ include '../../../components/header.php';
                                     <span class="badge bg-primary rounded-pill px-3">Dipinjam</span>
                                 <?php elseif ($data['ketersediaanAset'] == 'Sedang Diperbaiki'): ?>
                                     <span class="badge bg-warning text-dark rounded-pill px-3">Sedang Diperbaiki</span>
-                                <?php else: ?>
+                                <?php elseif ($data['ketersediaanAset'] == 'Tidak Tersedia'): ?>
                                     <span class="badge bg-secondary rounded-pill px-3">Tidak Tersedia</span>
+                                <?php else: ?>
+                                    <span class="badge bg-dark rounded-pill px-3">Nonaktif</span>
                                 <?php endif; ?>
                             </td>
 

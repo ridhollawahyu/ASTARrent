@@ -1,4 +1,5 @@
 <?php
+// --- FILE: modules/01_reservasi/transaksi_peminjaman/mahasiswa/index.php ---
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
@@ -7,7 +8,6 @@ include '../../../../config/functions.php';
 
 /** @var mysqli $koneksi */
 
-// Validasi Akses: HANYA MAHASISWA
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Mahasiswa') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Mahasiswa.');
     header('Location: ../../../00_auth/login.php');
@@ -16,7 +16,7 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Mahasiswa') {
 
 validasi_kadaluwarsa_peminjaman();
 
-$nim_login = $_SESSION['id']; // Ambil NIM dari session
+$nim_login = $_SESSION['id'];
 
 include '../../../../components/header.php';
 ?>
@@ -26,7 +26,7 @@ include '../../../../components/header.php';
         <h5 class="mb-0 text-white fw-bold"><i class="bi bi-clock-history me-2"></i>Riwayat Peminjaman Anda</h5>
         <div>
             <a href="../../../dashboards/mahasiswa_home.php" class="btn btn-outline-light btn-sm fw-bold me-2"><i class="bi bi-arrow-left"></i> Dashboard</a>
-            <a href="create.php" class="btn btn-light btn-sm fw-bold text-astar">+ Ajukan Baru</a>
+            <a href="create.php" class="btn btn-light btn-sm fw-bold text-astar"><i class="bi bi-plus-circle me-1"></i> Ajukan Baru</a>
         </div>
     </div>
 
@@ -42,15 +42,13 @@ include '../../../../components/header.php';
                     <tr>
                         <th class="text-center" width="5%">No.</th>
                         <th>Tanggal Pengajuan</th>
-                        <th>Barang yang Dipinjam</th>
+                        <th class="text-start">Barang yang Dipinjam</th>
                         <th>Rencana Kembali</th>
-                        <th>Status</th>
+                        <th>Status & Detail</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    // QUERY CERDAS: Mengambil data Aset dan Fasilitas (salah satu pasti NULL karena XOR)
-                    // HANYA mengambil data milik NIM yang sedang login!
                     $query_sql = "
                         SELECT tp.*, a.namaAset, f.namaFasilitas 
                         FROM transaksi_peminjaman tp
@@ -64,8 +62,6 @@ include '../../../../components/header.php';
                     $no = 1;
 
                     while ($data = mysqli_fetch_array($query)) {
-
-                        // Menentukan nama barang yang dipinjam (Aset atau Fasilitas)
                         if ($data['idAset'] != NULL) {
                             $nama_barang = "<span class='badge bg-secondary me-1'>Aset</span> " . $data['namaAset'];
                         } else {
@@ -78,16 +74,25 @@ include '../../../../components/header.php';
                             <td class="text-start fw-bold text-secondary"><?= $nama_barang; ?></td>
                             <td class="text-danger fw-bold"><?= date('d M Y, H:i', strtotime($data['tanggalRencana_kembali'])); ?></td>
 
-                            <!-- PEWARNAAN STATUS DENGAN BADGE -->
+                            <!-- STATUS & ALASAN PENOLAKAN -->
                             <td>
                                 <?php if ($data['statusPeminjaman'] == 'Menunggu'): ?>
                                     <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">Menunggu</span>
+
                                 <?php elseif ($data['statusPeminjaman'] == 'Disetujui'): ?>
-                                    <span class="badge bg-primary px-3 py-2 rounded-pill">Disetujui</span>
+                                    <span class="badge bg-primary px-3 py-2 rounded-pill">Disetujui (Sedang Dipinjam)</span>
+
                                 <?php elseif ($data['statusPeminjaman'] == 'Ditolak'): ?>
-                                    <span class="badge bg-danger px-3 py-2 rounded-pill">Ditolak</span>
+                                    <span class="badge bg-danger px-3 py-2 rounded-pill mb-1">Ditolak</span><br>
+
+                                    <!-- Tombol Info Alasan Penolakan -->
+                                    <button type="button" class="btn btn-sm btn-outline-danger mt-1" style="font-size: 11px; padding: 2px 8px; border-radius: 5px;"
+                                        onclick="lihatDetailTeks('<?= htmlspecialchars(addslashes($data['alasanPenolakan_peminjaman'] ?? 'Tidak ada alasan.')) ?>')">
+                                        <i class="bi bi-info-circle me-1"></i> Cek Alasan
+                                    </button>
+
                                 <?php else: ?>
-                                    <span class="badge bg-success px-3 py-2 rounded-pill">Selesai</span>
+                                    <span class="badge bg-success px-3 py-2 rounded-pill">Selesai Dikembalikan</span>
                                 <?php endif; ?>
                             </td>
                         </tr>

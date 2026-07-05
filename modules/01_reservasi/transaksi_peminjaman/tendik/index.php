@@ -39,18 +39,16 @@ include '../../../../components/header.php';
                 </thead>
                 <tbody>
                     <?php
-                    // Ambil departemen tendik yang lagi login
                     $dept_tendik = $_SESSION['departemen'];
-
-                    // QUERY CERDAS: HANYA TAMPILKAN MAHASISWA YANG PRODINYA SAMA DENGAN TENDIK!
                     $queryTransaksi = mysqli_query($koneksi, "
                         SELECT tp.*, m.namaMahasiswa, m.kodeProdi_mahasiswa, a.namaAset, f.namaFasilitas, u.namaUser
                         FROM transaksi_peminjaman tp
                         JOIN mahasiswa m ON tp.nimMahasiswa = m.nimMahasiswa
                         LEFT JOIN aset a ON tp.idAset = a.idAset
                         LEFT JOIN fasilitas f ON tp.idFasilitas = f.idFasilitas
-                        LEFT JOIN users u ON tp.idTendik = u.idUser
-                        WHERE m.kodeProdi_mahasiswa = '$dept_tendik' 
+                        LEFT JOIN users u ON tp.idPenyetuju = u.idUser
+                        WHERE m.kodeProdi_mahasiswa = '$dept_tendik'
+                        AND (tp.idAset IS NOT NULL OR f.tipeFasilitas = 'Akademik')
                         ORDER BY tp.tanggalPengajuan DESC
                     ");
 
@@ -58,20 +56,19 @@ include '../../../../components/header.php';
 
                     while ($data = mysqli_fetch_array($queryTransaksi)) {
                         $nama_barang = ($data['idAset'] != NULL) ? "[Aset] " . $data['namaAset'] : "[Fasilitas] " . $data['namaFasilitas'];
-                        $nama_tendik = ($data['idTendik'] != NULL) ? $data['namaUser'] : "Belum Dikelola";
-                        if ($data['statusPeminjaman'] == "Ditolak") {
-                            $nama_tendik = "Ditolak";
-                        }
+                        $nama_tendik = ($data['idPenyetuju'] != NULL) ? $data['namaUser'] : "Belum Dikelola";
                     ?>
                         <tr>
                             <td class="fw-bold"><?= $no++; ?></td>
                             <td class="text-start"><?= $data['namaMahasiswa']; ?></td>
                             <td class="text-start fw-bold text-secondary"><?= $nama_barang; ?></td>
                             <td><?= date('d M Y, H:i', strtotime($data['tanggalRencana_kembali'])); ?></td>
-                            <td><button type="button" class="btn btn-sm fw-bold" style="color: #1d4197; background-color: #e8f0fe; border: none; border-radius: 6px;"
+                            <td>
+                                <button type="button" class="btn btn-sm fw-bold" style="color: #1d4197; background-color: #e8f0fe; border: none; border-radius: 6px;"
                                     onclick="lihatDetailTeks('<?= htmlspecialchars(addslashes($data['keperluan'])) ?>')">
                                     <i class="bi bi-eye-fill me-1"></i> Detail
-                                </button></td>
+                                </button>
+                            </td>
                             <td class="text-center fw-bold text-secondary"><?= $nama_tendik; ?></td>
                             <td>
                                 <?php if ($data['statusPeminjaman'] == 'Menunggu'): ?>
@@ -86,10 +83,10 @@ include '../../../../components/header.php';
                             </td>
                             <td class="text-center">
                                 <?php if ($data['statusPeminjaman'] == 'Menunggu'): ?>
-                                    <!-- Tombol Setuju & Tolak yang diarahkan ke proses_approve.php -->
                                     <div class="d-flex justify-content-center gap-2">
                                         <a href="proses_approve.php?id=<?= $data['idPeminjaman']; ?>&aksi=setuju" class="btn btn-success btn-sm fw-bold"><i class="bi bi-check-lg"></i> Setuju</a>
-                                        <a href="proses_approve.php?id=<?= $data['idPeminjaman']; ?>&aksi=tolak" class="btn btn-danger btn-sm fw-bold"><i class="bi bi-x-lg"></i> Tolak</a>
+
+                                        <button type="button" onclick="bukaModalTolak('<?= $data['idPeminjaman']; ?>', 'proses_approve.php')" class="btn btn-danger btn-sm fw-bold"><i class="bi bi-x-lg"></i> Tolak</button>
                                     </div>
                                 <?php else: ?>
                                     <span class="text-muted"><i class="bi bi-lock-fill"></i> Selesai</span>
@@ -98,7 +95,6 @@ include '../../../../components/header.php';
                         </tr>
                     <?php } ?>
 
-                    <!-- Jika data kosong -->
                     <?php if (mysqli_num_rows($queryTransaksi) == 0): ?>
                         <tr>
                             <td colspan="8" class="py-4 text-muted fst-italic">Tidak ada Antrean Peminjaman yang ditemukan.</td>
@@ -109,4 +105,5 @@ include '../../../../components/header.php';
         </div>
     </div>
 </div>
+
 <?php include '../../../../components/footer.php'; ?>

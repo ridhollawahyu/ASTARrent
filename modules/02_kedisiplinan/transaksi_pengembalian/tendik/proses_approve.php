@@ -35,7 +35,7 @@ if (isset($_POST['submit_pengembalian'])) {
 
     // Insert ke tabel Pengembalian
     $id_pengembalian = generate_id('KMB', 'transaksi_pengembalian', 'idPengembalian');
-    $q_insert = "INSERT INTO transaksi_pengembalian (idPengembalian, idPeminjaman, idTendik, idSanksi, tanggalPengembalian, kondisiFisik, catatanPengembalian) 
+    $q_insert = "INSERT INTO transaksi_pengembalian (idPengembalian, idPeminjaman, idPengurus, idSanksi, tanggalPengembalian, kondisiFisik, catatanPengembalian) 
                  VALUES ('$id_pengembalian', '$id_peminjaman', '$id_tendik', '$id_sanksi', '$waktu_sekarang', '$kondisi_fisik', '$catatan')";
 
     if (mysqli_query($koneksi, $q_insert)) {

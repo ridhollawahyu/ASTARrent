@@ -25,8 +25,10 @@ $hitung_request = mysqli_query($koneksi, "
     SELECT COUNT(tp.idPeminjaman) AS total_antrean 
     FROM transaksi_peminjaman tp 
     JOIN mahasiswa m ON tp.nimMahasiswa = m.nimMahasiswa
-    JOIN fasilitas f ON tp.idFasilitas = f.idFasilitas
-    WHERE tp.statusPeminjaman = 'Menunggu' AND m.kodeProdi_mahasiswa = '$dept_tendik' AND f.tipeFasilitas != 'Non-Akademik'
+    LEFT JOIN fasilitas f ON tp.idFasilitas = f.idFasilitas
+    LEFT JOIN aset a ON tp.idAset = a.idAset
+    WHERE tp.statusPeminjaman = 'Menunggu' AND m.kodeProdi_mahasiswa = '$dept_tendik'
+    AND (tp.idAset IS NOT NULL OR f.tipeFasilitas = 'Akademik')
 ");
 $data_antrean = mysqli_fetch_assoc($hitung_request);
 $total_antrean = $data_antrean['total_antrean'];
@@ -36,8 +38,10 @@ $hitung_request = mysqli_query($koneksi, "
     SELECT COUNT(tp.idPeminjaman) AS total_antrean 
     FROM transaksi_peminjaman tp 
     JOIN mahasiswa m ON tp.nimMahasiswa = m.nimMahasiswa 
-    JOIN fasilitas f ON tp.idFasilitas = f.idFasilitas
-    WHERE tp.statusPeminjaman = 'Disetujui' AND m.kodeProdi_mahasiswa = '$dept_tendik' AND f.tipeFasilitas != 'Non-Akademik'
+    LEFT JOIN fasilitas f ON tp.idFasilitas = f.idFasilitas
+    LEFT JOIN aset a ON tp.idAset = a.idAset
+    WHERE tp.statusPeminjaman = 'Disetujui' AND m.kodeProdi_mahasiswa = '$dept_tendik'
+    AND (tp.idAset IS NOT NULL OR f.tipeFasilitas = 'Akademik')
 ");
 $data_antreanP = mysqli_fetch_assoc($hitung_request);
 $total_antreanP = $data_antreanP['total_antrean'];
@@ -190,17 +194,9 @@ include '../../components/header.php';
                     <h5 class="fw-bold text-dark mb-3">Request Pengadaan</h5>
                     <p class="text-secondary mb-4 flex-grow-1">Tinjau dan berikan persetujuan (Approve) untuk Pengembalian mahasiswa.</p>
 
-                    <!-- PERBAIKAN: Tombol Dengan Badge Notifikasi Angka Merah -->
                     <a href="../04_rantai_pasok/transaksi_pengadaan/tendik/index.php" class="btn btn-astar mt-auto py-2 fw-bold position-relative">
                         Request <i class="bi bi-arrow-right ms-2"></i>
-
-                        <?php if ($total_antreanP > 0): ?>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white shadow-sm" style="font-size: 0.85rem;">
-                                <?= $total_antreanP; ?>
-                                <span class="visually-hidden">request baru</span>
-                            </span>
-                        <?php endif; ?>
-
+                        <span class="visually-hidden">request baru</span>
                     </a>
                 </div>
             </div>

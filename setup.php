@@ -141,7 +141,7 @@ $tables = [
         statusPeminjaman ENUM('Menunggu', 'Disetujui', 'Ditolak', 'Selesai') DEFAULT 'Menunggu' NOT NULL,
         alasanPenolakan_pengadaan TEXT NULL,
         FOREIGN KEY (nimMahasiswa) REFERENCES mahasiswa(nimMahasiswa) ON UPDATE CASCADE,
-        FOREIGN KEY (idTendik) REFERENCES users(idUser) ON UPDATE CASCADE,
+        FOREIGN KEY (idPenyetuju) REFERENCES users(idUser) ON UPDATE CASCADE,
         FOREIGN KEY (idAset) REFERENCES aset(idAset) ON UPDATE CASCADE,
         FOREIGN KEY (idFasilitas) REFERENCES fasilitas(idFasilitas) ON UPDATE CASCADE
     )",

@@ -929,13 +929,12 @@ function ambil_pilihan_supplier()
 
 /**
  * FUNGSI 32: GENERATE ULANG PDF PENGAJUAN (TENDIK + GA + FINANCE)
- * Fungsi ini dipanggil 3x: Saat Tendik buat, GA setuju, dan Finance setuju.
+ * Dinamis: Menyuntikkan Stempel Elektronik jika sudah di-ACC
  */
 function buat_pdf_pengajuan($id_pengadaan)
 {
     global $koneksi;
 
-    // Ambil data transaksi beserta nama Tendik, GA, dan Finance
     $q = "SELECT tp.*, k.namaKategori, 
                  ut.namaUser AS namaTendik, ut.kodeDepartemen AS deptTendik,
                  uga.namaUser AS namaGA, 
@@ -948,15 +947,27 @@ function buat_pdf_pengajuan($id_pengadaan)
           WHERE tp.idPengadaan = '$id_pengadaan'";
     $data = mysqli_fetch_assoc(mysqli_query($koneksi, $q));
 
-    // Logika Tanda Tangan Dinamis
     $nama_tendik = $data['namaTendik'];
     $nama_ga = !empty($data['namaGA']) ? $data['namaGA'] : "(........................................)";
     $nama_finance = !empty($data['namaFinance']) ? $data['namaFinance'] : "(........................................)";
 
-    // Bersihkan Alasan dari String Vendor (jika Supplier sudah input)
     $alasan_full = $data['alasanKebutuhan'];
     $explode = explode('|||VENDOR|||', $alasan_full);
     $alasan_murni = trim($explode[0]);
+
+    // =========================================================================
+    // TRIK BASE64: MEMBACA GAMBAR STEMPEL DARI FOLDER ASSETS
+    // =========================================================================
+    $path_tendik = __DIR__ . '/../assets/images/stamp_tendik.png';
+    $path_ga = __DIR__ . '/../assets/images/stamp_kepalaga.png';
+    $path_finance = __DIR__ . '/../assets/images/stamp_finance.png';
+
+    // Tendik selalu muncul karena dia pembuatnya
+    $img_tendik = file_exists($path_tendik) ? '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_tendik)) . '" height="70">' : '<br><br><br>';
+
+    // Kepala GA dan Finance hanya muncul jika kolom di DB tidak kosong
+    $img_ga = !empty($data['namaGA']) && file_exists($path_ga) ? '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_ga)) . '" height="70">' : '<br><br><br>';
+    $img_finance = !empty($data['namaFinance']) && file_exists($path_finance) ? '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_finance)) . '" height="70">' : '<br><br><br>';
 
     $html = '
     <!DOCTYPE html>
@@ -974,6 +985,7 @@ function buat_pdf_pengajuan($id_pengadaan)
             .alasan-box { background-color: #f9f9f9; border: 1px solid #ddd; padding: 15px; text-align: justify; }
             .tabel-ttd { width: 100%; text-align: center; margin-top: 50px; font-size: 14px; }
             .tabel-ttd td { width: 33.33%; vertical-align: bottom; }
+            .stempel-box { height: 75px; margin: 10px 0; }
             .footer { position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 10px; }
         </style>
     </head>
@@ -995,9 +1007,9 @@ function buat_pdf_pengajuan($id_pengadaan)
 
         <table class="tabel-ttd">
             <tr>
-                <td>Pemohon,<br><br><br><br><br><b><u>' . $nama_tendik . '</u></b></td>
-                <td>Menyetujui (Ka. GA),<br><br><br><br><br><b><u>' . $nama_ga . '</u></b></td>
-                <td>Mengetahui (Finance),<br><br><br><br><br><b><u>' . $nama_finance . '</u></b></td>
+                <td>Pemohon,<br><div class="stempel-box">' . $img_tendik . '</div><b><u>' . $nama_tendik . '</u></b></td>
+                <td>Menyetujui (Ka. GA),<br><div class="stempel-box">' . $img_ga . '</div><b><u>' . $nama_ga . '</u></b></td>
+                <td>Mengetahui (Finance),<br><div class="stempel-box">' . $img_finance . '</div><b><u>' . $nama_finance . '</u></b></td>
             </tr>
         </table>
 
@@ -1012,14 +1024,13 @@ function buat_pdf_pengajuan($id_pengadaan)
     $dompdf->setPaper('A4', 'portrait');
     $dompdf->render();
 
-    // __DIR__ memastikan lokasi path absolute dari folder config/
     $path_file = __DIR__ . '/../uploads/dokumen_pengajuan/' . $data['dokumen_pengajuan'];
     file_put_contents($path_file, $dompdf->output());
 }
 
 /**
- * FUNGSI 34: GENERATE ULANG PDF PENAWARAN (SUPPLIER + FINANCE)
- * Dinamis: Jika sudah di-ACC Finance, PDF berubah wujud menampilkan rincian total dana.
+ * FUNGSI 33: GENERATE ULANG PDF PENAWARAN (SUPPLIER + FINANCE)
+ * Dinamis: Menyuntikkan Stempel Elektronik jika sudah di-ACC
  */
 function buat_pdf_penawaran($id_pengadaan)
 {
@@ -1039,7 +1050,15 @@ function buat_pdf_penawaran($id_pengadaan)
     $nama_finance = !empty($data['namaFinance']) ? $data['namaFinance'] : "(........................................)";
     $is_finance_acc = ($data['statusPengadaan'] === 'Disetujui Finance');
 
-    // Ambil Data JSON Vendor
+    // =========================================================================
+    // TRIK BASE64 UNTUK STEMPEL SUPPLIER & FINANCE
+    // =========================================================================
+    $path_supplier = __DIR__ . '/../assets/images/stamp_supplier.png';
+    $path_finance = __DIR__ . '/../assets/images/stamp_finance.png';
+
+    $img_supplier = file_exists($path_supplier) ? '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_supplier)) . '" height="70">' : '<br><br><br>';
+    $img_finance = !empty($data['namaFinance']) && file_exists($path_finance) ? '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_finance)) . '" height="70">' : '<br><br><br>';
+
     $explode = explode('|||VENDOR|||', $data['alasanKebutuhan']);
     $json_vendor = isset($explode[1]) ? trim($explode[1]) : '[]';
     $array_vendor = json_decode($json_vendor, true);
@@ -1053,7 +1072,6 @@ function buat_pdf_penawaran($id_pengadaan)
         foreach ($array_vendor as $index => $v) {
             $harga_rp = "Rp " . number_format($v['harga'], 0, ',', '.');
 
-            // LOGIKA JIKA PDF DICETAK ULANG OLEH FINANCE
             if ($is_finance_acc) {
                 $is_selected = isset($v['is_selected']) && $v['is_selected'];
                 $qty_acc = isset($v['qty_acc']) ? $v['qty_acc'] : 0;
@@ -1063,7 +1081,6 @@ function buat_pdf_penawaran($id_pengadaan)
                     $subtotal_acc = $qty_acc * $v['harga'];
                     $grand_total_pengeluaran += $subtotal_acc;
                     $total_unit_acc += $qty_acc;
-
                     $total_rp_tampil = "Rp " . number_format($subtotal_acc, 0, ',', '.');
                 } else {
                     $status_html = "<span style='color:#dc3545; font-weight:bold;'>Ditolak</span>";
@@ -1079,9 +1096,7 @@ function buat_pdf_penawaran($id_pengadaan)
                     <td style='text-align:center;'>{$status_html}</td>
                     <td style='text-align:right; font-weight:bold; color:#1d4197;'>{$total_rp_tampil}</td>
                 </tr>";
-            }
-            // LOGIKA JIKA PDF DIBUAT PERTAMA KALI OLEH SUPPLIER
-            else {
+            } else {
                 $total_stok_rp = "Rp " . number_format($v['stok'] * $v['harga'], 0, ',', '.');
                 $html_baris .= "
                 <tr>
@@ -1096,7 +1111,6 @@ function buat_pdf_penawaran($id_pengadaan)
         }
     }
 
-    // Header & Footer dinamis berdasarkan status
     if ($is_finance_acc) {
         $header_tabel = '<tr><th width="5%">No.</th><th width="20%">Nama Toko/Vendor</th><th width="25%">Spesifikasi</th><th width="15%">Harga Satuan</th><th width="15%">Keputusan</th><th width="20%">Total Harga</th></tr>';
         $grand_total_rp = "Rp " . number_format($grand_total_pengeluaran, 0, ',', '.');
@@ -1127,6 +1141,7 @@ function buat_pdf_penawaran($id_pengadaan)
             .table-vendor th { background-color: #1d4197; color: white; text-align: center; }
             .tabel-ttd { width: 100%; text-align: center; margin-top: 50px; font-size: 14px; }
             .tabel-ttd td { width: 50%; vertical-align: bottom; }
+            .stempel-box { height: 75px; margin: 10px 0; }
             .footer { position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 10px; }
         </style>
     </head>
@@ -1149,8 +1164,8 @@ function buat_pdf_penawaran($id_pengadaan)
 
         <table class="tabel-ttd">
             <tr>
-                <td>Disurvei Oleh (Supplier),<br><br><br><br><br><b><u>' . $nama_supplier . '</u></b></td>
-                <td>Disetujui Oleh (Finance),<br><br><br><br><br><b><u>' . $nama_finance . '</u></b></td>
+                <td>Disurvei Oleh (Supplier),<br><div class="stempel-box">' . $img_supplier . '</div><b><u>' . $nama_supplier . '</u></b></td>
+                <td>Disetujui Oleh (Finance),<br><div class="stempel-box">' . $img_finance . '</div><b><u>' . $nama_finance . '</u></b></td>
             </tr>
         </table>
 

@@ -75,7 +75,7 @@ $tables = [
         statusKategori ENUM('Aktif', 'Nonaktif', 'Draft') DEFAULT 'Aktif' NOT NULL,
         tipeKategori ENUM('Aset', 'Fasilitas Akademik', 'Fasilitas Non-Akademik') NOT NULL,
         idPembuat VARCHAR(20) NOT NULL,
-        FOREIGN KEY (idPembuat) REFERENCES users(idUsers) ON UPDATE CASCADE,
+        FOREIGN KEY (idPembuat) REFERENCES users(idUser) ON UPDATE CASCADE
     )",
 
     // 6. TRANSAKSI PENGADAAN

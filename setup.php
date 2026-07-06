@@ -93,7 +93,7 @@ $tables = [
         statusPengadaan ENUM('Draft', 'Disetujui GA', 'Harga Diinput Supplier', 'Disetujui Finance', 'Ditolak') DEFAULT 'Draft' NOT NULL,
         dokumen_pengajuan VARCHAR(255) NULL,
         dokumen_penawaran VARCHAR(255) NULL,
-        alasanPenolakan_pengadaan TEXT NOT NULL,
+        alasanPenolakan_pengadaan TEXT NULL,
         FOREIGN KEY (idKategori) REFERENCES kategori(idKategori) ON UPDATE CASCADE,
         FOREIGN KEY (idTendik) REFERENCES users(idUser) ON UPDATE CASCADE,
         FOREIGN KEY (idKepalaGA) REFERENCES users(idUser) ON UPDATE CASCADE,
@@ -139,6 +139,7 @@ $tables = [
         tanggalRencana_kembali DATETIME NOT NULL,
         keperluan VARCHAR(255) NOT NULL,
         statusPeminjaman ENUM('Menunggu', 'Disetujui', 'Ditolak', 'Selesai') DEFAULT 'Menunggu' NOT NULL,
+        alasanPenolakan_pengadaan TEXT NULL,
         FOREIGN KEY (nimMahasiswa) REFERENCES mahasiswa(nimMahasiswa) ON UPDATE CASCADE,
         FOREIGN KEY (idTendik) REFERENCES users(idUser) ON UPDATE CASCADE,
         FOREIGN KEY (idAset) REFERENCES aset(idAset) ON UPDATE CASCADE,
@@ -225,10 +226,11 @@ $q_mhs = "INSERT IGNORE INTO mahasiswa (nimMahasiswa, namaMahasiswa, kodeProdi_m
 mysqli_query($conn, $q_mhs);
 
 // C. Insert Kategori
-$q_kategori = "INSERT IGNORE INTO kategori (idKategori, namaKategori, tipeKategori) VALUES 
-('KTG-00001', 'Proyektor', 'Aset'),
-('KTG-00002', 'Ruang Kelas', 'Fasilitas'),
-('KTG-00003', 'Laptop', 'Aset')";
+$q_kategori = "INSERT IGNORE INTO kategori (idKategori, namaKategori, tipeKategori, idPembuat) VALUES 
+('KTG-00001', 'Proyektor', 'Aset', 'TDK-00001'),
+('KTG-00002', 'Ruang Kelas', 'Fasilitas Akademik', 'GA-00002'),
+('KTG-00003', 'Laptop', 'Aset', 'TDK-00001'),
+('KTG-00004', 'Komunal', 'Fasilitas Non-Akademik', 'GA-00002')";
 mysqli_query($conn, $q_kategori);
 
 // D. Insert Aset Dummy (Biar Mahasiswa bisa langsung klik pinjam pas demo!)

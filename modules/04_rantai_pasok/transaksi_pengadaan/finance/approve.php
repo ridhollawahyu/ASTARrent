@@ -166,10 +166,10 @@ include '../../../../components/header.php';
                             <p class="text-muted mb-0">Total yang dibutuhkan minimal: <span class="fw-bold text-danger fs-5" id="target_kebutuhan"><?= $kebutuhan_jumlah ?></span> <span class="fw-bold text-danger">Unit</span></p>
                         </div>
                         <div class="col-md-5 text-md-end mt-3 mt-md-0">
-                            <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan'] ?>" target="_blank" class="btn btn-outline-danger fw-bold shadow-sm mb-2 w-100">
+                            <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan'] ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger fw-bold shadow-sm mb-2 w-100">
                                 <i class="bi bi-file-earmark-pdf-fill me-1"></i> Baca Proposal Pengajuan
                             </a>
-                            <a href="../../../../uploads/dokumen_penawaran/<?= $data['dokumen_penawaran'] ?>" target="_blank" class="btn btn-outline-danger fw-bold shadow-sm w-100">
+                            <a href="../../../../uploads/dokumen_penawaran/<?= $data['dokumen_penawaran'] ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger fw-bold shadow-sm w-100">
                                 <i class="bi bi-file-earmark-pdf-fill me-1"></i> Baca Perbandingan Vendor
                             </a>
                         </div>

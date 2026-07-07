@@ -118,7 +118,7 @@ include '../../../../components/header.php';
                             </td>
                             <td class="fw-bold fs-5 text-primary"><?= $data['jumlah']; ?></td>
                             <td>
-                                <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan']; ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold">
+                                <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan']; ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold">
                                     <i class="bi bi-file-earmark-pdf-fill"></i> Baca PDF
                                 </a>
                             </td>

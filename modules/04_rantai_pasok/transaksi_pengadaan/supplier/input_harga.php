@@ -115,7 +115,7 @@ include '../../../../components/header.php';
                             <p class="text-muted mb-0">Total yang dibutuhkan: <span class="fw-bold text-danger fs-5" id="target_kebutuhan"><?= $kebutuhan_jumlah ?></span> <span class="fw-bold text-danger">Unit</span></p>
                         </div>
                         <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                            <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan'] ?>" target="_blank" class="btn btn-outline-danger fw-bold shadow-sm">
+                            <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan'] ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger fw-bold shadow-sm">
                                 <i class="bi bi-file-earmark-pdf-fill me-1"></i> Proposal Tendik
                             </a>
                         </div>

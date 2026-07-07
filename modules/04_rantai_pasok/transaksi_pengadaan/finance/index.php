@@ -53,7 +53,7 @@ include '../../../../components/header.php';
                                 <?php if ($data['statusPengadaan'] == 'Harga Diinput Supplier'): ?>
                                     <a href="approve.php?id=<?= $data['idPengadaan']; ?>" class="btn btn-astar btn-sm fw-bold px-3">Cairkan Dana</a>
                                 <?php else: ?>
-                                    <a href="../../../../uploads/dokumen_penawaran/<?= $data['dokumen_penawaran']; ?>" target="_blank" class="btn btn-outline-danger btn-sm">PDF Akhir</a>
+                                    <a href="../../../../uploads/dokumen_penawaran/<?= $data['dokumen_penawaran']; ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger btn-sm">PDF Akhir</a>
                                 <?php endif; ?>
                             </td>
                         </tr>

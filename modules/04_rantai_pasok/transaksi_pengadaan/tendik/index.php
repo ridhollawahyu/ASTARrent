@@ -143,7 +143,7 @@ include '../../../../components/header.php';
                             <td>
                                 <?php if (!empty($data['dokumen_pengajuan'])): ?>
                                     <!-- Link langsung buka PDF di tab baru -->
-                                    <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan']; ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold">
+                                    <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan']; ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold">
                                         <i class="bi bi-file-earmark-pdf-fill"></i> Proposal
                                     </a>
                                 <?php else: ?>

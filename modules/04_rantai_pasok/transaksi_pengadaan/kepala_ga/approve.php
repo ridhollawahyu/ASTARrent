@@ -129,7 +129,7 @@ $has_supplier = !empty($pilihan_supplier) ? 'true' : 'false';
                         <div class="p-4 rounded border h-100 text-center" style="background-color: #fdfdfd;">
                             <i class="bi bi-file-earmark-pdf-fill text-danger mb-2" style="font-size: 3.5rem;"></i>
                             <h6 class="fw-bold mb-3">Proposal Pengajuan</h6>
-                            <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan'] ?>" target="_blank" class="btn btn-outline-danger w-100 fw-bold shadow-sm">
+                            <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan'] ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger w-100 fw-bold shadow-sm">
                                 <i class="bi bi-box-arrow-up-right me-1"></i> Buka PDF
                             </a>
                         </div>

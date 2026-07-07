@@ -141,7 +141,7 @@ include '../../../../components/header.php';
                                         <i class="bi bi-clipboard-check me-1"></i> Proses Validasi
                                     </a>
                                 <?php else: ?>
-                                    <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan']; ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold px-3">
+                                    <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan']; ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold px-3">
                                         <i class="bi bi-file-earmark-pdf-fill me-1"></i> Baca PDF
                                     </a>
                                 <?php endif; ?>

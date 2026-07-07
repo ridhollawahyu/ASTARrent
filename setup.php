@@ -83,7 +83,7 @@ $tables = [
         idPengadaan VARCHAR(20) PRIMARY KEY NOT NULL,
         idKategori VARCHAR(20) NOT NULL,
         idTendik VARCHAR(20) NOT NULL,
-        idKepalaGA VARCHAR(20) NOT NULL,
+        idKepalaGA VARCHAR(20) NULL,
         idSupplier VARCHAR(20) NULL,
         idFinance VARCHAR(20) NULL,
         namaKebutuhan VARCHAR(255) NOT NULL,

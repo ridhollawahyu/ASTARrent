@@ -48,7 +48,7 @@ include '../../../../components/header.php';
     <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #1d4197; border-top-left-radius: 15px; border-top-right-radius: 15px;">
         <h5 class="mb-0 text-white fw-bold"><i class="bi bi-cart-plus-fill me-2"></i>Riwayat Pengajuan Pengadaan Aset</h5>
         <div>
-            <a href="../../../dashboards/tendik_home.php" class="btn btn-outline-light btn-sm fw-bold me-2"><i class="bi bi-arrow-left"></i> Dashboard</a>
+            <a href="../../../dashboards/tendik_home.php" class="btn btn-outline-light btn-sm fw-bold me-2"><i class="bi bi-arrow-left"></i> Kembali ke Dashboard</a>
             <a href="create.php" class="btn btn-light btn-sm fw-bold text-astar"><i class="bi bi-plus-circle me-1"></i> Buat Pengajuan</a>
         </div>
     </div>

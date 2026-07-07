@@ -137,7 +137,7 @@ include '../../../../components/header.php';
                                 <input type="text" name="nama_toko[]" class="form-control" style="border: 2px solid #e0e6ed;" required placeholder="Misal: Toko ABC">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 13px;">Spek/Keterangan</label>
+                                <label class="form-label fw-bold" style="font-size: 13px;">Keterangan</label>
                                 <input type="text" name="spek_toko[]" class="form-control" style="border: 2px solid #e0e6ed;" required placeholder="Misal: Garansi Resmi">
                             </div>
                             <div class="col-md-1">

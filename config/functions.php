@@ -1112,7 +1112,7 @@ function buat_pdf_penawaran($id_pengadaan)
     }
 
     if ($is_finance_acc) {
-        $header_tabel = '<tr><th width="5%">No.</th><th width="20%">Nama Toko/Vendor</th><th width="25%">Spesifikasi</th><th width="15%">Harga Satuan</th><th width="15%">Keputusan</th><th width="20%">Total Harga</th></tr>';
+        $header_tabel = '<tr><th width="5%">No.</th><th width="20%">Nama Toko/Vendor</th><th width="25%">Keterangan</th><th width="15%">Harga Satuan</th><th width="15%">Keputusan</th><th width="20%">Total Harga</th></tr>';
         $grand_total_rp = "Rp " . number_format($grand_total_pengeluaran, 0, ',', '.');
         $tfoot_html = "
         <tfoot>
@@ -1258,7 +1258,7 @@ function script_dinamis_supplier_input($kebutuhan_jumlah)
         function hapusBaris(btn) {
             let row = btn.closest('.vendor-row');
             if (document.querySelectorAll('.vendor-row').length > 1) { row.remove(); cekTotalStok(); } 
-            else { alert('Minimal harus ada 2 vendor perbandingan!'); }
+            else { alert('Minimal harus ada 1 vendor!'); }
         }
         window.onload = cekTotalStok;
     </script>";

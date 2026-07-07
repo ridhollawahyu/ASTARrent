@@ -84,10 +84,6 @@ include '../../../../components/header.php';
                         <div class="col-md-5">
                             <label class="form-label text-astar fw-bold">
                                 Kategori Aset <span class="text-danger">*</span>
-
-                                <!-- ======================================================== -->
-                                <!-- PERBAIKAN UI: TOMBOL BATAL DRAFT MEMANGGIL MODAL CONFIRM -->
-                                <!-- ======================================================== -->
                                 <?php if (isset($_SESSION['draft_kategori_id'])): ?>
                                     <span onclick="konfirmasiHapus('?batal_draft=true')" class="badge bg-danger ms-1 shadow-sm" style="cursor: pointer; transition: 0.2s;" title="Hapus Draft Kategori">
                                         <i class="bi bi-trash-fill me-1"></i>Hapus Draft

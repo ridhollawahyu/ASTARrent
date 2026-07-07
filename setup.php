@@ -206,7 +206,7 @@ foreach ($tables as $index => $sql) {
 $password_default = password_hash("12345", PASSWORD_DEFAULT);
 
 // A. Insert Users
-$q_users = "INSERT IGNORE INTO users (idUser, namaUser, noTelp_user, jabatanUser, emailUser, passUser, kodeDepartemen) VALUES 
+$q_users = "INSERT IGNORE INTO users (idUser, namaUser, noTelp_user, jabatanUser, emailUser, passUser, kodeDepartemen) VALUES
 ('SA-00000', 'IT Pusat ASTRAtech', '+62812212121', 'Super Admin', 'admin@astratech.ac.id', '$password_default', 'SA'),
 ('SA-00001', 'Calistung', '+62812212222', 'Super Admin', 'cadmin@astratech.ac.id', '$password_default', 'SA'),
 ('GA-00001', 'Ridzal', '+62812212211', 'Kepala GA', 'kGA@astratech.ac.id', '$password_default', 'GA'),
@@ -216,17 +216,17 @@ $q_users = "INSERT IGNORE INTO users (idUser, namaUser, noTelp_user, jabatanUser
 mysqli_query($conn, $q_users);
 
 // A. Insert Supplier
-$q_suppliers = "INSERT IGNORE INTO supplier (idSupplier, namaSupplier, noTelp_supplier, emailSupplier, passSupplier) VALUES 
+$q_suppliers = "INSERT IGNORE INTO supplier (idSupplier, namaSupplier, noTelp_supplier, emailSupplier, passSupplier) VALUES
 ('SPL-00001', 'Dola', '+62813313333', 'dola@astratech.ac.id', '$password_default')";
 mysqli_query($conn, $q_suppliers);
 
 // B. Insert Mahasiswa TRPL
-$q_mhs = "INSERT IGNORE INTO mahasiswa (nimMahasiswa, namaMahasiswa, kodeProdi_mahasiswa, noTelp_mahasiswa, emailMahasiswa, passMahasiswa) VALUES 
+$q_mhs = "INSERT IGNORE INTO mahasiswa (nimMahasiswa, namaMahasiswa, kodeProdi_mahasiswa, noTelp_mahasiswa, emailMahasiswa, passMahasiswa) VALUES
 ('0920260001', 'Andi Pratama', 'RPL', '+6281414141', 'andi@student.astratech.ac.id', '$password_default')";
 mysqli_query($conn, $q_mhs);
 
 // C. Insert Kategori
-$q_kategori = "INSERT IGNORE INTO kategori (idKategori, namaKategori, tipeKategori, idPembuat) VALUES 
+$q_kategori = "INSERT IGNORE INTO kategori (idKategori, namaKategori, tipeKategori, idPembuat) VALUES
 ('KTG-00001', 'Proyektor', 'Aset', 'TDK-00001'),
 ('KTG-00002', 'Ruang Kelas', 'Fasilitas Akademik', 'GA-00002'),
 ('KTG-00003', 'Laptop', 'Aset', 'TDK-00001'),
@@ -234,9 +234,30 @@ $q_kategori = "INSERT IGNORE INTO kategori (idKategori, namaKategori, tipeKatego
 mysqli_query($conn, $q_kategori);
 
 // D. Insert Aset Dummy (Biar Mahasiswa bisa langsung klik pinjam pas demo!)
-$q_aset = "INSERT IGNORE INTO aset (idAset, idKategori, namaAset) VALUES 
+$q_aset = "INSERT IGNORE INTO aset (idAset, idKategori, namaAset) VALUES
 ('AST-00001', 'KTG-00001', 'Proyektor Epson EB-X400')";
 mysqli_query($conn, $q_aset);
+
+// E. Insert Sanksi Dummy (Biar Mahasiswa bisa langsung klik pinjam pas demo!)
+$q_sanksi = "INSERT INTO sanksi (idSanksi, namaSanksi, sanksi_jamMinus, sanksi_denda, statusSanksi) VALUES
+('SNK-00000', 'Tepat Waktu + Normal', 0, 0, 'Aktif'),
+('SNK-00001', 'Tepat Waktu + Rusak (Masih Berfungsi)', 2, 50000, 'Aktif'),
+('SNK-00002', 'Tepat Waktu + Rusak (Tidak Berfungsi)', 10, 500000, 'Aktif'),
+('SNK-00003', 'Telat < 24 Jam (Barang Normal)', 2, 0, 'Aktif'),
+('SNK-00004', 'Telat < 24 Jam + Rusak (Masih Berfungsi)', 4, 50000, 'Aktif'),
+('SNK-00005', 'Telat < 24 Jam + Rusak (Tidak Berfungsi)', 12, 500000, 'Aktif'),
+('SNK-00006', 'Telat 1-3 Hari (Barang Normal)', 5, 25000, 'Aktif'),
+('SNK-00007', 'Telat 1-3 Hari + Rusak (Masih Berfungsi)', 7, 75000, 'Aktif'),
+('SNK-00008', 'Telat 1-3 Hari + Rusak (Tidak Berfungsi)', 15, 525000, 'Aktif'),
+('SNK-00009', 'Telat > 3 Hari (Barang Normal)', 10, 75000, 'Aktif'),
+('SNK-00010', 'Telat > 3 Hari + Rusak (Masih Berfungsi)', 12, 125000, 'Aktif'),
+('SNK-00011', 'Telat > 3 Hari + Rusak (Tidak Berfungsi)', 20, 575000, 'Aktif'),
+('SNK-00012', 'Batal Sepihak / No-Show', 3, 0, 'Aktif'),
+('SNK-00013', 'Meninggalkan Fasilitas Berantakan', 5, 0, 'Aktif'),
+('SNK-00014', 'Penyalahgunaan Hak Pinjam', 30, 500000, 'Aktif'),
+('SNK-00015', 'Kehilangan Aset Kampus', 50, 3500000, 'Aktif'),
+('SNK-00016', 'tes', 0, 0, 'Aktif')";
+mysqli_query($conn, $q_sanksi);
 
 // Cek Hasil
 if ($berhasil == count($tables)) {
@@ -245,9 +266,10 @@ if ($berhasil == count($tables)) {
     echo "<p>Seluruh 12 tabel dengan <b>VARCHAR(20)</b> telah berhasil dibuat sesuai dengan XML PDM Anda.</p>";
     echo "<p><b>Data Dummy yang disuntikkan:</b></p>";
     echo "<ul>
-            <li>User: TDK-00001 (Tendik)</li>
+            <li>User: Banyak</li>
             <li>NIM: 0920260001 (Mahasiswa)</li>
             <li>Aset: AST-00001 (Proyektor)</li>
+            <li>Sanksi: Banyak</li>
           </ul>";
     echo "<p>Silakan gas koding Modul Peminjamannya! <b>Semoga Review 1 hari ini lancar jaya!</b> 🚀</p>";
     echo "</div>";

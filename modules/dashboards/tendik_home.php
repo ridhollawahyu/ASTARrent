@@ -12,11 +12,12 @@ include '../../config/functions.php';
 // 2. Validasi Keamanan (Hanya Tendik yang boleh masuk)
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Tenaga Pendidik') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Tenaga Pendidik.');
-    echo "<script>window.location='../00_auth/login.php';</script>";
+    header('Location: ../00_auth/login.php');
     exit;
 } elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Tenaga Pendidik') && $_SESSION['status'] === 'Nonaktif') {
     set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah di Nonaktifkan.');
-    echo "<script>window.location='../00_auth/login.php';</script>";
+    header('Location: ../00_auth/login.php');
+    exit;
 }
 
 // 3. QUERY PENGHITUNG ANTREAN

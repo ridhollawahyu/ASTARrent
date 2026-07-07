@@ -9,7 +9,11 @@ include '../../../config/functions.php';
 
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Super Admin.');
-    echo "<script>window.location='../../00_auth/login.php';</script>";
+    header('Location: ../../00_auth/login.php');
+    exit;
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Super Admin') && $_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah di Nonaktifkan.');
+    header('Location: ../../00_auth/login.php');
     exit;
 }
 
@@ -60,7 +64,7 @@ if (isset($_POST['update'])) {
     if (mysqli_query($koneksi, $query_update)) {
         perbarui_status_mahasiswa($nim);
         set_notifikasi('success', 'Data mahasiswa berhasil diperbarui!');
-        echo "<script>window.location='index.php';</script>";
+        header('Location: index.php');
         exit;
     } else {
         // PERBAIKAN: Jika error (seperti kepanjangan huruf), munculkan pop-up error dan refresh halaman!

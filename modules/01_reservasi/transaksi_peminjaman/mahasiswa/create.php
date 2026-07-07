@@ -11,18 +11,12 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Mahasiswa') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Mahasiswa.');
     header('Location: ../../../00_auth/login.php');
     exit;
-}
-
-$cek_mhs = mysqli_query($koneksi, "SELECT * FROM mahasiswa WHERE nimMahasiswa = '{$_SESSION["id"]}'");
-
-if (mysqli_num_rows($cek_mhs) === 1) {
-    $row = mysqli_fetch_assoc($cek_mhs);
-
-    if ($row["statusMahasiswa"] == "Dibekukan") {
-        set_notifikasi('error', 'Akun kamu dibekukan!');
-        header("Location: ../../../dashboards/mahasiswa_home.php");
-        exit;
-    }
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Mahasiswa') && $_SESSION['status'] === 'Dibekukan') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu dibekukan.');
+    header('Location: ../../../00_auth/login.php');
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Mahasiswa') && $_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah di Nonaktifkan.');
+    header('Location: ../../../00_auth/login.php');
 }
 
 if (isset($_POST['submit'])) {
@@ -38,7 +32,7 @@ if (isset($_POST['submit'])) {
     // VALIDASI LOGIKA XOR (Wajib isi salah satu)
     if (($idAset == "NULL" && $idFasilitas == "NULL") || ($idAset != "NULL" && $idFasilitas != "NULL")) {
         set_notifikasi('error', 'Pilih SATU saja: Aset atau Fasilitas!');
-        echo "<script>window.location='create.php';</script>";
+        header('Location: create.php');
         exit;
     }
 
@@ -49,7 +43,7 @@ if (isset($_POST['submit'])) {
 
     if (mysqli_query($koneksi, $query)) {
         set_notifikasi('success', "Request terkirim! Menunggu persetujuan.");
-        echo "<script>window.location='index.php';</script>";
+        header('Location: index.php');
         exit;
     } else {
         set_notifikasi('error', 'Gagal memproses pengajuan!');

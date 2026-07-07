@@ -9,8 +9,12 @@ include '../../../config/functions.php';
 
 // 1. VALIDASI KEAMANAN (Hanya SA)
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
-    set_notifikasi('error', 'Akses Ditolak! Khusus Super Admin.');
-    header('Location: ../../../00_auth/login.php');
+    set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Super Admin.');
+    header('Location: ../../00_auth/login.php');
+    exit;
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Super Admin') && $_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah di Nonaktifkan.');
+    header('Location: ../../00_auth/login.php');
     exit;
 }
 
@@ -40,7 +44,7 @@ $data = mysqli_fetch_assoc($query_data);
 
 if (!$data) {
     set_notifikasi('error', 'Data User tidak ditemukan!');
-    echo "<script>window.location='index.php';</script>";
+    header('Location: index.php');
     exit;
 }
 
@@ -76,7 +80,7 @@ if (isset($_POST['update'])) {
 
     if (mysqli_query($koneksi, $query_update)) {
         set_notifikasi('success', 'Data User berhasil diperbarui!');
-        echo "<script>window.location='index.php';</script>";
+        header('Location: index.php');
         exit;
     } else {
         set_notifikasi('error', 'Gagal memperbarui data ke database!');

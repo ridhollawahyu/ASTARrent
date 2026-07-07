@@ -12,6 +12,10 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Super Admin.');
     header('Location: ../../00_auth/login.php');
     exit;
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Super Admin') && $_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah di Nonaktifkan.');
+    header('Location: ../../00_auth/login.php');
+    exit;
 }
 
 if (isset($_POST['submit'])) {
@@ -37,7 +41,7 @@ if (isset($_POST['submit'])) {
 
     if (mysqli_query($koneksi, $query_simpan)) {
         set_notifikasi('success', "Sukses! Sanksi baru ditambahkan dengan ID: $id_otomatis");
-        echo "<script>window.location='index.php';</script>";
+        header('Location: index.php');
         exit;
     } else {
         set_notifikasi('error', 'Gagal menyimpan data ke database!');

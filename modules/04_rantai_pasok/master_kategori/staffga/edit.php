@@ -11,6 +11,10 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Staff GA') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Staff GA.');
     header('Location: ../../../00_auth/login.php');
     exit;
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Staff GA') && $_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
+    header('Location: ../../../00_auth/login.php');
+    exit;
 }
 
 if (!isset($_GET['id'])) {
@@ -25,7 +29,7 @@ $data = mysqli_fetch_assoc($query_data);
 
 if (!$data) {
     set_notifikasi('error', 'Data Kategori tidak ditemukan!');
-    echo "<script>window.location='index.php';</script>";
+    header('Location: index.php');
     exit;
 }
 
@@ -40,7 +44,7 @@ if (isset($_POST['update'])) {
 
     if (mysqli_query($koneksi, $query_update)) {
         set_notifikasi('success', 'Data Kategori berhasil diperbarui!');
-        echo "<script>window.location='index.php';</script>";
+        header('Location: index.php');
         exit;
     } else {
         set_notifikasi('error', 'Gagal memperbarui data!');

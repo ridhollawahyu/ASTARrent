@@ -9,9 +9,14 @@ include '../../../config/functions.php';
 
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Staff GA') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Staff GA.');
-    header('Location: ../../../00_auth/login.php');
+    header('Location: ../../00_auth/login.php');
+    exit;
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Staff GA') && $_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
+    header('Location: ../../00_auth/login.php');
     exit;
 }
+
 if (empty($_GET['id_rep']) || empty($_GET['tipe']) || empty($_GET['id_brg'])) {
     set_notifikasi('error', 'Terjadi Kesalahan! Coba lagi.');
     header('Location: index.php');
@@ -78,7 +83,7 @@ if (isset($_POST['selesai'])) {
         set_notifikasi('success', "Reparasi Selesai! Barang kembali ke status Tersedia dengan kondisi $kondisi_akhir.");
     }
 
-    echo "<script>window.location='index.php';</script>";
+    header('Location: index.php');
     exit;
 }
 

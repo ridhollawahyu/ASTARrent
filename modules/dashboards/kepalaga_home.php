@@ -12,11 +12,11 @@ include '../../config/functions.php';
 // Validasi Keamanan (Hanya Kepala GA)
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Kepala GA') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Kepala GA.');
-    echo "<script>window.location='../00_auth/login.php';</script>";
+    header('Location: ../00_auth/login.php');
     exit;
-} elseif ($_SESSION['status'] === 'Nonaktif') {
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Kepala GA') && $_SESSION['status'] === 'Nonaktif') {
     set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
-    echo "<script>window.location='../00_auth/login.php';</script>";
+    header('Location: ../00_auth/login.php');
     exit;
 }
 

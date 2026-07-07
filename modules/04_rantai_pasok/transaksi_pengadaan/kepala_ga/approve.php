@@ -8,6 +8,11 @@ include '../../../../config/functions.php';
 /** @var mysqli $koneksi */
 
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Kepala GA') {
+    set_notifikasi('error', 'Akses Ditolak! Akses ini hanya bisa dilakukan oleh Kepala GA.');
+    header('Location: ../../../00_auth/login.php');
+    exit;
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Kepala GA') && $_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
     header('Location: ../../../00_auth/login.php');
     exit;
 }
@@ -83,7 +88,7 @@ if (isset($_POST['proses_validasi'])) {
         set_notifikasi('success', 'Disetujui! TTD Anda telah tercetak otomatis di PDF Proposal.');
     }
 
-    echo "<script>window.location='index.php';</script>";
+    header('Location: index.php');
     exit;
 }
 

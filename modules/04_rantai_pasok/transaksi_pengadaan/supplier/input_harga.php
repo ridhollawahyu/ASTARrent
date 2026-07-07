@@ -9,6 +9,11 @@ require '../../../../vendor/autoload.php';
 /** @var mysqli $koneksi */
 
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Supplier') {
+    set_notifikasi('error', 'Akses Ditolak! Akses ini hanya bisa dilakukan oleh Supplier.');
+    header('Location: ../../../00_auth/login.php');
+    exit;
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Supplier') && $_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
     header('Location: ../../../00_auth/login.php');
     exit;
 }
@@ -92,7 +97,7 @@ if (isset($_POST['submit_penawaran'])) {
     buat_pdf_penawaran($id_pengadaan);
 
     set_notifikasi('success', "Tugas Selesai! PDF Penawaran berhasil dibuat.");
-    echo "<script>window.location='index.php';</script>";
+    header('Location: index.php');
     exit;
 }
 

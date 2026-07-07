@@ -11,7 +11,11 @@ require '../../../../config/functions.php';
 
 // Validasi Akses
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Staff GA') {
-    set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Staff GA.');
+    set_notifikasi('error', 'Akses Ditolak! Akses ini hanya bisa dilakukan oleh Staff GA.');
+    header('Location: ../../../00_auth/login.php');
+    exit;
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Staff GA') && $_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
     header('Location: ../../../00_auth/login.php');
     exit;
 }

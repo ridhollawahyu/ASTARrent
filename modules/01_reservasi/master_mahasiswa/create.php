@@ -9,7 +9,11 @@ include '../../../config/functions.php';
 
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Super Admin.');
-    echo "<script>window.location='../../00_auth/login.php';</script>";
+    header('Location: ../../00_auth/login.php');
+    exit;
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Super Admin') && $_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah di Nonaktifkan.');
+    header('Location: ../../00_auth/login.php');
     exit;
 }
 
@@ -24,7 +28,7 @@ if (isset($_POST['submit'])) {
     if (cek_email_ganda($email)) {
         // Jika fungsi return true, gagalkan proses dan kembalikan ke form
         set_notifikasi('error', 'Gagal! Email tersebut sudah terdaftar di sistem ASTRAtech.');
-        echo "<script>window.location='create.php';</script>";
+        header('Location: create.php');
         exit; // Hentikan eksekusi kode di bawahnya!
     }
 
@@ -37,7 +41,7 @@ if (isset($_POST['submit'])) {
 
     if (mysqli_query($koneksi, $query_simpan)) {
         set_notifikasi('success', "Sukses! Mahasiswa berhasil didaftarkan dengan NIM: $nim_otomatis");
-        echo "<script>window.location='index.php';</script>";
+        header('Location: index.php');
         exit;
     } else {
         set_notifikasi('error', 'Gagal menyimpan data! Cek kembali form Anda.');

@@ -10,7 +10,11 @@ include '../../../config/functions.php';
 // Validasi Hak Akses: Hanya Staff GA
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Staff GA') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Staff GA.');
-    header('Location: ../../../00_auth/login.php');
+    header('Location: ../../00_auth/login.php');
+    exit;
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Staff GA') && $_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
+    header('Location: ../../00_auth/login.php');
     exit;
 }
 
@@ -75,7 +79,7 @@ if (isset($_POST['mulai'])) {
         set_notifikasi('error', 'Gagal memproses data: ' . mysqli_error($koneksi));
     }
 
-    echo "<script>window.location='index.php';</script>";
+    header('Location: index.php');
     exit;
 }
 

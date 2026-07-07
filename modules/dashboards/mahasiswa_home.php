@@ -9,11 +9,12 @@ include '../../components/header.php';
 
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Mahasiswa') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Mahasiswa.');
-    echo "<script>window.location='../00_auth/login.php';</script>";
+    header('Location: ../00_auth/login.php');
     exit;
 } elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Mahasiswa') && $_SESSION['status'] === 'Nonaktif') {
     set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah di Nonaktifkan.');
-    echo "<script>window.location='../00_auth/login.php';</script>";
+    header('Location: ../00_auth/login.php');
+    exit;
 }
 ?>
 

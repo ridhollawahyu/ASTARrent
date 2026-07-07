@@ -7,14 +7,13 @@ include '../../config/functions.php';
 
 /** @var mysqli $koneksi */
 
-$role_diizinkan = ['Staff GA'];
-if (!isset($_SESSION['login']) || !in_array($_SESSION['role'], $role_diizinkan, true)) {
+if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Staff GA') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Staff GA.');
-    echo "<script>window.location='../00_auth/login.php';</script>";
+    header('Location: ../00_auth/login.php');
     exit;
-} elseif ($_SESSION['status'] === 'Nonaktif') {
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Staff GA') && $_SESSION['status'] === 'Nonaktif') {
     set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
-    echo "<script>window.location='../00_auth/login.php';</script>";
+    header('Location: ../00_auth/login.php');
     exit;
 }
 

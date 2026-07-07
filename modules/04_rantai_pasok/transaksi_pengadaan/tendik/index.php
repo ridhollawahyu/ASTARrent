@@ -12,6 +12,9 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Tenaga Pendidik') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Tenaga Pendidik.');
     header('Location: ../../../00_auth/login.php');
     exit;
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Tenaga Pendidik') && $_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah di Nonaktifkan.');
+    header('Location: ../../../00_auth/login.php');
 }
 
 $id_tendik = $_SESSION['id'];

@@ -12,6 +12,10 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Kepala GA') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Kepala GA.');
     header('Location: ../../../00_auth/login.php');
     exit;
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Kepala GA') && $_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
+    header('Location: ../../../00_auth/login.php');
+    exit;
 }
 
 // 1. LOGIKA FILTER GLOBAL (3 PARAMETER)

@@ -9,7 +9,11 @@ include '../../../../config/functions.php';
 /** @var mysqli $koneksi */
 
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Supplier') {
-    set_notifikasi('error', 'Akses Ditolak!');
+    set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Supplier.');
+    header('Location: ../../../00_auth/login.php');
+    exit;
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Supplier') && $_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
     header('Location: ../../../00_auth/login.php');
     exit;
 }

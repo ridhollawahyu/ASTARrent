@@ -11,7 +11,12 @@ require '../../../../vendor/autoload.php';
 /** @var mysqli $koneksi */
 
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Finance') {
-    header('Location: ../../../00_auth/login.php');
+    set_notifikasi('error', 'Akses Ditolak! Akses ini hanya bisa dilakukan oleh Finance.');
+    header('Location: ../00_auth/login.php');
+    exit;
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Finance') && $_SESSION['status'] === 'Nonaktif') {
+    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
+    header('Location: ../00_auth/login.php');
     exit;
 }
 if (!isset($_GET['id'])) {
@@ -142,7 +147,7 @@ if (isset($_POST['submit_cairkan'])) {
         set_notifikasi('success', "Sukses! Dana sebesar $total_rp_cair telah dicairkan dan $jumlah_aset_lahir Aset baru telah ditambahkan ke gudang.");
     }
 
-    echo "<script>window.location='index.php';</script>";
+    header('Location: index.php');
     exit;
 }
 

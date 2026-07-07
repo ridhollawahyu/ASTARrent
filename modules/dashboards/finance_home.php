@@ -10,11 +10,11 @@ include '../../config/functions.php';
 // Validasi Keamanan (Hanya Finance)
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Finance') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Finance.');
-    echo "<script>window.location='../00_auth/login.php';</script>";
+    header('Location: ../00_auth/login.php');
     exit;
-} elseif ($_SESSION['status'] === 'Nonaktif') {
+} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Finance') && $_SESSION['status'] === 'Nonaktif') {
     set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
-    echo "<script>window.location='../00_auth/login.php';</script>";
+    header('Location: ../00_auth/login.php');
     exit;
 }
 $q_tugas = mysqli_query($koneksi, "SELECT COUNT(idPengadaan) AS total FROM transaksi_pengadaan WHERE statusPengadaan = 'Harga Diinput Supplier'");

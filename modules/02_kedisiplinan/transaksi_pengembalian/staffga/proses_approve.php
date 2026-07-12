@@ -111,13 +111,12 @@ include '../../../../components/header.php';
             </div>
             <div class="card-body p-4">
 
-                <!-- Info Mahasiswa & Barang -->
                 <div class="bg-light p-3 rounded border mb-4">
                     <p class="mb-1"><strong>Mahasiswa:</strong> <?= $detail['namaMahasiswa'] ?> (<?= $detail['nimMahasiswa'] ?>)</p>
-                    <p class="mb-1"><strong>Barang:</strong> <span class="badge bg-secondary"><?= $tipe_barang ?></span> <?= $nama_barang ?></p>
+                    <p class="mb-1"><strong>Fasilitas:</strong> <span class="badge bg-secondary"><?= $tipe_barang ?></span> <?= $nama_barang ?></p>
                     <p class="mb-0"><strong>Status Waktu:</strong>
                         <?php if ($jam_terlambat > 0): ?>
-                            <span class="text-danger fw-bold"><i class="bi bi-alarm-fill"></i> Terlambat <?= $jam_terlambat ?> Jam</span>
+                            <span class="text-danger fw-bold"><i class="bi bi-alarm-fill"></i> Terlambat <?= format_waktu_terlambat($jam_terlambat) ?></span>
                         <?php else: ?>
                             <span class="text-success fw-bold"><i class="bi bi-check-circle-fill"></i> Tepat Waktu</span>
                         <?php endif; ?>

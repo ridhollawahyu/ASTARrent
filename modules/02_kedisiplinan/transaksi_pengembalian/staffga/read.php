@@ -24,7 +24,7 @@ $dept_tendik = $_SESSION['departemen'];
 $query_sql = "
     SELECT tpm.*, tp.*, m.namaMahasiswa, m.nimMahasiswa AS nim, 
            a.namaAset, f.namaFasilitas, u.namaUser,
-           TIMESTAMPDIFF(HOUR, tp.tanggalRencana_kembali, NOW()) AS jam_terlambat
+           TIMESTAMPDIFF(HOUR, tp.tanggalRencana_kembali, tpm.tanggalPengembalian) AS jam_terlambat
     FROM transaksi_pengembalian tpm
     JOIN transaksi_peminjaman tp ON tpm.idPeminjaman = tp.idPeminjaman
     JOIN mahasiswa m ON tp.nimMahasiswa = m.nimMahasiswa
@@ -67,8 +67,9 @@ include '../../../../components/header.php';
                     $no = 1;
                     while ($data = mysqli_fetch_assoc($queryTransaksi)):
                         $is_terlambat = (int)$data['jam_terlambat'] > 0;
+                        $teks_waktu = format_waktu_terlambat((int)$data['jam_terlambat']);
                         $nama_barang = !empty($data['idAset']) ? '<span class="badge bg-secondary me-1">Aset</span>' . $data['namaAset'] : '<span class="badge bg-secondary me-1">Fasilitas</span>' . $data['namaFasilitas'];
-                        $nama_tendik = ($data['idPengurus'] != NULL) ? $data['namaUser'] : "Belum Dikelola";
+                        $namaStaffGA = ($data['idPengurus'] != NULL) ? $data['namaUser'] : "Belum Dikelola";
                     ?>
                         <tr>
                             <td class="fw-bold"><?= $no++ ?></td>
@@ -82,12 +83,12 @@ include '../../../../components/header.php';
                             </td>
                             <td>
                                 <?php if ($is_terlambat): ?>
-                                    <span class="badge bg-danger rounded-pill px-3 py-2"><i class="bi bi-alarm-fill me-1"></i> Telat <?= $data['jam_terlambat'] ?> Jam</span>
+                                    <span class="badge bg-danger rounded-pill px-3 py-2" style="white-space: normal; line-height: 1.5;"><i class="bi bi-alarm-fill me-1"></i> Telat <?= $teks_waktu ?></span>
                                 <?php else: ?>
                                     <span class="badge bg-success rounded-pill px-3 py-2"><i class="bi bi-check2-circle me-1"></i> Tepat Waktu</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="text-center fw-bold text-secondary"><?= $nama_tendik; ?></td>
+                            <td class="text-center fw-bold text-secondary"><?= $namaStaffGA; ?></td>
                         </tr>
                     <?php endwhile; ?>
 

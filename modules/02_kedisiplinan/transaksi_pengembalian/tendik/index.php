@@ -68,6 +68,7 @@ include '../../../../components/header.php';
                     $no = 1;
                     while ($data = mysqli_fetch_assoc($queryTransaksi)):
                         $is_terlambat = (int)$data['jam_terlambat'] > 0;
+                        $teks_waktu = format_waktu_terlambat((int)$data['jam_terlambat']);
                         $nama_barang = !empty($data['idAset']) ? '<span class="text-secondary fw-bold me-1">[Aset]</span>' . $data['namaAset'] : '<span class="text-secondary me-1 fw-bold">[Fasilitas]</span>' . $data['namaFasilitas'];
                     ?>
                         <tr>
@@ -82,7 +83,7 @@ include '../../../../components/header.php';
                             </td>
                             <td>
                                 <?php if ($is_terlambat): ?>
-                                    <span class="badge bg-danger rounded-pill px-3 py-2"><i class="bi bi-alarm-fill me-1"></i> Telat <?= $data['jam_terlambat'] ?> Jam</span>
+                                    <span class="badge bg-danger rounded-pill px-3 py-2" style="white-space: normal; line-height: 1.5;"><i class="bi bi-alarm-fill me-1"></i> Telat <?= $teks_waktu ?></span>
                                 <?php else: ?>
                                     <span class="badge bg-success rounded-pill px-3 py-2"><i class="bi bi-check2-circle me-1"></i> Tepat Waktu</span>
                                 <?php endif; ?>

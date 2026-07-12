@@ -1417,4 +1417,35 @@ function cek_kedatangan_aset_otomatis()
     }
 }
 
+/**
+ * FUNGSI 40: FORMAT WAKTU KETERLAMBATAN
+ * Mengubah total jam menjadi format: X Tahun, X Bulan, X Minggu, X Hari, X Jam
+ */
+function format_waktu_terlambat($total_jam)
+{
+    if ($total_jam <= 0) return "Tepat Waktu";
+
+    $tahun = floor($total_jam / 8760); // 1 Tahun = 365 hari * 24 jam
+    $sisa_jam = $total_jam % 8760;
+
+    $bulan = floor($sisa_jam / 720); // Asumsi 1 Bulan = 30 hari * 24 jam
+    $sisa_jam = $sisa_jam % 720;
+
+    $minggu = floor($sisa_jam / 168); // 1 Minggu = 7 hari * 24 jam
+    $sisa_jam = $sisa_jam % 168;
+
+    $hari = floor($sisa_jam / 24);
+    $jam = $sisa_jam % 24;
+
+    $hasil = [];
+    if ($tahun > 0) $hasil[] = "$tahun Tahun";
+    if ($bulan > 0) $hasil[] = "$bulan Bulan";
+    if ($minggu > 0) $hasil[] = "$minggu Minggu";
+    if ($hari > 0) $hasil[] = "$hari Hari";
+    if ($jam > 0) $hasil[] = "$jam Jam";
+
+    // Gabungkan array menjadi string dipisah spasi
+    return implode(" ", $hasil);
+}
+
 cek_kedatangan_aset_otomatis();

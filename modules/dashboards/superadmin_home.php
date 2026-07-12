@@ -64,7 +64,7 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
     <div class="welcome-banner">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h2 class="fw-bold mb-2">Selamat Datang, Super Admin! 👋</h2>
+                <h2 class="fw-bold mb-2">Selamat Datang, Super Admin!</h2>
                 <p class="mb-0 text-white-50">Sistem terpusat siap digunakan. Silakan kelola data master pengguna dan mahasiswa hari ini.</p>
             </div>
             <div class="col-md-4 text-end d-none d-md-block">

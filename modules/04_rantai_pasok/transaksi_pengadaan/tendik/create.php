@@ -35,8 +35,13 @@ if (isset($_POST['submit'])) {
     $kategori = mysqli_real_escape_string($koneksi, $_POST['kategori']);
     $nama_kebutuhan = mysqli_real_escape_string($koneksi, trim($_POST['nama_kebutuhan']));
     $jumlah = (int)$_POST['jumlah'];
-    $alasan = mysqli_real_escape_string($koneksi, trim($_POST['alasan']));
     $tgl_sekarang = date('Y-m-d H:i:s');
+    $alasan_asli = trim($_POST['alasan']);
+    $tanggal_butuh = date('d M Y', strtotime($_POST['tanggal_butuh']));
+
+    // Hasil rakitan: "Untuk lab komputer (Tanggal Dibutuhkan: 17 Aug 2026)"
+    $alasan_gabungan = $alasan_asli . "\n\n(Tanggal Dibutuhkan: " . $tanggal_butuh . ")";
+    $alasan_aman = mysqli_real_escape_string($koneksi, $alasan_gabungan);
 
     // Siapkan Nama File PDF
     $format_tgl_file = date('Ymd');
@@ -48,7 +53,7 @@ if (isset($_POST['submit'])) {
     $query_insert = "INSERT INTO transaksi_pengadaan 
                     (idPengadaan, idKategori, idTendik, namaKebutuhan, tanggalPengadaan, jumlah, alasanKebutuhan, statusPengadaan, dokumen_pengajuan) 
                     VALUES 
-                    ('$id_pengadaan', '$kategori', '$id_tendik', '$nama_kebutuhan', '$tgl_sekarang', $jumlah, '$alasan', 'Draft', '$nama_file_pdf')";
+                    ('$id_pengadaan', '$kategori', '$id_tendik', '$nama_kebutuhan', '$tgl_sekarang', $jumlah, '$alasan_aman', 'Draft', '$nama_file_pdf')";
 
     if (mysqli_query($koneksi, $query_insert)) {
 
@@ -128,6 +133,19 @@ include '../../../../components/header.php';
                             <input type="number" name="jumlah" class="form-control fw-bold fs-5 text-astar" required min="1" max="100" placeholder="0">
                             <span class="input-group-text bg-light fw-bold text-secondary">Unit</span>
                         </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-astar fw-bold">Tanggal Dibutuhkan <span class="text-danger">*</span></label>
+                        <?php
+                        // Set timezone dan hitung H+7
+                        $minTgl_pengadaan = date('Y-m-d', strtotime('+7 days'));
+                        ?>
+                        <input type="date" name="tanggal_butuh" class="form-control fw-bold text-secondary" required min="<?= $minTgl_pengadaan ?>" style="border: 2px solid #e0e6ed; padding: 11px 15px;">
+                    </div>
+
+                    <div class="mb-4">
+                        <small class="text-danger mt-1 d-block" style="font-size:11px;">*Wajib memberikan waktu minimal 7 hari ke depan untuk proses birokrasi & tender pengadaan.</small>
                     </div>
 
                     <div class="mb-4">

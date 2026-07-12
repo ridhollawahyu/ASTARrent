@@ -62,7 +62,10 @@ if (isset($_POST['proses_validasi'])) {
             mysqli_query($koneksi, "UPDATE kategori SET statusKategori = 'Nonaktif' WHERE idKategori = '$id_kat_draft'");
         }
 
-        set_notifikasi('success', 'Pengajuan berhasil ditolak.');
+        require '../../../../vendor/autoload.php';
+        buat_pdf_pengajuan($id_pengadaan);
+
+        set_notifikasi('success', 'Pengajuan berhasil ditolak. Dokumen PDF telah diperbarui.');
     } elseif ($keputusan === 'setuju') {
         $id_supplier = mysqli_real_escape_string($koneksi, $_POST['id_supplier']);
         if (empty($id_supplier)) {

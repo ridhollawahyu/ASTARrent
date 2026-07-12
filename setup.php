@@ -101,6 +101,21 @@ $tables = [
         FOREIGN KEY (idFinance) REFERENCES users(idUser) ON UPDATE CASCADE
     )",
 
+    // 6.5 DETAIL PENGADAAN VENDOR
+    "CREATE TABLE IF NOT EXISTS detail_pengadaan_vendor (
+        idDetail VARCHAR(20) PRIMARY KEY NOT NULL,
+        idPengadaan VARCHAR(20) NOT NULL,
+        namaVendor VARCHAR(100) NOT NULL,
+        spesifikasi VARCHAR(255) NOT NULL,
+        stok INT NOT NULL,
+        hargaSatuan INT NOT NULL,
+        estimasiTiba INT NOT NULL,
+        statusPilihan ENUM('Menunggu', 'Terpilih', 'Ditolak') DEFAULT 'Menunggu' NOT NULL,
+        tanggalJatuhTempo DATETIME NULL,
+        statusKedatangan ENUM('Belum Tiba', 'Sudah Tiba') DEFAULT 'Belum Tiba' NOT NULL,
+        FOREIGN KEY (idPengadaan) REFERENCES transaksi_pengadaan(idPengadaan) ON UPDATE CASCADE
+    )",
+
     // 7. MASTER ASET
     "CREATE TABLE IF NOT EXISTS aset (
         idAset VARCHAR(20) PRIMARY KEY NOT NULL,

@@ -37,7 +37,7 @@ include '../../../../components/header.php';
                     <tr>
                         <th>No.</th>
                         <th class="text-start">Kebutuhan Aset</th>
-                        <th>Jumlah Req</th>
+                        <th>Jumlah Kebutuhan</th>
                         <th>Status</th>
                         <th>Aksi</th>
                     </tr>

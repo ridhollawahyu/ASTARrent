@@ -3,20 +3,15 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
-include '../../../../config/database.php';
-include '../../../../config/functions.php';
 
+require '../../../../config/database.php';
+require '../../../../config/functions.php';
 require '../../../../vendor/autoload.php';
 
 /** @var mysqli $koneksi */
 
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Finance') {
-    set_notifikasi('error', 'Akses Ditolak! Akses ini hanya bisa dilakukan oleh Finance.');
-    header('Location: ../00_auth/login.php');
-    exit;
-} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Finance') && $_SESSION['status'] === 'Nonaktif') {
-    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
-    header('Location: ../00_auth/login.php');
+    header('Location: ../../../00_auth/login.php');
     exit;
 }
 if (!isset($_GET['id'])) {
@@ -44,12 +39,13 @@ if (!$data) {
 
 $kebutuhan_jumlah = (int)$data['jumlah'];
 $id_kategori_aset = $data['idKategori'];
-$nama_kebutuhan_aset = $data['namaKebutuhan'];
 
-// Ambil Data JSON Vendor
-$explode = explode('|||VENDOR|||', $data['alasanKebutuhan']);
-$json_vendor = isset($explode[1]) ? trim($explode[1]) : '[]';
-$array_vendor = json_decode($json_vendor, true);
+// Ambil Data Vendor dari Database
+$q_vendors = mysqli_query($koneksi, "SELECT * FROM detail_pengadaan_vendor WHERE idPengadaan = '$id_pengadaan' ORDER BY hargaSatuan ASC");
+$vendors = [];
+while ($row = mysqli_fetch_assoc($q_vendors)) {
+    $vendors[] = $row;
+}
 
 // ==============================================================================
 // PROSES PENGESAHAN OLEH FINANCE
@@ -63,88 +59,72 @@ if (isset($_POST['submit_cairkan'])) {
         mysqli_query($koneksi, "UPDATE transaksi_pengadaan 
                                 SET statusPengadaan = 'Ditolak', 
                                     idFinance = '$id_finance',
-                                    alasanTolak = '$alasan_tolak' 
+                                    alasanPenolakan_pengadaan = '$alasan_tolak' 
                                 WHERE idPengadaan = '$id_pengadaan'");
+
+        // Tolak semua vendor
+        mysqli_query($koneksi, "UPDATE detail_pengadaan_vendor SET statusPilihan = 'Ditolak' WHERE idPengadaan = '$id_pengadaan'");
 
         if ($data['statusKategori'] === 'Draft') {
             mysqli_query($koneksi, "UPDATE kategori SET statusKategori = 'Nonaktif' WHERE idKategori = '$id_kategori_aset'");
         }
+
+        buat_pdf_pengajuan($id_pengadaan);
+        buat_pdf_penawaran($id_pengadaan);
+
         set_notifikasi('success', 'Pengadaan berhasil ditolak oleh Finance.');
     } elseif ($keputusan === 'setuju') {
 
         $vendor_terpilih = isset($_POST['vendor_check']) ? $_POST['vendor_check'] : [];
+        $tgl_sekarang = date('Y-m-d H:i:s');
 
         $total_dibeli_server = 0;
-        $total_uang_keluar = 0;
+        $subtotal_uang = 0;
 
-        // 1. MANIPULASI JSON VENDOR UNTUK MENYIMPAN RIWAYAT ACC & HITUNG UANG
-        foreach ($array_vendor as $idx => $v) {
-            // Jika toko ini dicentang
-            if (in_array($idx, $vendor_terpilih)) {
+        foreach ($vendor_terpilih as $id_detail_vendor) {
+            $q_cek_vd = mysqli_query($koneksi, "SELECT stok, hargaSatuan, estimasiTiba FROM detail_pengadaan_vendor WHERE idDetail = '$id_detail_vendor'");
+            $vd = mysqli_fetch_assoc($q_cek_vd);
 
-                // PERBAIKAN: Karena memborong, kita ambil langsung dari stok tokonya
-                $qty_acc = (int)$v['stok'];
+            $total_dibeli_server += (int)$vd['stok'];
+            $subtotal_uang += ((int)$vd['stok'] * (int)$vd['hargaSatuan']);
 
-                $array_vendor[$idx]['is_selected'] = true;
-                $array_vendor[$idx]['qty_acc'] = $qty_acc;
+            $estimasi = (int)$vd['estimasiTiba'];
+            $tgl_jatuh_tempo = date('Y-m-d H:i:s', strtotime($tgl_sekarang . " + $estimasi days"));
 
-                $total_dibeli_server += $qty_acc;
-                $total_uang_keluar += ($qty_acc * (int)$v['harga']);
-            } else {
-                // Toko tidak dipilih (Ditolak)
-                $array_vendor[$idx]['is_selected'] = false;
-                $array_vendor[$idx]['qty_acc'] = 0;
-            }
+            mysqli_query($koneksi, "UPDATE detail_pengadaan_vendor 
+                                    SET statusPilihan = 'Terpilih', tanggalJatuhTempo = '$tgl_jatuh_tempo' 
+                                    WHERE idDetail = '$id_detail_vendor'");
         }
 
-        // Backend Validation (Sekarang Pasti Berhasil!)
         if ($total_dibeli_server < $kebutuhan_jumlah) {
-            set_notifikasi('error', 'Total stok toko yang dipilih tidak memenuhi syarat request minimal (' . $kebutuhan_jumlah . ' Unit).');
-            echo "<script>window.location='approve.php?id=$id_pengadaan';</script>";
+            set_notifikasi('error', 'Total stok toko yang dipilih tidak memenuhi syarat request minimal!');
+            header("Location: approve.php?id=$id_pengadaan");
             exit;
         }
 
-        // 2. SIMPAN BALIK JSON YANG SUDAH DIUPDATE KE DATABASE
-        $json_baru = json_encode($array_vendor);
-        $alasan_lama = explode('|||VENDOR|||', $data['alasanKebutuhan'])[0];
-        $alasan_baru_aman = mysqli_real_escape_string($koneksi, $alasan_lama . "|||VENDOR|||" . $json_baru);
+        // =============================================================
+        // PERHITUNGAN PPN 12% DI SERVER (BACKEND) SEBELUM DISIMPAN
+        // =============================================================
+        $ppn = $subtotal_uang * 0.12;
+        $grand_total_uang = $subtotal_uang + $ppn;
 
-        // 3. UBAH STATUS TRANSAKSI & SIMPAN TOTAL BIAYA
+        // Tolak vendor yang tidak dicentang
+        mysqli_query($koneksi, "UPDATE detail_pengadaan_vendor SET statusPilihan = 'Ditolak' WHERE idPengadaan = '$id_pengadaan' AND statusPilihan = 'Menunggu'");
+
+        // UBAH STATUS TRANSAKSI & SIMPAN GRAND TOTAL BIAYA (+PPN)
         mysqli_query($koneksi, "UPDATE transaksi_pengadaan 
-                                SET statusPengadaan = 'Disetujui Finance', 
-                                    idFinance = '$id_finance',
-                                    totalBiaya = $total_uang_keluar,
-                                    alasanKebutuhan = '$alasan_baru_aman'
+                                SET statusPengadaan = 'Disetujui Finance', idFinance = '$id_finance', totalBiaya = $grand_total_uang
                                 WHERE idPengadaan = '$id_pengadaan'");
 
-        // 4. SAHKAN KATEGORI JIKA DRAFT
         if ($data['statusKategori'] === 'Draft') {
             mysqli_query($koneksi, "UPDATE kategori SET statusKategori = 'Aktif' WHERE idKategori = '$id_kategori_aset'");
         }
 
-        // 5. SIHIR LOOPING: KELAHIRAN ASET BARU!
-        $jumlah_aset_lahir = 0;
-        foreach ($vendor_terpilih as $idx) {
-            $qty_beli = (int)$array_vendor[$idx]['stok'];
-            $nama_toko = mysqli_real_escape_string($koneksi, $array_vendor[$idx]['toko']);
-            $nama_aset_baru = $nama_kebutuhan_aset . " (" . $nama_toko . ")";
-
-            for ($i = 0; $i < $qty_beli; $i++) {
-                $id_aset_baru = generate_id('AST', 'aset', 'idAset');
-                $q_lahir = "INSERT INTO aset (idAset, idKategori, idPengadaan, namaAset, kondisiAset, ketersediaanAset) 
-                            VALUES ('$id_aset_baru', '$id_kategori_aset', '$id_pengadaan', '$nama_aset_baru', 'Normal', 'Tersedia')";
-                mysqli_query($koneksi, $q_lahir);
-                $jumlah_aset_lahir++;
-            }
-        }
-
-        // 6. GENERATE ULANG KEDUA PDF UNTUK TANDA TANGAN FINANCE
         buat_pdf_pengajuan($id_pengadaan);
         buat_pdf_penawaran($id_pengadaan);
 
-        // Format uang untuk Notifikasi Pop-up
-        $total_rp_cair = "Rp " . number_format($total_uang_keluar, 0, ',', '.');
-        set_notifikasi('success', "Sukses! Dana sebesar $total_rp_cair telah dicairkan dan $jumlah_aset_lahir Aset baru telah ditambahkan ke gudang.");
+        $total_rp_cair = "Rp " . number_format($grand_total_uang, 0, ',', '.');
+        set_notifikasi('success', "Sukses! Dana sebesar $total_rp_cair (Termasuk PPN 12%) dicairkan. Aset akan tiba sesuai jadwal estimasi.");
     }
 
     header('Location: index.php');
@@ -162,13 +142,12 @@ include '../../../../components/header.php';
             </div>
             <div class="card-body p-4">
 
-                <!-- INFO DOKUMEN PDF -->
                 <div class="bg-light p-4 rounded border mb-4">
                     <div class="row align-items-center">
                         <div class="col-md-7">
                             <h6 class="fw-bold text-astar mb-2"><i class="bi bi-info-circle-fill me-2"></i>Kebutuhan Aset:</h6>
                             <h5 class="fw-bold text-dark mb-1"><?= $data['namaKategori'] ?> - <?= $data['namaKebutuhan'] ?></h5>
-                            <p class="text-muted mb-0">Total yang dibutuhkan minimal: <span class="fw-bold text-danger fs-5" id="target_kebutuhan"><?= $kebutuhan_jumlah ?></span> <span class="fw-bold text-danger">Unit</span></p>
+                            <p class="text-muted mb-0">Total yang dibutuhkan minimal: <span class="fw-bold text-danger fs-5"><?= $kebutuhan_jumlah ?></span> <span class="fw-bold text-danger">Unit</span></p>
                         </div>
                         <div class="col-md-5 text-md-end mt-3 mt-md-0">
                             <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan'] ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger fw-bold shadow-sm mb-2 w-100">
@@ -201,7 +180,6 @@ include '../../../../components/header.php';
                         </div>
                     </div>
 
-                    <!-- PANEL VENDOR (JIKA SETUJU) -->
                     <div id="panel_vendor" class="mb-4">
                         <h6 class="fw-bold text-astar mb-3"><i class="bi bi-shop me-2"></i>Pilih Penawaran Vendor (Memborong Seluruh Stok)</h6>
                         <div class="table-responsive border rounded">
@@ -212,46 +190,52 @@ include '../../../../components/header.php';
                                         <th class="text-start">Nama Toko</th>
                                         <th>Harga Satuan</th>
                                         <th width="15%">Stok Tersedia</th>
-                                        <th>Total Harga</th>
+                                        <th>Estimasi Tiba</th>
+                                        <th>Subtotal</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($array_vendor as $index => $v):
-                                        $total_harga = $v['harga'] * $v['stok'];
+                                    <?php foreach ($vendors as $v):
+                                        $total_harga = $v['hargaSatuan'] * $v['stok'];
                                     ?>
                                         <tr>
                                             <td>
-                                                <!-- Checkbox membawa attribute data-stok dan data-harga untuk hitung realtime JS -->
-                                                <input type="checkbox" name="vendor_check[]" value="<?= $index ?>" class="form-check-input chk-vendor" style="transform: scale(1.5);" data-stok="<?= $v['stok'] ?>" data-harga="<?= $total_harga ?>" onchange="updateTotal()">
+                                                <input type="checkbox" name="vendor_check[]" value="<?= $v['idDetail'] ?>" class="form-check-input chk-vendor" style="transform: scale(1.5);" data-stok="<?= $v['stok'] ?>" data-harga="<?= $total_harga ?>" onchange="updateTotal()">
                                             </td>
-                                            <td class="text-start fw-bold text-secondary"><?= $v['toko'] ?></td>
-                                            <td class="text-muted">Rp <?= number_format($v['harga'], 0, ',', '.') ?></td>
+                                            <td class="text-start fw-bold text-secondary"><?= $v['namaVendor'] ?></td>
+                                            <td class="text-muted">Rp <?= number_format($v['hargaSatuan'], 0, ',', '.') ?></td>
                                             <td><span class="badge bg-secondary" style="font-size: 14px;"><?= $v['stok'] ?> Unit</span></td>
-                                            <td class="fw-bold text-astar">Rp <?= number_format($total_harga, 0, ',', '.') ?></td>
+                                            <td class="text-muted fw-bold"><?= $v['estimasiTiba'] ?> Hari</td>
+                                            <td class="fw-bold text-secondary">Rp <?= number_format($total_harga, 0, ',', '.') ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
-                                <tfoot style="background-color: #fdfdfd;">
-                                    <tr>
-                                        <td colspan="3" class="text-end fw-bold text-danger">Total yang akan di-ACC :</td>
-                                        <td>
-                                            <input type="text" id="display_total_unit" class="form-control text-center fw-bold text-danger border-danger" value="0 Unit" readonly>
-                                        </td>
-                                        <td>
-                                            <input type="text" id="display_total_rp" class="form-control text-center fw-bold text-danger border-danger" value="Rp 0" readonly>
-                                        </td>
-                                    </tr>
-                                </tfoot>
                             </table>
                         </div>
 
-                        <!-- PERINGATAN (CLASS D-BLOCK TELAH DIHAPUS) -->
+                        <div class="d-flex justify-content-end mt-3 mb-2">
+                            <div class="bg-white p-4 rounded border shadow-sm" style="width: 100%; max-width: 566px;">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-secondary fw-bold">Subtotal (<span id="display_total_unit">0</span> Unit)</span>
+                                    <span class="text-secondary fw-bold" id="display_subtotal_rp">Rp 0</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-secondary fw-bold">PPN (12%)</span>
+                                    <span class="text-secondary fw-bold" id="display_ppn_rp">Rp 0</span>
+                                </div>
+                                <hr class="border-secondary opacity-25 my-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-danger fw-bold fs-5 mb-0">TOTAL</span>
+                                    <span class="text-danger fw-bold fs-5 mb-0" id="display_grand_total_rp">Rp 0</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <small id="peringatan_qty" class="text-danger fw-bold mt-2" style="display: block;">
                             <i class="bi bi-exclamation-triangle-fill"></i> Total unit toko yang dipilih belum memenuhi target kebutuhan minimal (<?= $kebutuhan_jumlah ?> Unit).
                         </small>
                     </div>
 
-                    <!-- PANEL TOLAK -->
                     <div id="panel_tolak" class="mb-4 p-4 rounded border" style="display: none; background-color: #fff3f3; border-color: #f5c6cb !important;">
                         <label class="form-label fw-bold text-danger"><i class="bi bi-chat-left-text-fill me-1"></i> Alasan Penolakan <span class="text-danger">*</span></label>
                         <textarea name="alasan_tolak" id="input_alasan_tolak" class="form-control border-danger" rows="3" placeholder="Jelaskan alasan pengadaan ini ditolak agar Tendik mengetahuinya..."></textarea>
@@ -260,7 +244,7 @@ include '../../../../components/header.php';
                     <div class="d-flex justify-content-between mt-4 border-top pt-4">
                         <a href="index.php" class="btn btn-light border fw-bold text-secondary px-4">Batal</a>
                         <button type="submit" id="btn_submit" name="submit_cairkan" class="btn btn-secondary px-5 fw-bold shadow-sm" disabled>
-                            Simpan & Cetak Aset <i class="bi bi-magic ms-1"></i>
+                            Cairkan Dana & Pesan <i class="bi bi-wallet2 ms-1"></i>
                         </button>
                     </div>
                 </form>

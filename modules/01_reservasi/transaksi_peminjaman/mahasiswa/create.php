@@ -13,7 +13,7 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Mahasiswa') {
     exit;
 } elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Mahasiswa') && $_SESSION['status'] === 'Dibekukan') {
     set_notifikasi('error', 'Akses Ditolak! Akun kamu dibekukan.');
-    header('Location: ../../../00_auth/login.php');
+    header('Location: ../../../dashboards/mahasiswa_home.php');
 } elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Mahasiswa') && $_SESSION['status'] === 'Nonaktif') {
     set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah di Nonaktifkan.');
     header('Location: ../../../00_auth/login.php');

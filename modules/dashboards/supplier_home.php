@@ -64,7 +64,7 @@ include '../../components/header.php';
     <div class="welcome-banner">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h2 class="fw-bold mb-2">Halo, Tim Supplier! 🛒</h2>
+                <h2 class="fw-bold mb-2">Halo, Tim Supplier!</h2>
                 <p class="mb-0 text-white-50">Silakan selesaikan tugas pencarian vendor Anda hari ini.</p>
             </div>
             <div class="col-md-4 text-end d-none d-md-block">

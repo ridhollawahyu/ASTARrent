@@ -1,23 +1,20 @@
 <?php
+// --- FILE: modules/04_rantai_pasok/transaksi_pengadaan/supplier/input_harga.php ---
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
-include '../../../../config/database.php';
-include '../../../../config/functions.php';
+
+require '../../../../config/database.php';
+require '../../../../config/functions.php';
 require '../../../../vendor/autoload.php';
 
 /** @var mysqli $koneksi */
 
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Supplier') {
-    set_notifikasi('error', 'Akses Ditolak! Akses ini hanya bisa dilakukan oleh Supplier.');
-    header('Location: ../../../00_auth/login.php');
-    exit;
-} elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Supplier') && $_SESSION['status'] === 'Nonaktif') {
-    set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
+    set_notifikasi('error', 'Akses Ditolak!');
     header('Location: ../../../00_auth/login.php');
     exit;
 }
-
 if (!isset($_GET['id'])) {
     header('Location: index.php');
     exit;
@@ -41,25 +38,24 @@ if (!$data) {
     exit;
 }
 
-$kebutuhan_jumlah = (int)$data['jumlah']; // Target yang harus dipenuhi
+$kebutuhan_jumlah = (int)$data['jumlah'];
 
 if (isset($_POST['submit_penawaran'])) {
     $nama_toko = $_POST['nama_toko'];
     $spek_toko = $_POST['spek_toko'];
     $stok_toko = $_POST['stok_toko'];
     $harga_toko = $_POST['harga_toko'];
+    $estimasi_tiba = $_POST['estimasi_tiba']; // Estimasi Tiba (Hari)
 
-    // ====================================================================
-    // VALIDASI BACKEND: TOTAL STOK HARUS >= KEBUTUHAN
-    // ====================================================================
+    // Validasi Total Stok
     $total_stok_diinput = 0;
     foreach ($stok_toko as $stok) {
         $total_stok_diinput += (int)$stok;
     }
 
     if ($total_stok_diinput < $kebutuhan_jumlah) {
-        set_notifikasi('error', "Total stok gabungan ($total_stok_diinput Unit) kurang dari target kebutuhan ($kebutuhan_jumlah Unit)! Cari vendor lain untuk menggenapinya.");
-        echo "<script>window.location='input_harga.php?id=$id_pengadaan';</script>";
+        set_notifikasi('error', "Total stok gabungan ($total_stok_diinput Unit) kurang dari target kebutuhan ($kebutuhan_jumlah Unit)!");
+        header("Location: input_harga.php?id=$id_pengadaan");
         exit;
     }
 
@@ -68,27 +64,26 @@ if (isset($_POST['submit_penawaran'])) {
     $folder_simpan = "../../../../uploads/dokumen_penawaran/";
     if (!is_dir($folder_simpan)) mkdir($folder_simpan, 0777, true);
 
-    // RAKIT ARRAY JSON
-    $array_vendor = [];
+    // LOOPING INSERT KE TABEL DETAIL VENDOR (RELASIONAL)
     for ($i = 0; $i < count($nama_toko); $i++) {
         if (!empty(trim($nama_toko[$i]))) {
-            $array_vendor[] = [
-                'toko' => mysqli_real_escape_string($koneksi, trim($nama_toko[$i])),
-                'spek' => mysqli_real_escape_string($koneksi, trim($spek_toko[$i])),
-                'stok' => (int)$stok_toko[$i],
-                'harga' => (int)$harga_toko[$i]
-            ];
+            $id_detail = generate_id('DTL', 'detail_pengadaan_vendor', 'idDetail');
+            $toko = mysqli_real_escape_string($koneksi, trim($nama_toko[$i]));
+            $spek = mysqli_real_escape_string($koneksi, trim($spek_toko[$i]));
+            $stok = (int)$stok_toko[$i];
+            $harga = (int)$harga_toko[$i];
+            $estimasi = (int)$estimasi_tiba[$i];
+
+            mysqli_query($koneksi, "INSERT INTO detail_pengadaan_vendor 
+                (idDetail, idPengadaan, namaVendor, spesifikasi, stok, hargaSatuan, estimasiTiba, statusPilihan, statusKedatangan) 
+                VALUES ('$id_detail', '$id_pengadaan', '$toko', '$spek', $stok, $harga, $estimasi, 'Menunggu', 'Belum Tiba')");
         }
     }
 
-    $json_vendor = json_encode($array_vendor);
-    $alasan_baru = $data['alasanKebutuhan'] . "|||VENDOR|||" . $json_vendor;
-    $alasan_aman = mysqli_real_escape_string($koneksi, $alasan_baru);
-
+    // UPDATE STATUS PENGADAAN & FILE PDF
     mysqli_query($koneksi, "UPDATE transaksi_pengadaan 
                             SET dokumen_penawaran = '$nama_file_pdf', 
-                                statusPengadaan = 'Harga Diinput Supplier',
-                                alasanKebutuhan = '$alasan_aman' 
+                                statusPengadaan = 'Harga Diinput Supplier'
                             WHERE idPengadaan = '$id_pengadaan'");
 
     mysqli_query($koneksi, "UPDATE supplier SET jumlahTugas_aktif = GREATEST(0, jumlahTugas_aktif - 1) WHERE idSupplier = '$id_supplier'");
@@ -96,7 +91,7 @@ if (isset($_POST['submit_penawaran'])) {
     // GENERATE PDF
     buat_pdf_penawaran($id_pengadaan);
 
-    set_notifikasi('success', "Tugas Selesai! PDF Penawaran berhasil dibuat.");
+    set_notifikasi('success', "Tugas Selesai! PDF Penawaran dan data vendor berhasil disimpan.");
     header('Location: index.php');
     exit;
 }
@@ -105,7 +100,7 @@ include '../../../../components/header.php';
 ?>
 
 <div class="row justify-content-center mb-5 mt-4">
-    <div class="col-md-11">
+    <div class="col-md-12">
         <div class="card shadow-sm border-0" style="border-radius: 15px;">
             <div class="card-header text-white d-flex align-items-center" style="background-color: #1d4197; border-radius: 15px 15px 0 0;">
                 <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i>Input Perbandingan Harga Vendor</h5>
@@ -117,7 +112,7 @@ include '../../../../components/header.php';
                         <div class="col-md-8">
                             <h6 class="fw-bold text-astar mb-2"><i class="bi bi-info-circle-fill me-2"></i>Kebutuhan Aset:</h6>
                             <h5 class="fw-bold text-dark mb-1"><?= $data['namaKategori'] ?> - <?= $data['namaKebutuhan'] ?></h5>
-                            <p class="text-muted mb-0">Total yang dibutuhkan: <span class="fw-bold text-danger fs-5" id="target_kebutuhan"><?= $kebutuhan_jumlah ?></span> <span class="fw-bold text-danger">Unit</span></p>
+                            <p class="text-muted mb-0">Total yang dibutuhkan: <span class="fw-bold text-danger fs-5"><?= $kebutuhan_jumlah ?></span> <span class="fw-bold text-danger">Unit</span></p>
                         </div>
                         <div class="col-md-4 text-md-end mt-3 mt-md-0">
                             <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan'] ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger fw-bold shadow-sm">
@@ -127,52 +122,54 @@ include '../../../../components/header.php';
                     </div>
                 </div>
 
-                <div class="alert py-2 mb-4" style="background-color: #e8f0fe; color: #1d4197; border: 1px solid #c2d5ff;">
-                    <i class="bi bi-magic me-2"></i> <strong>Sistem Auto-Generate:</strong> Masukkan minimal 2 vendor perbandingan. <b>Pastikan Total Stok memenuhi jumlah kebutuhan!</b>
-                </div>
-
                 <form action="" method="POST">
                     <h6 class="fw-bold text-astar mb-3"><i class="bi bi-shop me-2"></i>Daftar Vendor Eksternal (Form Dinamis)</h6>
 
                     <div id="vendor_container">
                         <!-- Baris 1 Default -->
                         <div class="row g-2 mb-3 vendor-row align-items-start">
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 13px;">Nama Toko/Vendor</label>
-                                <input type="text" name="nama_toko[]" class="form-control" style="border: 2px solid #e0e6ed;" required placeholder="Misal: Toko ABC">
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold" style="font-size: 13px;">Nama Toko</label>
+                                <input type="text" name="nama_toko[]" class="form-control" style="border: 2px solid #e0e6ed;" required placeholder="Toko ABC">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label fw-bold" style="font-size: 13px;">Keterangan</label>
-                                <input type="text" name="spek_toko[]" class="form-control" style="border: 2px solid #e0e6ed;" required placeholder="Misal: Garansi Resmi">
+                                <input type="text" name="spek_toko[]" class="form-control" style="border: 2px solid #e0e6ed;" required placeholder="Garansi Resmi">
                             </div>
                             <div class="col-md-1">
                                 <label class="form-label fw-bold text-danger" style="font-size: 13px;">Stok</label>
-                                <input type="number" name="stok_toko[]" class="form-control fw-bold border-danger input-stok" required min="0" placeholder="0" oninput="cekTotalStok()">
+                                <input type="number" name="stok_toko[]" class="form-control fw-bold border-danger input-stok" required min="1" placeholder="..." oninput="cekTotalStok()">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold" style="font-size: 13px;">Estimasi Tiba</label>
+                                <div class="input-group">
+                                    <input type="number" name="estimasi_tiba[]" class="form-control fw-bold text-center" style="border: 2px solid #e0e6ed;" required min="1" placeholder="...">
+                                    <span class="input-group-text bg-light">Hari</span>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold" style="font-size: 13px;">Harga Satuan</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light fw-bold">Rp</span>
-                                    <input type="number" name="harga_toko[]" class="form-control fw-bold" style="border: 2px solid #e0e6ed;" required min="1000" placeholder="1000000">
+                                    <input type="number" name="harga_toko[]" class="form-control fw-bold" style="border: 2px solid #e0e6ed;" required min="1000" placeholder="...">
                                 </div>
                             </div>
-                            <div class="col-md-1 d-flex align-items-end" style="height: 65px;">
-                                <button type="button" class="btn btn-outline-danger w-100 fw-bold" onclick="hapusBaris(this)" title="Hapus Baris"><i class="bi bi-x-lg"></i></button>
+                            <div class="col-md-1 d-flex align-items-end" style="height: 68px;">
+                                <button type="button" class="btn btn-outline-danger w-100 fw-bold" onclick="hapusBaris(this)"><i class="bi bi-x-lg"></i></button>
                             </div>
                         </div>
                     </div>
 
-                    <button type="button" class="btn btn-success btn-sm fw-bold px-4 py-2 shadow-sm" onclick="tambahBaris()"><i class="bi bi-plus-circle-fill me-2"></i>Tambah Toko Lain</button>
+                    <button type="button" class="btn btn-success btn-sm fw-bold mb-4 px-4 py-2 shadow-sm" onclick="tambahBaris()"><i class="bi bi-plus-circle-fill me-2"></i>Tambah Toko Lain</button>
 
-                    <!-- Peringatan JS Realtime -->
                     <div id="peringatan_stok" class="alert alert-danger fw-bold mt-4" style="display: block;">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Total stok yang Anda input belum memenuhi target kebutuhan (<span id="teks_total_stok">0</span> / <?= $kebutuhan_jumlah ?> Unit).
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Total stok yang Anda input (<span id="teks_total_stok">0</span> Unit) belum memenuhi target kebutuhan!
                     </div>
 
                     <div class="d-flex justify-content-between mt-4 border-top pt-4">
                         <a href="index.php" class="btn btn-light border fw-bold text-secondary px-4">Kembali</a>
                         <button type="submit" id="btn_submit" name="submit_penawaran" class="btn btn-astar px-5 fw-bold shadow-sm" disabled>
-                            <i class="bi bi-printer me-2"></i> Generate PDF Penawaran
+                            <i class="bi bi-printer me-2"></i> Simpan & Generate PDF
                         </button>
                     </div>
                 </form>

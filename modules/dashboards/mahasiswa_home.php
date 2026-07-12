@@ -22,7 +22,7 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Mahasiswa') {
     <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #1d4197 0%, #2a5bd4 100%); color: white; border-radius: 15px; padding: 30px 40px; margin-bottom: 40px;">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h2 class="fw-bold mb-2">Halo, Mahasiswa! </h2>
+                <h2 class="fw-bold mb-2">Halo, Mahasiswa!</h2>
                 <p class="mb-0 text-white-50">Silakan ajukan peminjaman fasilitas atau aset kampus untuk keperluan kegiatan akademik Anda hari ini.</p>
             </div>
             <div class="col-md-4 text-end d-none d-md-block">

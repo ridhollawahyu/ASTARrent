@@ -12,6 +12,8 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 header("Expires: 0");
 
+date_default_timezone_set('Asia/Jakarta');
+
 // 1. FUNGSI READ (Menampilkan Data)
 // Contoh pakai: $data_mhs = ambil_data("SELECT * FROM mahasiswa");
 function ambil_data($query)
@@ -929,7 +931,7 @@ function ambil_pilihan_supplier()
 
 /**
  * FUNGSI 32: GENERATE ULANG PDF PENGAJUAN (TENDIK + GA + FINANCE)
- * Dinamis: Menyuntikkan Stempel Elektronik jika sudah di-ACC
+ * Dinamis: Menyuntikkan Stempel ACC atau REJECTED
  */
 function buat_pdf_pengajuan($id_pengadaan)
 {
@@ -955,6 +957,15 @@ function buat_pdf_pengajuan($id_pengadaan)
     $explode = explode('|||VENDOR|||', $alasan_full);
     $alasan_murni = trim($explode[0]);
 
+    // DETEKSI PENOLAKAN
+    $is_rejected = ($data['statusPengadaan'] === 'Ditolak');
+    $rejected_by_ga = ($is_rejected && empty($data['idFinance']));
+    $rejected_by_finance = ($is_rejected && !empty($data['idFinance']));
+
+    if ($is_rejected && !empty($data['alasanPenolakan_pengadaan'])) {
+        $alasan_murni .= "<br><br><strong style='color:#dc3545;'>[DITOLAK]:</strong> " . nl2br(htmlspecialchars($data['alasanPenolakan_pengadaan']));
+    }
+
     // =========================================================================
     // TRIK BASE64: MEMBACA GAMBAR STEMPEL DARI FOLDER ASSETS
     // =========================================================================
@@ -962,12 +973,30 @@ function buat_pdf_pengajuan($id_pengadaan)
     $path_ga = __DIR__ . '/../assets/images/stamp_kepalaga.png';
     $path_finance = __DIR__ . '/../assets/images/stamp_finance.png';
 
-    // Tendik selalu muncul karena dia pembuatnya
+    // PATH STEMPEL REJECT
+    $path_reject_ga = __DIR__ . '/../assets/images/stamp_reject_kepalaga.png';
+    $path_reject_finance = __DIR__ . '/../assets/images/stamp_reject_finance.png';
+
+    // 1. Tendik Stamp (Selalu Muncul)
     $img_tendik = file_exists($path_tendik) ? '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_tendik)) . '" height="70">' : '<br><br><br>';
 
-    // Kepala GA dan Finance hanya muncul jika kolom di DB tidak kosong
-    $img_ga = !empty($data['namaGA']) && file_exists($path_ga) ? '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_ga)) . '" height="70">' : '<br><br><br>';
-    $img_finance = !empty($data['namaFinance']) && file_exists($path_finance) ? '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_finance)) . '" height="70">' : '<br><br><br>';
+    // 2. Kepala GA Stamp
+    if ($rejected_by_ga && file_exists($path_reject_ga)) {
+        $img_ga = '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_reject_ga)) . '" height="70">';
+    } elseif (!empty($data['idKepalaGA']) && file_exists($path_ga)) {
+        $img_ga = '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_ga)) . '" height="70">';
+    } else {
+        $img_ga = '<br><br><br>';
+    }
+
+    // 3. Finance Stamp
+    if ($rejected_by_finance && file_exists($path_reject_finance)) {
+        $img_finance = '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_reject_finance)) . '" height="70">';
+    } elseif ($data['statusPengadaan'] === 'Disetujui Finance' && file_exists($path_finance)) {
+        $img_finance = '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_finance)) . '" height="70">';
+    } else {
+        $img_finance = '<br><br><br>';
+    }
 
     $html = '
     <!DOCTYPE html>
@@ -1002,7 +1031,7 @@ function buat_pdf_pengajuan($id_pengadaan)
             <tr><td>Nama Kebutuhan</td><td>: <strong>' . $data['namaKebutuhan'] . '</strong></td></tr>
             <tr><td>Jumlah Diminta</td><td>: <strong>' . $data['jumlah'] . ' Unit</strong></td></tr>
         </table>
-        <h4>Alasan Kebutuhan & Tujuan Penggunaan:</h4>
+        <h4>Alasan Kebutuhan & Tanggal Dibutuhkan:</h4>
         <div class="alasan-box">' . nl2br($alasan_murni) . '</div>
 
         <table class="tabel-ttd">
@@ -1029,16 +1058,13 @@ function buat_pdf_pengajuan($id_pengadaan)
 }
 
 /**
- * FUNGSI 33: GENERATE ULANG PDF PENAWARAN (SUPPLIER + FINANCE)
- * Dinamis: Menyuntikkan Stempel Elektronik jika sudah di-ACC
+ * FUNGSI 33: GENERATE ULANG PDF PENAWARAN (TIDAK LAGI PAKAI JSON)
  */
 function buat_pdf_penawaran($id_pengadaan)
 {
     global $koneksi;
 
-    $q = "SELECT tp.*, k.namaKategori, 
-                 us.namaSupplier AS namaSupplier, 
-                 uf.namaUser AS namaFinance
+    $q = "SELECT tp.*, k.namaKategori, us.namaSupplier, uf.namaUser AS namaFinance
           FROM transaksi_pengadaan tp
           JOIN kategori k ON tp.idKategori = k.idKategori
           LEFT JOIN supplier us ON tp.idSupplier = us.idSupplier
@@ -1049,129 +1075,99 @@ function buat_pdf_penawaran($id_pengadaan)
     $nama_supplier = $data['namaSupplier'] ? $data['namaSupplier'] : "(........................................)";
     $nama_finance = !empty($data['namaFinance']) ? $data['namaFinance'] : "(........................................)";
     $is_finance_acc = ($data['statusPengadaan'] === 'Disetujui Finance');
+    $is_rejected = ($data['statusPengadaan'] === 'Ditolak');
 
-    // =========================================================================
-    // TRIK BASE64 UNTUK STEMPEL SUPPLIER & FINANCE
-    // =========================================================================
     $path_supplier = __DIR__ . '/../assets/images/stamp_supplier.png';
     $path_finance = __DIR__ . '/../assets/images/stamp_finance.png';
+    $path_reject_finance = __DIR__ . '/../assets/images/stamp_reject_finance.png';
 
     $img_supplier = file_exists($path_supplier) ? '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_supplier)) . '" height="70">' : '<br><br><br>';
-    $img_finance = !empty($data['namaFinance']) && file_exists($path_finance) ? '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_finance)) . '" height="70">' : '<br><br><br>';
 
-    $explode = explode('|||VENDOR|||', $data['alasanKebutuhan']);
-    $json_vendor = isset($explode[1]) ? trim($explode[1]) : '[]';
-    $array_vendor = json_decode($json_vendor, true);
+    if ($is_rejected && file_exists($path_reject_finance)) {
+        $img_finance = '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_reject_finance)) . '" height="70">';
+    } elseif ($is_finance_acc && file_exists($path_finance)) {
+        $img_finance = '<img src="data:image/png;base64,' . base64_encode(file_get_contents($path_finance)) . '" height="70">';
+    } else {
+        $img_finance = '<br><br><br>';
+    }
+
+    $q_vendor = mysqli_query($koneksi, "SELECT * FROM detail_pengadaan_vendor WHERE idPengadaan = '$id_pengadaan' ORDER BY hargaSatuan ASC");
 
     $html_baris = '';
-    $tfoot_html = '';
-    $grand_total_pengeluaran = 0;
+    $subtotal_dana = 0;
     $total_unit_acc = 0;
+    $no = 1;
 
-    if (is_array($array_vendor)) {
-        foreach ($array_vendor as $index => $v) {
-            $harga_rp = "Rp " . number_format($v['harga'], 0, ',', '.');
+    while ($v = mysqli_fetch_assoc($q_vendor)) {
+        $harga_rp = "Rp " . number_format($v['hargaSatuan'], 0, ',', '.');
+        $estimasi_teks = $v['estimasiTiba'] . " Hari";
 
-            if ($is_finance_acc) {
-                $is_selected = isset($v['is_selected']) && $v['is_selected'];
-                $qty_acc = isset($v['qty_acc']) ? $v['qty_acc'] : 0;
-
+        if ($is_finance_acc || $is_rejected) {
+            if ($is_rejected) {
+                $status_html = "<span style='color:#dc3545; font-weight:bold;'>Ditolak</span>";
+                $total_rp_tampil = "-";
+            } else {
+                $is_selected = ($v['statusPilihan'] == 'Terpilih');
                 if ($is_selected) {
-                    $status_html = "<span style='color:#198754; font-weight:bold;'>Disetujui ($qty_acc Unit)</span>";
-                    $subtotal_acc = $qty_acc * $v['harga'];
-                    $grand_total_pengeluaran += $subtotal_acc;
-                    $total_unit_acc += $qty_acc;
+                    $status_html = "<span style='color:#198754; font-weight:bold;'>Disetujui</span>";
+                    $subtotal_acc = $v['stok'] * $v['hargaSatuan'];
+                    $subtotal_dana += $subtotal_acc; // Hitung Subtotal (Tanpa Pajak)
+                    $total_unit_acc += $v['stok'];
                     $total_rp_tampil = "Rp " . number_format($subtotal_acc, 0, ',', '.');
                 } else {
                     $status_html = "<span style='color:#dc3545; font-weight:bold;'>Ditolak</span>";
                     $total_rp_tampil = "-";
                 }
-
-                $html_baris .= "
-                <tr>
-                    <td style='text-align:center;'>" . ($index + 1) . "</td>
-                    <td><strong>{$v['toko']}</strong></td>
-                    <td>{$v['spek']}</td>
-                    <td style='text-align:right;'>{$harga_rp}</td>
-                    <td style='text-align:center;'>{$status_html}</td>
-                    <td style='text-align:right; font-weight:bold; color:#1d4197;'>{$total_rp_tampil}</td>
-                </tr>";
-            } else {
-                $total_stok_rp = "Rp " . number_format($v['stok'] * $v['harga'], 0, ',', '.');
-                $html_baris .= "
-                <tr>
-                    <td style='text-align:center;'>" . ($index + 1) . "</td>
-                    <td><strong>{$v['toko']}</strong></td>
-                    <td>{$v['spek']}</td>
-                    <td style='text-align:center;'>{$v['stok']} Unit</td>
-                    <td style='text-align:right;'>{$harga_rp}</td>
-                    <td style='text-align:right; font-weight:bold; color:#1d4197;'>{$total_stok_rp}</td>
-                </tr>";
             }
+            $html_baris .= "<tr><td style='text-align:center;'>{$no}</td><td><strong>{$v['namaVendor']}</strong></td><td>{$v['spesifikasi']}</td><td style='text-align:center;'>{$v['stok']} Unit<br><small>({$estimasi_teks})</small></td><td style='text-align:right;'>{$harga_rp}</td><td style='text-align:center;'>{$status_html}</td><td style='text-align:right; font-weight:bold;'>{$total_rp_tampil}</td></tr>";
+        } else {
+            $total_stok_rp = "Rp " . number_format($v['stok'] * $v['hargaSatuan'], 0, ',', '.');
+            $html_baris .= "<tr><td style='text-align:center;'>{$no}</td><td><strong>{$v['namaVendor']}</strong></td><td>{$v['spesifikasi']}</td><td style='text-align:center;'>{$v['stok']} Unit<br><small>({$estimasi_teks})</small></td><td style='text-align:right;'>{$harga_rp}</td><td style='text-align:right; font-weight:bold;'>{$total_stok_rp}</td></tr>";
         }
+        $no++;
     }
 
+    $tfoot_html = '';
+    // =========================================================================
+    // HITUNGAN PPN 12% UNTUK PDF FINANCE
+    // =========================================================================
     if ($is_finance_acc) {
-        $header_tabel = '<tr><th width="5%">No.</th><th width="20%">Nama Toko/Vendor</th><th width="25%">Keterangan</th><th width="15%">Harga Satuan</th><th width="15%">Keputusan</th><th width="20%">Total Harga</th></tr>';
-        $grand_total_rp = "Rp " . number_format($grand_total_pengeluaran, 0, ',', '.');
+        $ppn_12 = $subtotal_dana * 0.12;
+        $grand_total = $subtotal_dana + $ppn_12;
+
+        $header_tabel = '<tr><th width="5%">No.</th><th width="15%">Nama Toko</th><th width="25%">Spesifikasi</th><th width="10%">Stok (Est)</th><th width="15%">Harga Satuan</th><th width="10%">Keputusan</th><th width="20%">Total Harga</th></tr>';
+
+        $subtotal_rp = "Rp " . number_format($subtotal_dana, 0, ',', '.');
+        $ppn_rp = "Rp " . number_format($ppn_12, 0, ',', '.');
+        $grand_total_rp = "Rp " . number_format($grand_total, 0, ',', '.');
+
         $tfoot_html = "
         <tfoot>
+            <tr>
+                <td colspan='6' style='text-align:right; font-weight:bold; color:#555;'>SUBTOTAL ({$total_unit_acc} Unit) :</td>
+                <td style='text-align:right; font-weight:bold; color:#555;'>{$subtotal_rp}</td>
+            </tr>
+            <tr>
+                <td colspan='6' style='text-align:right; font-weight:bold; color:#555;'>PPN (12%) :</td>
+                <td style='text-align:right; font-weight:bold; color:#555;'>{$ppn_rp}</td>
+            </tr>
             <tr style='background-color:#e8f0fe;'>
-                <td colspan='4' style='text-align:right; font-weight:bold; color:#dc3545;'>TOTAL DANA DICAIRKAN :</td>
-                <td style='text-align:center; font-weight:bold; color:#1d4197;'>{$total_unit_acc} Unit</td>
-                <td style='text-align:right; font-weight:bold; color:#dc3545;'>{$grand_total_rp}</td>
+                <td colspan='6' style='text-align:right; font-weight:bold; color:#198754;'>TOTAL DICAIRKAN :</td>
+                <td style='text-align:right; font-weight:bold; color:#198754;'>{$grand_total_rp}</td>
             </tr>
         </tfoot>";
+    } elseif ($is_rejected) {
+        $header_tabel = '<tr><th width="5%">No.</th><th width="15%">Nama Toko</th><th width="25%">Spesifikasi</th><th width="10%">Stok (Est)</th><th width="15%">Harga Satuan</th><th width="10%">Keputusan</th><th width="20%">Total Harga</th></tr>';
     } else {
-        $header_tabel = '<tr><th width="5%">No.</th><th width="20%">Nama Toko/Vendor</th><th width="30%">Spesifikasi / Keterangan</th><th width="10%">Stok</th><th width="15%">Harga Satuan</th><th width="20%">Total Harga (Max)</th></tr>';
+        $header_tabel = '<tr><th width="5%">No.</th><th width="20%">Nama Toko/Vendor</th><th width="25%">Spesifikasi</th><th width="15%">Stok (Estimasi)</th><th width="15%">Harga Satuan</th><th width="20%">Total Harga (Max)</th></tr>';
     }
 
-    $html = '
-    <!DOCTYPE html>
-    <html lang="id">
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            body { font-family: "Helvetica", "Arial", sans-serif; font-size: 13px; color: #333; line-height: 1.6; }
-            .kop-surat { text-align: center; border-bottom: 3px solid #1d4197; padding-bottom: 15px; margin-bottom: 30px; }
-            .kop-surat h2 { margin: 0; color: #1d4197; font-size: 20px; text-transform: uppercase; }
-            .info-box { background-color: #f4f6f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-            .table-vendor { width: 100%; border-collapse: collapse; margin-top: 10px; }
-            .table-vendor th, .table-vendor td { border: 1px solid #ddd; padding: 8px; }
-            .table-vendor th { background-color: #1d4197; color: white; text-align: center; }
-            .tabel-ttd { width: 100%; text-align: center; margin-top: 50px; font-size: 14px; }
-            .tabel-ttd td { width: 50%; vertical-align: bottom; }
-            .stempel-box { height: 75px; margin: 10px 0; }
-            .footer { position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 10px; }
-        </style>
-    </head>
-    <body>
-        <div class="kop-surat">
-            <h2>DOKUMEN PENAWARAN & PERBANDINGAN HARGA VENDOR</h2>
-            <p>Sistem Manajemen Aset & Fasilitas Terpadu (ASTARrent) - ASTRAtech</p>
-        </div>
-        
-        <div class="info-box">
-            <p style="margin:0;"><strong>ID Pengadaan :</strong> ' . $id_pengadaan . '</p>
-            <p style="margin:5px 0;"><strong>Kebutuhan :</strong> ' . $data['namaKategori'] . ' - ' . $data['namaKebutuhan'] . ' (' . $data['jumlah'] . ' Unit Diajukan)</p>
-        </div>
+    $alasan_tolak_html = '';
+    if ($is_rejected && !empty($data['alasanPenolakan_pengadaan'])) {
+        $alasan_tolak_html = '<div style="background-color: #fff3f3; color: #dc3545; padding: 10px; border: 1px solid #f5c6cb; border-radius: 5px; margin-bottom: 20px;"><strong>ALASAN PENOLAKAN:</strong><br>' . nl2br(htmlspecialchars($data['alasanPenolakan_pengadaan'])) . '</div>';
+    }
 
-        <table class="table-vendor">
-            <thead>' . $header_tabel . '</thead>
-            <tbody>' . $html_baris . '</tbody>
-            ' . $tfoot_html . '
-        </table>
-
-        <table class="tabel-ttd">
-            <tr>
-                <td>Disurvei Oleh (Supplier),<br><div class="stempel-box">' . $img_supplier . '</div><b><u>' . $nama_supplier . '</u></b></td>
-                <td>Disetujui Oleh (Finance),<br><div class="stempel-box">' . $img_finance . '</div><b><u>' . $nama_finance . '</u></b></td>
-            </tr>
-        </table>
-
-        <div class="footer">Dokumen ini dicetak otomatis dan dilampirkan sebagai dokumen resmi pencairan dana.</div>
-    </body>
-    </html>';
+    $html = '<!DOCTYPE html><html lang="id"><head><style>body { font-family: "Helvetica", "Arial", sans-serif; font-size: 13px; color: #333; line-height: 1.6; } .kop-surat { text-align: center; border-bottom: 3px solid #1d4197; padding-bottom: 15px; margin-bottom: 30px; } .kop-surat h2 { margin: 0; color: #1d4197; font-size: 20px; } .info-box { background-color: #f4f6f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; } .table-vendor { width: 100%; border-collapse: collapse; margin-top: 10px; } .table-vendor th, .table-vendor td { border: 1px solid #ddd; padding: 8px; } .table-vendor th { background-color: #1d4197; color: white; text-align: center; } .tabel-ttd { width: 100%; text-align: center; margin-top: 50px; } .tabel-ttd td { width: 50%; vertical-align: bottom; } .stempel-box { height: 75px; margin: 10px 0; } .footer { position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 10px; }</style></head><body><div class="kop-surat"><h2>DOKUMEN PENAWARAN HARGA VENDOR</h2><p>Sistem Manajemen Aset & Fasilitas Terpadu (ASTARrent) - ASTRAtech</p></div><div class="info-box"><p style="margin:0;"><strong>ID Pengadaan :</strong> ' . $id_pengadaan . '</p><p style="margin:5px 0;"><strong>Kebutuhan :</strong> ' . $data['namaKategori'] . ' - ' . $data['namaKebutuhan'] . ' (' . $data['jumlah'] . ' Unit Dibutuhkan)</p></div>' . $alasan_tolak_html . '<table class="table-vendor"><thead>' . $header_tabel . '</thead><tbody>' . $html_baris . '</tbody>' . $tfoot_html . '</table><table class="tabel-ttd"><tr><td>Disurvei Oleh (Supplier),<br><div class="stempel-box">' . $img_supplier . '</div><b><u>' . $nama_supplier . '</u></b></td><td>Disetujui Oleh (Finance),<br><div class="stempel-box">' . $img_finance . '</div><b><u>' . $nama_finance . '</u></b></td></tr></table><div class="footer">Dokumen ini dicetak otomatis oleh ASTARrent.</div></body></html>';
 
     $options = new \Dompdf\Options();
     $options->set('isHtml5ParserEnabled', true);
@@ -1179,9 +1175,7 @@ function buat_pdf_penawaran($id_pengadaan)
     $dompdf->loadHtml($html);
     $dompdf->setPaper('A4', 'portrait');
     $dompdf->render();
-
-    $path_file = __DIR__ . '/../uploads/dokumen_penawaran/' . $data['dokumen_penawaran'];
-    file_put_contents($path_file, $dompdf->output());
+    file_put_contents(__DIR__ . '/../uploads/dokumen_penawaran/' . $data['dokumen_penawaran'], $dompdf->output());
 }
 
 /**
@@ -1219,7 +1213,7 @@ function script_dinamis_kepalaga_approve($has_supplier)
 }
 
 /**
- * FUNGSI 36: SCRIPT DINAMIS SUPPLIER (INPUT HARGA & STOK)
+ * FUNGSI 36: SCRIPT DINAMIS SUPPLIER (INPUT HARGA, STOK, & ESTIMASI)
  */
 function script_dinamis_supplier_input($kebutuhan_jumlah)
 {
@@ -1245,27 +1239,33 @@ function script_dinamis_supplier_input($kebutuhan_jumlah)
             let container = document.getElementById('vendor_container');
             let html_baru = `
                 <div class=\"row g-2 mb-3 vendor-row align-items-start\">
-                    <div class=\"col-md-3\"><input type=\"text\" name=\"nama_toko[]\" class=\"form-control\" style=\"border: 2px solid #e0e6ed;\" required placeholder=\"Nama Toko\"></div>
-                    <div class=\"col-md-4\"><input type=\"text\" name=\"spek_toko[]\" class=\"form-control\" style=\"border: 2px solid #e0e6ed;\" required placeholder=\"Keterangan\"></div>
+                    <div class=\"col-md-2\"><input type=\"text\" name=\"nama_toko[]\" class=\"form-control\" style=\"border: 2px solid #e0e6ed;\" required placeholder=\"Nama Toko\"></div>
+                    <div class=\"col-md-3\"><input type=\"text\" name=\"spek_toko[]\" class=\"form-control\" style=\"border: 2px solid #e0e6ed;\" required placeholder=\"Keterangan\"></div>
                     <div class=\"col-md-1\"><input type=\"number\" name=\"stok_toko[]\" class=\"form-control fw-bold border-danger input-stok\" required min=\"1\" placeholder=\"...\" oninput=\"cekTotalStok()\"></div>
-                    <div class=\"col-md-3\">
-                        <div class=\"input-group\"><span class=\"input-group-text bg-light fw-bold\">Rp</span><input type=\"number\" name=\"harga_toko[]\" class=\"form-control fw-bold\" style=\"border: 2px solid #e0e6ed;\" required placeholder=\"1000\" min=\"1000\"></div>
+                    <div class=\"col-md-2\">
+                        <div class=\"input-group\"><input type=\"number\" name=\"estimasi_tiba[]\" class=\"form-control fw-bold text-center\" style=\"border: 2px solid #e0e6ed;\" required min=\"1\" placeholder=\"...\"><span class=\"input-group-text bg-light\">Hari</span></div>
                     </div>
-                    <div class=\"col-md-1\"><button type=\"button\" class=\"btn btn-outline-danger w-100 fw-bold\" onclick=\"hapusBaris(this)\"><i class=\"bi bi-x-lg\"></i></button></div>
+                    <div class=\"col-md-3\">
+                        <div class=\"input-group\"><span class=\"input-group-text bg-light fw-bold\">Rp</span><input type=\"number\" name=\"harga_toko[]\" class=\"form-control fw-bold\" style=\"border: 2px solid #e0e6ed;\" required min=\"1000\" placeholder=\"...\"></div>
+                    </div>
+                    <div class=\"col-md-1 d-flex align-items-end\" style=\"height: 38px;\"><button type=\"button\" class=\"btn btn-outline-danger w-100 fw-bold\" onclick=\"hapusBaris(this)\"><i class=\"bi bi-x-lg\"></i></button></div>
                 </div>`;
             container.insertAdjacentHTML('beforeend', html_baru); cekTotalStok();
         }
         function hapusBaris(btn) {
             let row = btn.closest('.vendor-row');
             if (document.querySelectorAll('.vendor-row').length > 1) { row.remove(); cekTotalStok(); } 
-            else { alert('Minimal harus ada 1 vendor!'); }
+            else { alert('Minimal harus ada 1 vendor perbandingan!'); }
         }
         window.onload = cekTotalStok;
     </script>";
 }
 
 /**
- * FUNGSI 37: SCRIPT DINAMIS FINANCE (ACC PENCAIRAN)
+ * FUNGSI 37: SCRIPT DINAMIS FINANCE (ACC PENCAIRAN + PPN 12%)
+ */
+/**
+ * FUNGSI 37: SCRIPT DINAMIS FINANCE (ACC PENCAIRAN + PPN 12%)
  */
 function script_dinamis_finance_approve($kebutuhan_jumlah)
 {
@@ -1291,15 +1291,24 @@ function script_dinamis_finance_approve($kebutuhan_jumlah)
         }
         function updateTotal() {
             let checkboxes = document.querySelectorAll('.chk-vendor');
-            let totalUnit = 0; let totalRp = 0;
+            let totalUnit = 0; let subtotalRp = 0;
+
             checkboxes.forEach(function(chk) {
                 if (chk.checked) {
                     totalUnit += parseInt(chk.getAttribute('data-stok')) || 0;
-                    totalRp += parseInt(chk.getAttribute('data-harga')) || 0;
+                    subtotalRp += parseInt(chk.getAttribute('data-harga')) || 0;
                 }
             });
-            document.getElementById('display_total_unit').value = totalUnit + ' Unit';
-            document.getElementById('display_total_rp').value = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalRp);
+
+            // LOGIKA PPN 12% DI JAVASCRIPT
+            let ppnRp = subtotalRp * 0.12;
+            let grandTotalRp = subtotalRp + ppnRp;
+
+            // MENCETAK KE DALAM SPAN (BUKAN INPUT)
+            document.getElementById('display_total_unit').innerText = totalUnit;
+            document.getElementById('display_subtotal_rp').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(subtotalRp);
+            document.getElementById('display_ppn_rp').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(ppnRp);
+            document.getElementById('display_grand_total_rp').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(grandTotalRp);
 
             let btnSubmit = document.getElementById('btn_submit');
             let peringatan = document.getElementById('peringatan_qty');
@@ -1310,7 +1319,7 @@ function script_dinamis_finance_approve($kebutuhan_jumlah)
             } else {
                 btnSubmit.disabled = false; btnSubmit.classList.remove('btn-secondary', 'btn-danger');
                 btnSubmit.classList.add('btn-astar'); peringatan.style.display = 'none';
-                btnSubmit.innerHTML = 'Cairkan & Lahirkan Aset <i class=\"bi bi-magic ms-1\"></i>';
+                btnSubmit.innerHTML = 'Cairkan Dana & Pesan <i class=\"bi bi-wallet2 ms-1\"></i>';
             }
         }
         window.onload = toggleKeputusan;
@@ -1367,3 +1376,45 @@ function script_dinamis_reparasi()
         window.onload = toggleTindakan;
     </script>";
 }
+
+/**
+ * FUNGSI 39: ROBOT KEDATANGAN ASET (TIME-BASED TRIGGER)
+ * Mengecek apakah ada vendor yang barangnya diprediksi sudah tiba hari ini!
+ */
+function cek_kedatangan_aset_otomatis()
+{
+    global $koneksi;
+    $waktu_sekarang = date('Y-m-d H:i:s');
+
+    // Cari vendor yang sudah ACC, belum tiba, dan tanggal estimasi tibanya sudah lewat/hari ini!
+    $q_cek = mysqli_query($koneksi, "
+        SELECT dv.*, tp.idKategori, tp.namaKebutuhan 
+        FROM detail_pengadaan_vendor dv
+        JOIN transaksi_pengadaan tp ON dv.idPengadaan = tp.idPengadaan
+        WHERE dv.statusPilihan = 'Terpilih' 
+          AND dv.statusKedatangan = 'Belum Tiba' 
+          AND dv.tanggalJatuhTempo <= '$waktu_sekarang'
+    ");
+
+    while ($vendor = mysqli_fetch_assoc($q_cek)) {
+        $id_detail = $vendor['idDetail'];
+        $id_pengadaan = $vendor['idPengadaan'];
+        $qty_beli = (int)$vendor['stok'];
+        $id_kategori = $vendor['idKategori'];
+
+        $nama_aset_baru = $vendor['namaKebutuhan'] . " (" . $vendor['namaVendor'] . ")";
+
+        // Catat aset yang sudah tiba ke tabel master aset
+        for ($i = 0; $i < $qty_beli; $i++) {
+            $id_aset_baru = generate_id('AST', 'aset', 'idAset');
+            $q_tiba = "INSERT INTO aset (idAset, idKategori, idPengadaan, namaAset, kondisiAset, ketersediaanAset) 
+                        VALUES ('$id_aset_baru', '$id_kategori', '$id_pengadaan', '$nama_aset_baru', 'Normal', 'Tersedia')";
+            mysqli_query($koneksi, $q_tiba);
+        }
+
+        // Tandai barang vendor ini "Sudah Tiba" agar tidak dilooping ulang besok
+        mysqli_query($koneksi, "UPDATE detail_pengadaan_vendor SET statusKedatangan = 'Sudah Tiba' WHERE idDetail = '$id_detail'");
+    }
+}
+
+cek_kedatangan_aset_otomatis();

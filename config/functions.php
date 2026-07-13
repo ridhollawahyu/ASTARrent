@@ -731,35 +731,49 @@ function cari_id_sanksi_otomatis($kategori_waktu, $kondisi_fisik)
 }
 
 /**
- * FUNGSI 23: MATRIKS OTOMATISASI SANKSI (VERSI REVISI: Normal, Berfungsi, Tidak Berfungsi)
- * Menghitung Sanksi Tepat Waktu (A) maupun Terlambat (B, C, D)
+ * FUNGSI 23: MATRIKS OTOMATISASI SANKSI (DATABASE-DRIVEN)
  */
 function dapatkan_sanksi_otomatis($jam_terlambat, $kondisi_fisik)
 {
-    // Matriks Sanksi (Sesuai ID Sanksi SQL terbaru)
-    // SKS-000 adalah kode bantuan jika Tepat Waktu & Normal (Tidak ada sanksi)
-    $matrix = [
-        'A' => ['Normal' => 'SNK-00000', 'Berfungsi' => 'SNK-00001', 'Tidak Berfungsi' => 'SNK-00002'],
-        'B' => ['Normal' => 'SNK-00003', 'Berfungsi' => 'SNK-00004', 'Tidak Berfungsi' => 'SNK-00005'],
-        'C' => ['Normal' => 'SNK-00006', 'Berfungsi' => 'SNK-00007', 'Tidak Berfungsi' => 'SNK-00008'],
-        'D' => ['Normal' => 'SNK-00009', 'Berfungsi' => 'SNK-00010', 'Tidak Berfungsi' => 'SNK-00011']
-    ];
+    global $koneksi;
 
+    // 1. Tentukan Trigger Waktu
     $hari_telat = floor($jam_terlambat / 24);
+    $trigger_waktu = "";
 
-    // Penentuan Kategori Waktu
     if ($jam_terlambat <= 0) {
-        $kategori = 'A'; // Tepat waktu
+        $trigger_waktu = 'Tepat Waktu';
     } elseif ($jam_terlambat < 24) {
-        $kategori = 'B'; // Telat < 24 Jam
+        $trigger_waktu = 'Telat < 24 Jam';
     } elseif ($hari_telat >= 1 && $hari_telat <= 3) {
-        $kategori = 'C'; // Telat 1 - 3 Hari
+        $trigger_waktu = 'Telat 1-3 Hari';
     } else {
-        $kategori = 'D'; // Telat > 3 Hari
+        $trigger_waktu = 'Telat > 3 Hari';
     }
 
-    // Return ID Sanksi. Jika data tidak wajar/tidak ketemu, kembalikan aman (SNK-000)
-    return isset($matrix[$kategori][$kondisi_fisik]) ? $matrix[$kategori][$kondisi_fisik] : 'SNK-00000';
+    // 2. Trigger kondisi fisik sudah sama persis dengan ENUM
+    $trigger_kondisi = $kondisi_fisik; // Nilainya pasti: 'Normal', 'Berfungsi', 'Tidak Berfungsi'
+
+    // Pengecualian khusus: Jika tepat waktu & barang mulus, lolos dari sanksi.
+    if ($trigger_waktu == 'Tepat Waktu' && $trigger_kondisi == 'Normal') {
+        return "NULL";
+    }
+
+    // 3. CARI KE DATABASE (Murni mencocokkan Trigger, bukan Nama Sanksi)
+    $query = mysqli_query($koneksi, "
+        SELECT idSanksi 
+        FROM sanksi 
+        WHERE klasifikasi_waktu = '$trigger_waktu' 
+          AND klasifikasi_kondisi = '$trigger_kondisi' 
+          AND statusSanksi = 'Aktif' 
+        LIMIT 1
+    ");
+
+    if ($row = mysqli_fetch_assoc($query)) {
+        return "'" . $row['idSanksi'] . "'";
+    }
+
+    return "NULL"; // Fail-safe jika SA lupa membuat sanksi untuk kondisi tersebut
 }
 
 /**
@@ -1446,6 +1460,39 @@ function format_waktu_terlambat($total_jam)
 
     // Gabungkan array menjadi string dipisah spasi
     return implode(" ", $hasil);
+}
+
+/**
+ * FUNGSI 41: SCRIPT DINAMIS TIPE PEMINJAMAN (MAHASISWA)
+ */
+function script_dinamis_tipe_pinjam()
+{
+    return "
+    <script>
+        function toggleTipePinjam(tipe) {
+            let boxAset = document.getElementById('box_aset');
+            let boxFasilitas = document.getElementById('box_fasilitas');
+            let btnSubmit = document.getElementById('btn_submit_pinjam');
+            
+            let inputAset = document.querySelector(\"input[name='aset']\");
+            let inputFasilitas = document.querySelector(\"input[name='fasilitas']\");
+            
+            let textAset = inputAset ? document.getElementById('text_' + inputAset.id.replace('input_', '')) : null;
+            let textFasilitas = inputFasilitas ? document.getElementById('text_' + inputFasilitas.id.replace('input_', '')) : null;
+
+            if (tipe === 'aset') {
+                boxAset.style.display = 'block'; boxFasilitas.style.display = 'none';
+                if (inputFasilitas) inputFasilitas.value = '';
+                if (textFasilitas) textFasilitas.innerText = '-- Pilih --';
+            } else if (tipe === 'fasilitas') {
+                boxFasilitas.style.display = 'block'; boxAset.style.display = 'none';
+                if (inputAset) inputAset.value = '';
+                if (textAset) textAset.innerText = '-- Pilih --';
+            }
+            btnSubmit.disabled = false;
+            btnSubmit.classList.replace('btn-secondary', 'btn-astar');
+        }
+    </script>";
 }
 
 cek_kedatangan_aset_otomatis();

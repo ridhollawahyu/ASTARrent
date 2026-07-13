@@ -118,37 +118,6 @@
   </div>
 </div>
 
-<!-- ============================================== -->
-<!-- 6. MODAL KATEGORI DRAFT PENGADAAN (NATIVE FORM)-->
-<!-- ============================================== -->
-<?php $base_url = "/" . explode("/", $_SERVER['REQUEST_URI'])[1]; ?>
-<div class="modal fade" id="modalKategoriAset" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
-      <div class="modal-header text-white" style="background-color: #1d4197; border-radius: 15px 15px 0 0;">
-        <h5 class="modal-title fw-bold"><i class="bi bi-plus-circle-fill me-2"></i> Tambah Kategori Aset Baru</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-
-      <!-- Menggunakan Absolute URL yang dinamis beradaptasi dengan nama folder lokal XAMPP Anda -->
-      <form method="POST" action="<?= $base_url ?>/modules/04_rantai_pasok/master_kategori/tendik/create/create_aset.php">
-        <div class="modal-body p-4">
-          <div class="alert alert-warning py-2 mb-3" style="font-size: 13px;">
-            <i class="bi bi-exclamation-triangle-fill me-1"></i> Kategori ini akan berstatus <b>Draft</b> sampai disetujui Finance.
-          </div>
-          <label class="form-label text-astar fw-bold">Nama Kategori Baru <span class="text-danger">*</span></label>
-          <input type="text" name="nama_kategori" class="form-control border-primary" required placeholder="Contoh: Kamera DSLR, Drone, dll">
-        </div>
-        <div class="modal-footer justify-content-center border-0 pb-4 px-4 gap-3">
-          <button type="button" class="btn btn-light fw-bold px-4 text-secondary border" data-bs-dismiss="modal" style="border-radius: 8px;">Batal</button>
-          <!-- Native Submit -->
-          <button type="submit" name="submit_kategori_draft" class="btn btn-astar fw-bold px-4" style="border-radius: 8px;">Simpan & Gunakan</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
 <script>
   // Hanya mengatur Form Action dan Munculin Modal
   let modalTolak;
@@ -183,6 +152,37 @@
   });
 </script>
 
+<!-- ============================================== -->
+<!-- 6. MODAL KATEGORI DRAFT PENGADAAN (NATIVE FORM)-->
+<!-- ============================================== -->
+<?php $base_url = "/" . explode("/", $_SERVER['REQUEST_URI'])[1]; ?>
+<div class="modal fade" id="modalKategoriAset" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+      <div class="modal-header text-white" style="background-color: #1d4197; border-radius: 15px 15px 0 0;">
+        <h5 class="modal-title fw-bold"><i class="bi bi-plus-circle-fill me-2"></i> Tambah Kategori Aset Baru</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Menggunakan Absolute URL yang dinamis beradaptasi dengan nama folder lokal XAMPP Anda -->
+      <form method="POST" action="<?= $base_url ?>/modules/04_rantai_pasok/master_kategori/tendik/create/create_aset.php">
+        <div class="modal-body p-4">
+          <div class="alert alert-warning py-2 mb-3" style="font-size: 13px;">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> Kategori ini akan berstatus <b>Draft</b> sampai disetujui Finance.
+          </div>
+          <label class="form-label text-astar fw-bold">Nama Kategori Baru <span class="text-danger">*</span></label>
+          <input type="text" name="nama_kategori" class="form-control border-primary" required placeholder="Contoh: Kamera DSLR, Drone, dll">
+        </div>
+        <div class="modal-footer justify-content-center border-0 pb-4 px-4 gap-3">
+          <button type="button" class="btn btn-light fw-bold px-4 text-secondary border" data-bs-dismiss="modal" style="border-radius: 8px;">Batal</button>
+          <!-- Native Submit -->
+          <button type="submit" name="submit_kategori_draft" class="btn btn-astar fw-bold px-4" style="border-radius: 8px;">Simpan & Gunakan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <?php
 // ===================================================================================
 // PENGUNCI UI KATEGORI (HANYA MUNCUL JIKA SESSION DRAFT AKTIF)
@@ -209,6 +209,42 @@ if (isset($_SESSION['draft_kategori_id'])):
     });
   </script>
 <?php endif; ?>
+
+<!-- ============================================== -->
+<!-- 7. MODAL PELUNASAN SANKSI (GLOBAL)             -->
+<!-- ============================================== -->
+<div class="modal fade" id="modalLunas" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+      <div class="modal-header bg-success text-white" style="border-radius: 15px 15px 0 0;">
+        <h5 class="modal-title fw-bold"><i class="bi bi-check-circle-fill me-2"></i> Konfirmasi Pelunasan</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="" method="POST" id="formLunas">
+        <div class="modal-body text-center p-4">
+          <input type="hidden" name="nim" id="lunas_nim">
+          <i class="bi bi-patch-check-fill text-success mb-3" style="font-size: 3rem;"></i>
+          <h5 class="text-dark fw-bold mb-2">Selesaikan Sanksi?</h5>
+          <p class="text-secondary mb-0">Hapus kewajiban milik <b id="lunas_nama" class="text-dark"></b>?</p>
+        </div>
+        <div class="modal-footer justify-content-center border-0 pb-4">
+          <button type="button" class="btn btn-light fw-bold px-4" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" name="submit_lunas" class="btn btn-success fw-bold px-4">Ya, Proses Lunas</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // JS GLOBAL UNTUK MODAL PELUNASAN SANKSI
+  function bukaModalLunas(nim, nama, urlEndpoint) {
+    document.getElementById('lunas_nim').value = nim;
+    document.getElementById('lunas_nama').innerText = nama;
+    document.getElementById('formLunas').action = urlEndpoint;
+    new bootstrap.Modal(document.getElementById('modalLunas')).show();
+  }
+</script>
 
 <!-- SCRIPT BOOTSTRAP -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

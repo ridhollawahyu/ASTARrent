@@ -28,6 +28,9 @@ $q_dana = mysqli_query($koneksi, "SELECT SUM(totalBiaya) AS total FROM transaksi
 $data_dana = mysqli_fetch_assoc($q_dana);
 $total_dana = $data_dana['total'] ?: 0;
 
+$q_beku_fin = mysqli_query($koneksi, "SELECT COUNT(nimMahasiswa) AS total FROM mahasiswa WHERE dendaMahasiswa > 0");
+$total_beku_fin = mysqli_fetch_assoc($q_beku_fin)['total'];
+
 include '../../components/header.php';
 ?>
 
@@ -150,6 +153,25 @@ include '../../components/header.php';
                     <h5 class="fw-bold text-dark mb-3">Laporan Transaksi</h5>
                     <p class="text-secondary mb-4 flex-grow-1">Lihat dan ekspor laporan monitoring peminjaman dan pengadaan aset baru.</p>
                     <a href="../05_laporan_sistem/index.php" class="btn btn-astar mt-auto py-2 fw-bold">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu 2: Pelunasan Denda -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card menu-card h-100 p-4">
+                <div class="card-body d-flex flex-column">
+                    <div class="icon-box"><i class="bi bi-cash-stack"></i></div>
+                    <h5 class="fw-bold text-dark mb-3">Penerimaan Denda</h5>
+                    <p class="text-secondary mb-4 flex-grow-1">Proses pelunasan tagihan denda mahasiswa dari seluruh Prodi agar akun kembali normal.</p>
+                    <a href="../02_kedisiplinan/pelunasan_sanksi/finance/index.php" class="btn btn-astar mt-auto py-2 fw-bold position-relative">
+                        Proses Pembayaran <i class="bi bi-arrow-right ms-2"></i>
+                        <?php if ($total_beku_fin > 0): ?>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white shadow-sm">
+                                <?= $total_beku_fin; ?>
+                            </span>
+                        <?php endif; ?>
+                    </a>
                 </div>
             </div>
         </div>

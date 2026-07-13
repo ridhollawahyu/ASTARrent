@@ -58,6 +58,9 @@ $hitung_mhs = mysqli_query($koneksi, "SELECT COUNT(*) AS total_mhs FROM mahasisw
 $data_mhs_count = mysqli_fetch_assoc($hitung_mhs);
 $total_mhs = $data_mhs_count ? $data_mhs_count['total_mhs'] : 0;
 
+$q_beku_tendik = mysqli_query($koneksi, "SELECT COUNT(nimMahasiswa) AS total FROM mahasiswa WHERE jamMinus_mahasiswa > 0 AND kodeProdi_mahasiswa = '$dept_tendik'");
+$total_beku_tendik = mysqli_fetch_assoc($q_beku_tendik)['total'];
+
 include '../../components/header.php';
 ?>
 
@@ -268,6 +271,25 @@ include '../../components/header.php';
                     <h5 class="fw-bold text-dark mb-3">Laporan Transaksi</h5>
                     <p class="text-secondary mb-4 flex-grow-1">Lihat dan ekspor laporan monitoring peminjaman, pengembalian, dan pengadaan prodi Anda.</p>
                     <a href="../05_laporan_sistem/index.php" class="btn btn-astar mt-auto py-2 fw-bold">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu 7: Pelunasan Sanksi -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card menu-card h-100 p-4">
+                <div class="card-body d-flex flex-column">
+                    <div class="icon-box"><i class="bi bi-shield-slash-fill"></i></div>
+                    <h5 class="fw-bold text-dark mb-3">Penyelesaian Sanksi</h5>
+                    <p class="text-secondary mb-4 flex-grow-1">Buka pembekuan akun mahasiswa (<?= $dept_tendik ?>) yang telah melunasi denda/kompensasi.</p>
+                    <a href="../02_kedisiplinan/pelunasan_sanksi/tendik/index.php" class="btn btn-astar mt-auto py-2 fw-bold position-relative">
+                        Proses Pelunasan <i class="bi bi-arrow-right ms-2"></i>
+                        <?php if ($total_beku_tendik > 0): ?>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white shadow-sm">
+                                <?= $total_beku_tendik; ?>
+                            </span>
+                        <?php endif; ?>
+                    </a>
                 </div>
             </div>
         </div>

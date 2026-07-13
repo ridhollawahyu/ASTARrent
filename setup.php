@@ -65,6 +65,8 @@ $tables = [
         namaSanksi VARCHAR(100) NOT NULL,
         sanksi_jamMinus INT DEFAULT 0 NOT NULL,
         sanksi_denda INT DEFAULT 0 NOT NULL,
+        klasifikasi_waktu ENUM('Tepat Waktu', 'Telat < 24 Jam', 'Telat 1-3 Hari', 'Telat > 3 Hari', 'Manual') NOT NULL,
+        klasifikasi_kondisi ENUM('Normal', 'Berfungsi', 'Tidak Berfungsi', 'Manual') NOT NULL,
         statusSanksi ENUM('Aktif', 'Nonaktif') DEFAULT 'Aktif' NOT NULL
     )",
 
@@ -254,24 +256,23 @@ $q_aset = "INSERT IGNORE INTO aset (idAset, idKategori, namaAset) VALUES
 mysqli_query($conn, $q_aset);
 
 // E. Insert Sanksi Dummy (Biar Mahasiswa bisa langsung klik pinjam pas demo!)
-$q_sanksi = "INSERT INTO sanksi (idSanksi, namaSanksi, sanksi_jamMinus, sanksi_denda, statusSanksi) VALUES
-('SNK-00000', 'Tepat Waktu + Normal', 0, 0, 'Aktif'),
-('SNK-00001', 'Tepat Waktu + Rusak (Masih Berfungsi)', 2, 50000, 'Aktif'),
-('SNK-00002', 'Tepat Waktu + Rusak (Tidak Berfungsi)', 10, 500000, 'Aktif'),
-('SNK-00003', 'Telat < 24 Jam (Barang Normal)', 2, 0, 'Aktif'),
-('SNK-00004', 'Telat < 24 Jam + Rusak (Masih Berfungsi)', 4, 50000, 'Aktif'),
-('SNK-00005', 'Telat < 24 Jam + Rusak (Tidak Berfungsi)', 12, 500000, 'Aktif'),
-('SNK-00006', 'Telat 1-3 Hari (Barang Normal)', 5, 25000, 'Aktif'),
-('SNK-00007', 'Telat 1-3 Hari + Rusak (Masih Berfungsi)', 7, 75000, 'Aktif'),
-('SNK-00008', 'Telat 1-3 Hari + Rusak (Tidak Berfungsi)', 15, 525000, 'Aktif'),
-('SNK-00009', 'Telat > 3 Hari (Barang Normal)', 10, 75000, 'Aktif'),
-('SNK-00010', 'Telat > 3 Hari + Rusak (Masih Berfungsi)', 12, 125000, 'Aktif'),
-('SNK-00011', 'Telat > 3 Hari + Rusak (Tidak Berfungsi)', 20, 575000, 'Aktif'),
-('SNK-00012', 'Batal Sepihak / No-Show', 3, 0, 'Aktif'),
-('SNK-00013', 'Meninggalkan Fasilitas Berantakan', 5, 0, 'Aktif'),
-('SNK-00014', 'Penyalahgunaan Hak Pinjam', 30, 500000, 'Aktif'),
-('SNK-00015', 'Kehilangan Aset Kampus', 50, 3500000, 'Aktif'),
-('SNK-00016', 'tes', 0, 0, 'Aktif')";
+$q_sanksi = "INSERT IGNORE INTO sanksi (idSanksi, namaSanksi, sanksi_jamMinus, sanksi_denda, klasifikasi_waktu, klasifikasi_kondisi, statusSanksi) VALUES
+('SNK-00000', 'Tepat Waktu + Normal (Aman)', 0, 0, 'Tepat Waktu', 'Normal', 'Aktif'),
+('SNK-00001', 'Tepat Waktu + Rusak (Masih Berfungsi)', 2, 50000, 'Tepat Waktu', 'Berfungsi', 'Aktif'),
+('SNK-00002', 'Tepat Waktu + Rusak (Tidak Berfungsi)', 10, 500000, 'Tepat Waktu', 'Tidak Berfungsi', 'Aktif'),
+('SNK-00003', 'Telat < 24 Jam (Barang Normal)', 2, 0, 'Telat < 24 Jam', 'Normal', 'Aktif'),
+('SNK-00004', 'Telat < 24 Jam + Rusak (Masih Berfungsi)', 4, 50000, 'Telat < 24 Jam', 'Berfungsi', 'Aktif'),
+('SNK-00005', 'Telat < 24 Jam + Rusak (Tidak Berfungsi)', 12, 500000, 'Telat < 24 Jam', 'Tidak Berfungsi', 'Aktif'),
+('SNK-00006', 'Telat 1-3 Hari (Barang Normal)', 5, 25000, 'Telat 1-3 Hari', 'Normal', 'Aktif'),
+('SNK-00007', 'Telat 1-3 Hari + Rusak (Masih Berfungsi)', 7, 75000, 'Telat 1-3 Hari', 'Berfungsi', 'Aktif'),
+('SNK-00008', 'Telat 1-3 Hari + Rusak (Tidak Berfungsi)', 15, 525000, 'Telat 1-3 Hari', 'Tidak Berfungsi', 'Aktif'),
+('SNK-00009', 'Telat > 3 Hari (Barang Normal)', 10, 75000, 'Telat > 3 Hari', 'Normal', 'Aktif'),
+('SNK-00010', 'Telat > 3 Hari + Rusak (Masih Berfungsi)', 12, 125000, 'Telat > 3 Hari', 'Berfungsi', 'Aktif'),
+('SNK-00011', 'Telat > 3 Hari + Rusak (Tidak Berfungsi)', 20, 575000, 'Telat > 3 Hari', 'Tidak Berfungsi', 'Aktif'),
+('SNK-00012', 'Batal Sepihak / No-Show', 3, 0, 'Manual', 'Manual', 'Aktif'),
+('SNK-00013', 'Meninggalkan Fasilitas Berantakan', 5, 0, 'Manual', 'Manual', 'Aktif'),
+('SNK-00014', 'Penyalahgunaan Hak Pinjam', 30, 500000, 'Manual', 'Manual', 'Aktif'),
+('SNK-00015', 'Kehilangan Aset Kampus', 50, 3500000, 'Manual', 'Manual', 'Aktif')";
 mysqli_query($conn, $q_sanksi);
 
 // Cek Hasil

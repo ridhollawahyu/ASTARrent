@@ -2,19 +2,19 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
-include '../../../../config/database.php';
-include '../../../../config/functions.php';
+include '../../../config/database.php';
+include '../../../config/functions.php';
 
 /** @var mysqli $koneksi */
 
 // 1. VALIDASI HAK AKSES
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Staff GA') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini tidak dapat diakses oleh Anda.');
-    header('Location: ../../../00_auth/login.php');
+    header('Location: ../../00_auth/login.php');
     exit;
 } elseif (isset($_SESSION['status']) && $_SESSION['status'] === 'Nonaktif') {
     set_notifikasi('error', 'Akses Ditolak! Akun Anda sudah dinonaktifkan.');
-    header('Location: ../../../00_auth/login.php');
+    header('Location: ../../00_auth/login.php');
     exit;
 }
 
@@ -72,9 +72,9 @@ $stat_card3_val = count($menunggu);
 $stat_card3_icon = "bi-hourglass-split";
 $stat_card3_bg = "bg-warning shadow-warning";
 
-$dashboard_link = "../../../dashboards/staffga_home.php";
+$dashboard_link = "../../dashboards/staffga_home.php";
 
-include '../../../../components/header.php';
+include '../../../components/header.php';
 ?>
 
 <!-- STYLE PRINTING & EXPORT -->
@@ -85,26 +85,44 @@ include '../../../../components/header.php';
             color: black !important;
             font-size: 12px !important;
         }
-        .no-print, .navbar, .btn, form, .dataTables_filter, .dataTables_length, .dataTables_paginate, .dataTables_info, .card-header, .nav-tabs {
+
+        .no-print,
+        .navbar,
+        .btn,
+        form,
+        .dataTables_filter,
+        .dataTables_length,
+        .dataTables_paginate,
+        .dataTables_info,
+        .card-header,
+        .nav-tabs {
             display: none !important;
         }
-        .container, .card, .card-body {
+
+        .container,
+        .card,
+        .card-body {
             padding: 0 !important;
             margin: 0 !important;
             box-shadow: none !important;
             border: none !important;
         }
+
         .table-responsive {
             overflow: visible !important;
         }
+
         table {
             width: 100% !important;
             border-collapse: collapse !important;
         }
-        table th, table td {
+
+        table th,
+        table td {
             border: 1px solid #111 !important;
             padding: 6px !important;
         }
+
         .print-header {
             display: block !important;
             text-align: center;
@@ -112,18 +130,21 @@ include '../../../../components/header.php';
             border-bottom: 3px double #111;
             padding-bottom: 10px;
         }
+
         .print-title {
             font-size: 20px;
             font-weight: bold;
             margin: 0;
             color: #000;
         }
+
         .print-date {
             font-size: 11px;
             color: #555;
             margin-top: 5px;
         }
     }
+
     .print-header {
         display: none;
     }
@@ -165,12 +186,12 @@ include '../../../../components/header.php';
                 <label class="form-label fw-bold text-astar">Dari Tanggal</label>
                 <input type="date" name="tgl_awal" class="form-control border-2" style="border-radius:8px; border-color:#e0e6ed; color:#1d4197; font-weight:500;" value="<?= htmlspecialchars($tgl_awal) ?>">
             </div>
-            
+
             <div class="col-md-4 col-6">
                 <label class="form-label fw-bold text-astar">Sampai Tanggal</label>
                 <input type="date" name="tgl_akhir" class="form-control border-2" style="border-radius:8px; border-color:#e0e6ed; color:#1d4197; font-weight:500;" value="<?= htmlspecialchars($tgl_akhir) ?>">
             </div>
-            
+
             <div class="col-md-4">
                 <label class="form-label fw-bold text-astar">Status Transaksi</label>
                 <select name="status" class="form-select border-2" style="border-radius:8px; border-color:#e0e6ed; color:#1d4197; font-weight:500;">
@@ -181,7 +202,7 @@ include '../../../../components/header.php';
                     <option value="Selesai" <?= $status_filter === 'Selesai' ? 'selected' : '' ?>>Selesai</option>
                 </select>
             </div>
-            
+
             <div class="col-12 d-flex justify-content-between mt-4">
                 <div>
                     <button type="submit" class="btn btn-astar px-4 fw-bold"><i class="bi bi-funnel-fill"></i> Terapkan Filter</button>
@@ -212,7 +233,7 @@ include '../../../../components/header.php';
             </div>
         </div>
     </div>
-    
+
     <!-- Card 2 -->
     <div class="col-md-4">
         <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #198754 !important;">
@@ -227,7 +248,7 @@ include '../../../../components/header.php';
             </div>
         </div>
     </div>
-    
+
     <!-- Card 3 -->
     <div class="col-md-4">
         <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #dc3545 !important;">
@@ -260,9 +281,9 @@ include '../../../../components/header.php';
                     </tr>
                 </thead>
                 <tbody>
-                    <?php 
+                    <?php
                     $no = 1;
-                    foreach ($data_report as $row): 
+                    foreach ($data_report as $row):
                         $nm_barang = !empty($row['idAset']) ? '[Aset] ' . $row['namaAset'] : '[Fasilitas] ' . $row['namaFasilitas'];
                         $badge_class = 'bg-warning text-dark';
                         if ($row['statusPeminjaman'] === 'Disetujui') $badge_class = 'bg-primary';
@@ -293,7 +314,7 @@ include '../../../../components/header.php';
         let table = document.getElementById("tableLaporan");
         let rows = table.querySelectorAll("tr");
         let csvContent = "";
-        
+
         rows.forEach(function(row) {
             let cols = row.querySelectorAll("td, th");
             let rowData = [];
@@ -303,12 +324,14 @@ include '../../../../components/header.php';
             });
             csvContent += rowData.join(",") + "\r\n";
         });
-        
-        let blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: "text/csv;charset=utf-8;" });
+
+        let blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], {
+            type: "text/csv;charset=utf-8;"
+        });
         let link = document.createElement("a");
         let url = URL.createObjectURL(blob);
-        let fileName = "Laporan_Astarrent_peminjaman_" + new Date().toISOString().slice(0,10) + ".csv";
-        
+        let fileName = "Laporan_Astarrent_peminjaman_" + new Date().toISOString().slice(0, 10) + ".csv";
+
         link.setAttribute("href", url);
         link.setAttribute("download", fileName);
         link.style.visibility = "hidden";
@@ -318,4 +341,4 @@ include '../../../../components/header.php';
     }
 </script>
 
-<?php include '../../../../components/footer.php'; ?>
+<?php include '../../../components/footer.php'; ?>

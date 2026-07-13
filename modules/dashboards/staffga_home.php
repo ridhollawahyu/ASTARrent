@@ -108,13 +108,13 @@ include '../../components/header.php';
     <div class="row g-4 mb-4">
         <!-- Card 1: Tiket Reparasi Aktif -->
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #dc3545 !important;">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #1d4197 !important;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Tiket Reparasi Aktif</p>
-                        <h4 class="fw-bold mb-0 text-danger"><?= $total_reparasi_menunggu ?> Tiket</h4>
+                        <h4 class="fw-bold mb-0 text-dark"><?= $total_reparasi_menunggu ?> Tiket</h4>
                     </div>
-                    <div class="rounded-circle p-3 bg-danger-subtle text-danger" style="font-size: 1.5rem; line-height: 1;">
+                    <div class="rounded-circle p-3 bg-primary-subtle text-astar" style="font-size: 1.5rem; line-height: 1;">
                         <i class="bi bi-tools"></i>
                     </div>
                 </div>
@@ -122,13 +122,13 @@ include '../../components/header.php';
         </div>
         <!-- Card 2: Request Peminjaman Menunggu -->
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #ffc107 !important;">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #1d4197 !important;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Antrean Peminjaman</p>
-                        <h4 class="fw-bold mb-0 text-warning"><?= $total_antrean ?> Request</h4>
+                        <h4 class="fw-bold mb-0 text-dark"><?= $total_antrean ?> Request</h4>
                     </div>
-                    <div class="rounded-circle p-3 bg-warning-subtle text-warning" style="font-size: 1.5rem; line-height: 1;">
+                    <div class="rounded-circle p-3 bg-primary-subtle text-astar" style="font-size: 1.5rem; line-height: 1;">
                         <i class="bi bi-clock-history"></i>
                     </div>
                 </div>
@@ -136,13 +136,13 @@ include '../../components/header.php';
         </div>
         <!-- Card 3: Antrean Verifikasi Pengembalian -->
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #198754 !important;">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #1d4197 !important;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Antrean Pengembalian</p>
-                        <h4 class="fw-bold mb-0 text-success"><?= $total_antreanP ?> Request</h4>
+                        <h4 class="fw-bold mb-0 text-dark"><?= $total_antreanP ?> Request</h4>
                     </div>
-                    <div class="rounded-circle p-3 bg-success-subtle text-success" style="font-size: 1.5rem; line-height: 1;">
+                    <div class="rounded-circle p-3 bg-primary-subtle text-astar" style="font-size: 1.5rem; line-height: 1;">
                         <i class="bi bi-check-circle-fill"></i>
                     </div>
                 </div>

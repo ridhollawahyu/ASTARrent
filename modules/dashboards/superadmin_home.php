@@ -7,6 +7,8 @@ include '../../config/database.php';
 include '../../config/functions.php';
 include '../../components/header.php';
 
+/** @var mysqli $koneksi */
+
 // Validasi Keamanan (Hanya SA yang boleh masuk)
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Super Admin.');
@@ -95,9 +97,9 @@ $total_fas = $q_fas ? mysqli_fetch_assoc($q_fas)['total'] : 0;
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Tim Staff (Aktif)</p>
-                        <h4 class="fw-bold mb-0 text-primary"><?= $total_users ?> Orang</h4>
+                        <h4 class="fw-bold mb-0 text-dark"><?= $total_users ?> Orang</h4>
                     </div>
-                    <div class="rounded-circle p-3 bg-primary-subtle text-primary" style="font-size: 1.5rem; line-height: 1;">
+                    <div class="rounded-circle p-3 bg-primary-subtle text-astar" style="font-size: 1.5rem; line-height: 1;">
                         <i class="bi bi-person-badge-fill"></i>
                     </div>
                 </div>
@@ -105,13 +107,13 @@ $total_fas = $q_fas ? mysqli_fetch_assoc($q_fas)['total'] : 0;
         </div>
         <!-- Card 2: Jumlah Mahasiswa -->
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #198754 !important;">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #1d4197 !important;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Mahasiswa (Normal)</p>
-                        <h4 class="fw-bold mb-0 text-success"><?= $total_mhs ?> Orang</h4>
+                        <h4 class="fw-bold mb-0 text-dark"><?= $total_mhs ?> Orang</h4>
                     </div>
-                    <div class="rounded-circle p-3 bg-success-subtle text-success" style="font-size: 1.5rem; line-height: 1;">
+                    <div class="rounded-circle p-3 bg-primary-subtle text-astar" style="font-size: 1.5rem; line-height: 1;">
                         <i class="bi bi-mortarboard-fill"></i>
                     </div>
                 </div>
@@ -119,13 +121,13 @@ $total_fas = $q_fas ? mysqli_fetch_assoc($q_fas)['total'] : 0;
         </div>
         <!-- Card 3: Total Aset -->
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #ffc107 !important;">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #1d4197 !important;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Total Aset Inventaris</p>
-                        <h4 class="fw-bold mb-0 text-warning"><?= $total_aset ?> Items</h4>
+                        <h4 class="fw-bold mb-0 text-dark"><?= $total_aset ?> Items</h4>
                     </div>
-                    <div class="rounded-circle p-3 bg-warning-subtle text-warning" style="font-size: 1.5rem; line-height: 1;">
+                    <div class="rounded-circle p-3 bg-primary-subtle text-astar" style="font-size: 1.5rem; line-height: 1;">
                         <i class="bi bi-pc-display"></i>
                     </div>
                 </div>
@@ -133,13 +135,13 @@ $total_fas = $q_fas ? mysqli_fetch_assoc($q_fas)['total'] : 0;
         </div>
         <!-- Card 4: Total Fasilitas -->
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #0dcaf0 !important;">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #1d4197 !important;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Total Fasilitas Kampus</p>
-                        <h4 class="fw-bold mb-0 text-info"><?= $total_fas ?> Lokasi</h4>
+                        <h4 class="fw-bold mb-0 text-dark"><?= $total_fas ?> Lokasi</h4>
                     </div>
-                    <div class="rounded-circle p-3 bg-info-subtle text-info" style="font-size: 1.5rem; line-height: 1;">
+                    <div class="rounded-circle p-3 bg-primary-subtle text-astar" style="font-size: 1.5rem; line-height: 1;">
                         <i class="bi bi-house-up-fill"></i>
                     </div>
                 </div>

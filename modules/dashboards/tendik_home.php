@@ -119,13 +119,13 @@ include '../../components/header.php';
     <div class="row g-4 mb-4">
         <!-- Card 1: Antrean Peminjaman -->
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #ffc107 !important;">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #1d4197 !important;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Antrean Peminjaman</p>
-                        <h4 class="fw-bold mb-0 text-warning"><?= $total_antrean ?> Request</h4>
+                        <h4 class="fw-bold mb-0 text-dark"><?= $total_antrean ?> Request</h4>
                     </div>
-                    <div class="rounded-circle p-3 bg-warning-subtle text-warning" style="font-size: 1.5rem; line-height: 1;">
+                    <div class="rounded-circle p-3 bg-primary-subtle text-astar" style="font-size: 1.5rem; line-height: 1;">
                         <i class="bi bi-clock-history"></i>
                     </div>
                 </div>
@@ -137,9 +137,9 @@ include '../../components/header.php';
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Usulan Pengadaan Saya</p>
-                        <h4 class="fw-bold mb-0 text-primary"><?= $total_proc ?> Pengajuan</h4>
+                        <h4 class="fw-bold mb-0 text-dark"><?= $total_proc ?> Pengajuan</h4>
                     </div>
-                    <div class="rounded-circle p-3 bg-primary-subtle text-primary" style="font-size: 1.5rem; line-height: 1;">
+                    <div class="rounded-circle p-3 bg-primary-subtle text-astar" style="font-size: 1.5rem; line-height: 1;">
                         <i class="bi bi-cart-plus-fill"></i>
                     </div>
                 </div>
@@ -147,13 +147,13 @@ include '../../components/header.php';
         </div>
         <!-- Card 3: Total Mahasiswa Prodi -->
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #198754 !important;">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #1d4197 !important;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Mahasiswa Aktif (Prodi <?= $dept_tendik ?>)</p>
-                        <h4 class="fw-bold mb-0 text-success"><?= $total_mhs ?> Orang</h4>
+                        <h4 class="fw-bold mb-0 text-dark"><?= $total_mhs ?> Orang</h4>
                     </div>
-                    <div class="rounded-circle p-3 bg-success-subtle text-success" style="font-size: 1.5rem; line-height: 1;">
+                    <div class="rounded-circle p-3 bg-primary-subtle text-astar" style="font-size: 1.5rem; line-height: 1;">
                         <i class="bi bi-people-fill"></i>
                     </div>
                 </div>

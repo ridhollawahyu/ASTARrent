@@ -41,15 +41,15 @@ $data_mhs = mysqli_fetch_assoc($query_mhs);
     <div class="row g-4 mb-4">
         <!-- Card 1: Status Akun -->
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid <?= ($data_mhs['statusMahasiswa'] == 'Normal') ? '#198754' : '#dc3545' ?> !important;">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid <?= ($data_mhs['statusMahasiswa'] == 'Normal') ? '#1d4197' : '#dc3545' ?> !important;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Status Akun</p>
-                        <h4 class="fw-bold mb-0 <?= ($data_mhs['statusMahasiswa'] == 'Normal') ? 'text-success' : 'text-danger' ?>">
+                        <h4 class="fw-bold mb-0 <?= ($data_mhs['statusMahasiswa'] == 'Normal') ? 'text-dark' : 'text-danger' ?>">
                             <?= $data_mhs['statusMahasiswa'] ?>
                         </h4>
                     </div>
-                    <div class="rounded-circle p-3 <?= ($data_mhs['statusMahasiswa'] == 'Normal') ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' ?>" style="font-size: 1.5rem; line-height: 1;">
+                    <div class="rounded-circle p-3 <?= ($data_mhs['statusMahasiswa'] == 'Normal') ? 'bg-primary-subtle text-success' : 'bg-danger-subtle text-danger' ?>" style="font-size: 1.5rem; line-height: 1;">
                         <i class="bi <?= ($data_mhs['statusMahasiswa'] == 'Normal') ? 'bi-shield-check' : 'bi-shield-slash' ?>"></i>
                     </div>
                 </div>
@@ -57,7 +57,7 @@ $data_mhs = mysqli_fetch_assoc($query_mhs);
         </div>
         <!-- Card 2: Jam Minus -->
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid <?= ($data_mhs['jamMinus_mahasiswa'] > 0) ? '#ffc107' : '#1d4197' ?> !important;">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid <?= ($data_mhs['jamMinus_mahasiswa'] > 0) ? '#dc3545' : '#1d4197' ?> !important;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Jam Minus Kedisiplinan</p>
@@ -73,15 +73,15 @@ $data_mhs = mysqli_fetch_assoc($query_mhs);
         </div>
         <!-- Card 3: Denda Kumulatif -->
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid <?= ($data_mhs['dendaMahasiswa'] > 0) ? '#dc3545' : '#198754' ?> !important;">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid <?= ($data_mhs['dendaMahasiswa'] > 0) ? '#dc3545' : '#1d4197' ?> !important;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Denda Keterlambatan</p>
-                        <h4 class="fw-bold mb-0 <?= ($data_mhs['dendaMahasiswa'] > 0) ? 'text-danger' : 'text-success' ?>">
+                        <h4 class="fw-bold mb-0 <?= ($data_mhs['dendaMahasiswa'] > 0) ? 'text-danger' : 'text-dark' ?>">
                             Rp <?= number_format($data_mhs['dendaMahasiswa'], 0, ',', '.') ?>
                         </h4>
                     </div>
-                    <div class="rounded-circle p-3 <?= ($data_mhs['dendaMahasiswa'] > 0) ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success' ?>" style="font-size: 1.5rem; line-height: 1;">
+                    <div class="rounded-circle p-3 <?= ($data_mhs['dendaMahasiswa'] > 0) ? 'bg-danger-subtle text-danger' : 'bg-primary-subtle text-success' ?>" style="font-size: 1.5rem; line-height: 1;">
                         <i class="bi bi-cash-coin"></i>
                     </div>
                 </div>

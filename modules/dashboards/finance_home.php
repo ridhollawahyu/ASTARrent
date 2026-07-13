@@ -84,13 +84,13 @@ include '../../components/header.php';
     <div class="row g-4 mb-4">
         <!-- Card 1: Antrean Pencairan -->
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #ffc107 !important;">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #1d4197 !important;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Antrean E-Proc</p>
-                        <h4 class="fw-bold mb-0 text-warning"><?= $total_tugas ?> Request</h4>
+                        <h4 class="fw-bold mb-0 text-dark"><?= $total_tugas ?> Request</h4>
                     </div>
-                    <div class="rounded-circle p-3 bg-warning-subtle text-warning" style="font-size: 1.5rem; line-height: 1;">
+                    <div class="rounded-circle p-3 bg-primary-subtle text-astar" style="font-size: 1.5rem; line-height: 1;">
                         <i class="bi bi-file-earmark-check-fill"></i>
                     </div>
                 </div>
@@ -98,13 +98,13 @@ include '../../components/header.php';
         </div>
         <!-- Card 2: Pengadaan Selesai -->
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #198754 !important;">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #1d4197 !important;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Pengadaan Selesai</p>
-                        <h4 class="fw-bold mb-0 text-success"><?= $total_selesai ?> Transaksi</h4>
+                        <h4 class="fw-bold mb-0 text-dark"><?= $total_selesai ?> Transaksi</h4>
                     </div>
-                    <div class="rounded-circle p-3 bg-success-subtle text-success" style="font-size: 1.5rem; line-height: 1;">
+                    <div class="rounded-circle p-3 bg-primary-subtle text-astar" style="font-size: 1.5rem; line-height: 1;">
                         <i class="bi bi-check-circle-fill"></i>
                     </div>
                 </div>
@@ -116,9 +116,9 @@ include '../../components/header.php';
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Anggaran Terpakai</p>
-                        <h4 class="fw-bold mb-0 text-primary" style="font-size: 1.15rem;">Rp <?= number_format($total_dana, 0, ',', '.') ?></h4>
+                        <h4 class="fw-bold mb-0 text-dark" style="font-size: 1.15rem;">Rp <?= number_format($total_dana, 0, ',', '.') ?></h4>
                     </div>
-                    <div class="rounded-circle p-3 bg-primary-subtle text-primary" style="font-size: 1.5rem; line-height: 1;">
+                    <div class="rounded-circle p-3 bg-primary-subtle text-astar" style="font-size: 1.5rem; line-height: 1;">
                         <i class="bi bi-cash-coin"></i>
                     </div>
                 </div>

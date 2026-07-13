@@ -3,6 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
 // Panggil header global
+include '../../config/database.php';
 include '../../config/functions.php';
 include '../../components/header.php';
 
@@ -16,6 +17,19 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
     header('Location: ../00_auth/login.php');
     exit;
 }
+
+// Query Rekapitulasi Super Admin
+$q_users = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM users WHERE statusUser = 'Aktif' AND idUser != 'SA-00000'");
+$total_users = $q_users ? mysqli_fetch_assoc($q_users)['total'] : 0;
+
+$q_mhs = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM mahasiswa WHERE statusMahasiswa = 'Normal'");
+$total_mhs = $q_mhs ? mysqli_fetch_assoc($q_mhs)['total'] : 0;
+
+$q_aset = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM aset WHERE ketersediaanAset != 'Nonaktif'");
+$total_aset = $q_aset ? mysqli_fetch_assoc($q_aset)['total'] : 0;
+
+$q_fas = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM fasilitas WHERE ketersediaanFasilitas != 'Nonaktif'");
+$total_fas = $q_fas ? mysqli_fetch_assoc($q_fas)['total'] : 0;
 ?>
 
 <!-- Tambahkan CDN Bootstrap Icons khusus untuk halaman ini -->
@@ -28,7 +42,7 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
         color: white;
         border-radius: 15px;
         padding: 30px 40px;
-        margin-bottom: 40px;
+        margin-bottom: 25px;
         box-shadow: 0 10px 20px rgba(29, 65, 151, 0.2);
     }
 
@@ -69,6 +83,66 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
             </div>
             <div class="col-md-4 text-end d-none d-md-block">
                 <i class="bi bi-shield-lock text-white" style="font-size: 4rem; opacity: 0.8;"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metric Cards Row -->
+    <div class="row g-4 mb-4">
+        <!-- Card 1: Jumlah Pengguna (Staff) -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #1d4197 !important;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Tim Staff (Aktif)</p>
+                        <h4 class="fw-bold mb-0 text-primary"><?= $total_users ?> Orang</h4>
+                    </div>
+                    <div class="rounded-circle p-3 bg-primary-subtle text-primary" style="font-size: 1.5rem; line-height: 1;">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 2: Jumlah Mahasiswa -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #198754 !important;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Mahasiswa (Normal)</p>
+                        <h4 class="fw-bold mb-0 text-success"><?= $total_mhs ?> Orang</h4>
+                    </div>
+                    <div class="rounded-circle p-3 bg-success-subtle text-success" style="font-size: 1.5rem; line-height: 1;">
+                        <i class="bi bi-mortarboard-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 3: Total Aset -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #ffc107 !important;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Total Aset Inventaris</p>
+                        <h4 class="fw-bold mb-0 text-warning"><?= $total_aset ?> Items</h4>
+                    </div>
+                    <div class="rounded-circle p-3 bg-warning-subtle text-warning" style="font-size: 1.5rem; line-height: 1;">
+                        <i class="bi bi-pc-display"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 4: Total Fasilitas -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #0dcaf0 !important;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Total Fasilitas Kampus</p>
+                        <h4 class="fw-bold mb-0 text-info"><?= $total_fas ?> Lokasi</h4>
+                    </div>
+                    <div class="rounded-circle p-3 bg-info-subtle text-info" style="font-size: 1.5rem; line-height: 1;">
+                        <i class="bi bi-house-up-fill"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -117,7 +191,7 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
             </div>
         </div>
 
-        <!-- Menu 4: Master Supplier (Tugas Super Admin) -->
+        <!-- Menu 4: Kelola Supplier (Pencari Vendor) -->
         <div class="col-md-6 col-lg-4">
             <div class="card menu-card h-100 p-4">
                 <div class="card-body d-flex flex-column">
@@ -132,11 +206,12 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
             </div>
         </div>
 
+
+
     </div>
 </div>
 
 <?php
 include '../../components/footer.php';
 ?>
-
 <!-- btn btn-astar mt-auto py-2 fw-bold -->

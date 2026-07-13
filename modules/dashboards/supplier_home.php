@@ -22,6 +22,13 @@ $id_supplier = $_SESSION['id'];
 $q_tugas = mysqli_query($koneksi, "SELECT COUNT(idPengadaan) AS total FROM transaksi_pengadaan WHERE idSupplier = '$id_supplier' AND statusPengadaan = 'Disetujui GA'");
 $total_tugas = mysqli_fetch_assoc($q_tugas)['total'];
 
+// Query tambahan supplier info
+$q_supp_info = mysqli_query($koneksi, "SELECT * FROM supplier WHERE idSupplier = '$id_supplier'");
+$data_sup = mysqli_fetch_assoc($q_supp_info);
+
+$q_selesai = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM transaksi_pengadaan WHERE idSupplier = '$id_supplier' AND statusPengadaan IN ('Harga Diinput Supplier', 'Disetujui Finance')");
+$total_selesai = mysqli_fetch_assoc($q_selesai)['total'];
+
 include '../../components/header.php';
 ?>
 <style>
@@ -30,7 +37,7 @@ include '../../components/header.php';
         color: white;
         border-radius: 15px;
         padding: 30px 40px;
-        margin-bottom: 40px;
+        margin-bottom: 25px;
         box-shadow: 0 10px 20px rgba(29, 65, 151, 0.2);
     }
 
@@ -69,6 +76,54 @@ include '../../components/header.php';
             </div>
             <div class="col-md-4 text-end d-none d-md-block">
                 <i class="bi bi-cart-check-fill text-white" style="font-size: 4rem; opacity: 0.8;"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metric Cards Row -->
+    <div class="row g-4 mb-4">
+        <!-- Card 1: Status Akun -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid <?= ($data_sup['statusSupplier'] == 'Aktif') ? '#198754' : '#dc3545' ?> !important;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Status Kemitraan</p>
+                        <h4 class="fw-bold mb-0 <?= ($data_sup['statusSupplier'] == 'Aktif') ? 'text-success' : 'text-danger' ?>">
+                            <?= $data_sup['statusSupplier'] ?>
+                        </h4>
+                    </div>
+                    <div class="rounded-circle p-3 <?= ($data_sup['statusSupplier'] == 'Aktif') ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' ?>" style="font-size: 1.5rem; line-height: 1;">
+                        <i class="bi <?= ($data_sup['statusSupplier'] == 'Aktif') ? 'bi-shield-check' : 'bi-shield-slash' ?>"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 2: Tugas Banding Harga Aktif -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #ffc107 !important;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Tugas Aktif</p>
+                        <h4 class="fw-bold mb-0 text-warning"><?= $total_tugas ?> Tugas</h4>
+                    </div>
+                    <div class="rounded-circle p-3 bg-warning-subtle text-warning" style="font-size: 1.5rem; line-height: 1;">
+                        <i class="bi bi-shop"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 3: Tugas Terselesaikan -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #1d4197 !important;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Tugas Diselesaikan</p>
+                        <h4 class="fw-bold mb-0 text-primary"><?= $total_selesai ?> Transaksi</h4>
+                    </div>
+                    <div class="rounded-circle p-3 bg-primary-subtle text-primary" style="font-size: 1.5rem; line-height: 1;">
+                        <i class="bi bi-check2-all"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

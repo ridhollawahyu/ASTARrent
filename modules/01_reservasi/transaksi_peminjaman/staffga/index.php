@@ -29,7 +29,7 @@ include '../../../../components/header.php';
     </div>
     <div class="card-body p-4">
         <div class="table-responsive">
-            <table class="table table-hover align-middle text-center mb-0">
+            <table class="datatable-astar table table-hover align-middle text-center mb-0">
                 <thead style="background-color: #f4f6f9; color: #1d4197; border-bottom: 2px solid #e0e6ed;">
                     <tr>
                         <th class="text-center" style="width: 5%;">No.</th>

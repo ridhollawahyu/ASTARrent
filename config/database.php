@@ -10,6 +10,9 @@ $koneksi_awal = mysqli_connect($host, $user, $pass);
 
 // Koneksi utama
 $koneksi = mysqli_connect($host, $user, $pass, $db);
+if ($koneksi) {
+    mysqli_query($koneksi, "SET time_zone = '+07:00'");
+}
 
 // Fungsi cek error koneksi
 if (mysqli_connect_errno()) {

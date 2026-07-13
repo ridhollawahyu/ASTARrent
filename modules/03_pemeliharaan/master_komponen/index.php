@@ -92,7 +92,7 @@ include '../../../components/header.php';
         </form>
 
         <div class="table-responsive">
-            <table class="table table-hover table-striped mb-0 text-center align-middle">
+            <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
                 <thead style="background-color: #f4f6f9; color: #1d4197;">
                     <tr>
                         <th width="5%">No.</th>

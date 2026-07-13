@@ -83,7 +83,7 @@ include '../../../components/header.php';
         <!-- TABEL DATA SANKSI -->
         <!-- ========================================== -->
         <div class="table-responsive">
-            <table class="table table-hover table-striped mb-0 text-center align-middle">
+            <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
                 <thead style="background-color: #f4f6f9; color: #1d4197;">
                     <tr>
                         <th class="text-center pe-5" width="10%">No.</th>

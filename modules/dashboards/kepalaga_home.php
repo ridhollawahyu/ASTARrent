@@ -24,6 +24,13 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Kepala GA') {
 $q_antrean = mysqli_query($koneksi, "SELECT COUNT(idPengadaan) AS total FROM transaksi_pengadaan WHERE statusPengadaan = 'Draft'");
 $total_pengajuan = mysqli_fetch_assoc($q_antrean)['total'];
 
+// Query Aset Aktif & Fasilitas Aktif
+$q_aset = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM aset WHERE ketersediaanAset != 'Nonaktif'");
+$total_aset = mysqli_fetch_assoc($q_aset)['total'];
+
+$q_fas = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM fasilitas WHERE ketersediaanFasilitas != 'Nonaktif'");
+$total_fas = mysqli_fetch_assoc($q_fas)['total'];
+
 include '../../components/header.php';
 ?>
 
@@ -33,7 +40,7 @@ include '../../components/header.php';
         color: white;
         border-radius: 15px;
         padding: 30px 40px;
-        margin-bottom: 40px;
+        margin-bottom: 25px;
         box-shadow: 0 10px 20px rgba(29, 65, 151, 0.2);
     }
 
@@ -76,6 +83,52 @@ include '../../components/header.php';
         </div>
     </div>
 
+    <!-- Metric Cards Row -->
+    <div class="row g-4 mb-4">
+        <!-- Card 1: Antrean Validasi E-Proc -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #ffc107 !important;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Antrean E-Proc</p>
+                        <h4 class="fw-bold mb-0 text-warning"><?= $total_pengajuan ?> Pengajuan</h4>
+                    </div>
+                    <div class="rounded-circle p-3 bg-warning-subtle text-warning" style="font-size: 1.5rem; line-height: 1;">
+                        <i class="bi bi-file-earmark-check-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 2: Total Aset Aktif -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #1d4197 !important;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Total Aset Aktif</p>
+                        <h4 class="fw-bold mb-0 text-primary"><?= $total_aset ?> Items</h4>
+                    </div>
+                    <div class="rounded-circle p-3 bg-primary-subtle text-primary" style="font-size: 1.5rem; line-height: 1;">
+                        <i class="bi bi-pc-display"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 3: Total Fasilitas Aktif -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #198754 !important;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Total Fasilitas Aktif</p>
+                        <h4 class="fw-bold mb-0 text-success"><?= $total_fas ?> Lokasi</h4>
+                    </div>
+                    <div class="rounded-circle p-3 bg-success-subtle text-success" style="font-size: 1.5rem; line-height: 1;">
+                        <i class="bi bi-house-up-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row g-4">
         <!-- Menu: Approval Pengadaan -->
         <div class="col-md-6 col-lg-4">
@@ -92,6 +145,18 @@ include '../../components/header.php';
                             </span>
                         <?php endif; ?>
                     </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu: Laporan Transaksi -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card menu-card h-100 p-4">
+                <div class="card-body d-flex flex-column">
+                    <div class="icon-box"><i class="bi bi-bar-chart-line-fill"></i></div>
+                    <h5 class="fw-bold text-dark mb-3">Laporan Transaksi</h5>
+                    <p class="text-secondary mb-4 flex-grow-1">Lihat dan ekspor laporan monitoring peminjaman, pengembalian, reparasi, dan pengadaan.</p>
+                    <a href="../05_laporan_sistem/index.php" class="btn btn-astar mt-auto py-2 fw-bold">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
                 </div>
             </div>
         </div>

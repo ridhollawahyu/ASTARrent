@@ -47,6 +47,17 @@ $hitung_request = mysqli_query($koneksi, "
 $data_antreanP = mysqli_fetch_assoc($hitung_request);
 $total_antreanP = $data_antreanP['total_antrean'];
 
+// 4. QUERY PENGHITUNG USULAN PENGADAAN TENDIK
+$id_tendik = $_SESSION['id'];
+$hitung_pengadaan = mysqli_query($koneksi, "SELECT COUNT(*) AS total_proc FROM transaksi_pengadaan WHERE idTendik = '$id_tendik'");
+$data_proc = mysqli_fetch_assoc($hitung_pengadaan);
+$total_proc = $data_proc ? $data_proc['total_proc'] : 0;
+
+// 5. QUERY PENGHITUNG MAHASISWA DI PRODI TENDIK
+$hitung_mhs = mysqli_query($koneksi, "SELECT COUNT(*) AS total_mhs FROM mahasiswa WHERE kodeProdi_mahasiswa = '$dept_tendik' AND statusMahasiswa = 'Normal'");
+$data_mhs_count = mysqli_fetch_assoc($hitung_mhs);
+$total_mhs = $data_mhs_count ? $data_mhs_count['total_mhs'] : 0;
+
 include '../../components/header.php';
 ?>
 
@@ -57,7 +68,7 @@ include '../../components/header.php';
         color: white;
         border-radius: 15px;
         padding: 30px 40px;
-        margin-bottom: 40px;
+        margin-bottom: 25px;
         box-shadow: 0 10px 20px rgba(29, 65, 151, 0.2);
     }
 
@@ -97,6 +108,52 @@ include '../../components/header.php';
             </div>
             <div class="col-md-4 text-end d-none d-md-block">
                 <i class="bi bi-ui-checks text-white" style="font-size: 4rem; opacity: 0.8;"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metric Cards Row -->
+    <div class="row g-4 mb-4">
+        <!-- Card 1: Antrean Peminjaman -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #ffc107 !important;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Antrean Peminjaman</p>
+                        <h4 class="fw-bold mb-0 text-warning"><?= $total_antrean ?> Request</h4>
+                    </div>
+                    <div class="rounded-circle p-3 bg-warning-subtle text-warning" style="font-size: 1.5rem; line-height: 1;">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 2: Usulan Pengadaan Anda -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #1d4197 !important;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Usulan Pengadaan Saya</p>
+                        <h4 class="fw-bold mb-0 text-primary"><?= $total_proc ?> Pengajuan</h4>
+                    </div>
+                    <div class="rounded-circle p-3 bg-primary-subtle text-primary" style="font-size: 1.5rem; line-height: 1;">
+                        <i class="bi bi-cart-plus-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 3: Total Mahasiswa Prodi -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #198754 !important;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Mahasiswa Aktif (Prodi <?= $dept_tendik ?>)</p>
+                        <h4 class="fw-bold mb-0 text-success"><?= $total_mhs ?> Orang</h4>
+                    </div>
+                    <div class="rounded-circle p-3 bg-success-subtle text-success" style="font-size: 1.5rem; line-height: 1;">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -199,6 +256,18 @@ include '../../components/header.php';
                         Request <i class="bi bi-arrow-right ms-2"></i>
                         <span class="visually-hidden">request baru</span>
                     </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu 7: Laporan Transaksi -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card menu-card h-100 p-4">
+                <div class="card-body d-flex flex-column">
+                    <div class="icon-box"><i class="bi bi-bar-chart-line-fill"></i></div>
+                    <h5 class="fw-bold text-dark mb-3">Laporan Transaksi</h5>
+                    <p class="text-secondary mb-4 flex-grow-1">Lihat dan ekspor laporan monitoring peminjaman, pengembalian, dan pengadaan prodi Anda.</p>
+                    <a href="../05_laporan_sistem/index.php" class="btn btn-astar mt-auto py-2 fw-bold">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
                 </div>
             </div>
         </div>

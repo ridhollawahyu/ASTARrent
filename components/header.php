@@ -35,6 +35,15 @@
             /* Menggunakan font Poppins agar sangat modern */
         }
 
+        /* DataTables Poppins Font Style integration */
+        .dataTables_wrapper, 
+        .dataTables_wrapper .dataTables_filter input, 
+        .dataTables_wrapper .dataTables_length select, 
+        .dataTables_wrapper .dataTables_info, 
+        .dataTables_wrapper .dataTables_paginate {
+            font-family: 'Poppins', sans-serif !important;
+        }
+
         /* ------------------------------------------- */
         /* NAVBAR MODERN STYLING                       */
         /* ------------------------------------------- */

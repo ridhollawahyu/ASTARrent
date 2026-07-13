@@ -30,7 +30,7 @@ include '../../../../components/header.php';
         <div class="alert alert-warning fw-bold"><i class="bi bi-info-circle-fill me-2"></i>Tekan tombol Lunas hanya jika mahasiswa telah menyelesaikan kewajiban kompensasi Jam Minus. Akun akan otomatis kembali Normal jika tidak ada denda uang yang tertunggak.</div>
 
         <div class="table-responsive mt-3">
-            <table class="table table-hover align-middle text-center">
+            <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
                 <thead style="background-color: #f4f6f9; color: #1d4197;">
                     <tr>
                         <th>No.</th>

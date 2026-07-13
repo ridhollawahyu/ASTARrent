@@ -298,6 +298,34 @@ if (isset($_SESSION['notif_pesan'])):
 endif;
 ?>
 
+<!-- Inisialisasi DataTables Global secara Otomatis -->
+<script>
+  $(document).ready(function() {
+    if ($.fn.DataTable) {
+      $('.datatable-astar').DataTable({
+        "language": {
+          "lengthMenu": "Tampilkan _MENU_",
+          "search": "Cari:",
+          "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+          "infoEmpty": "Menampilkan 0 sampai 0 dari 0 data",
+          "infoFiltered": "(difilter dari _MAX_ total data)",
+          "zeroRecords": "Tidak ada data yang cocok ditemukan",
+          "emptyTable": "Tidak ada data tersedia di tabel ini",
+          "paginate": {
+            "first": "Pertama",
+            "last": "Terakhir",
+            "next": "Berikutnya",
+            "previous": "Sebelumnya"
+          }
+        },
+        "responsive": true,
+        "pageLength": 10,
+        "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Semua"]]
+      });
+    }
+  });
+</script>
+
 </body>
 
 </html>

@@ -47,6 +47,9 @@ $hitung_request = mysqli_query($koneksi, "
 $data_antreanP = mysqli_fetch_assoc($hitung_request);
 $total_antreanP = $data_antreanP['total_antrean'];
 
+$q_beku_tendik = mysqli_query($koneksi, "SELECT COUNT(nimMahasiswa) AS total FROM mahasiswa WHERE jamMinus_mahasiswa > 0 AND kodeProdi_mahasiswa = '$dept_tendik'");
+$total_beku_tendik = mysqli_fetch_assoc($q_beku_tendik)['total'];
+
 include '../../components/header.php';
 ?>
 
@@ -198,6 +201,25 @@ include '../../components/header.php';
                     <a href="../04_rantai_pasok/transaksi_pengadaan/tendik/index.php" class="btn btn-astar mt-auto py-2 fw-bold position-relative">
                         Request <i class="bi bi-arrow-right ms-2"></i>
                         <span class="visually-hidden">request baru</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu 7: Pelunasan Sanksi -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card menu-card h-100 p-4">
+                <div class="card-body d-flex flex-column">
+                    <div class="icon-box"><i class="bi bi-shield-slash-fill"></i></div>
+                    <h5 class="fw-bold text-dark mb-3">Penyelesaian Sanksi</h5>
+                    <p class="text-secondary mb-4 flex-grow-1">Buka pembekuan akun mahasiswa (<?= $dept_tendik ?>) yang telah melunasi denda/kompensasi.</p>
+                    <a href="../02_kedisiplinan/pelunasan_sanksi/tendik/index.php" class="btn btn-astar mt-auto py-2 fw-bold position-relative">
+                        Proses Pelunasan <i class="bi bi-arrow-right ms-2"></i>
+                        <?php if ($total_beku_tendik > 0): ?>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-white shadow-sm">
+                                <?= $total_beku_tendik; ?>
+                            </span>
+                        <?php endif; ?>
                     </a>
                 </div>
             </div>

@@ -320,10 +320,51 @@ endif;
         },
         "responsive": true,
         "pageLength": 10,
-        "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Semua"]]
+        "lengthMenu": [
+          [5, 10, 25, 50, -1],
+          [5, 10, 25, 50, "Semua"]
+        ]
       });
     }
   });
+</script>
+
+<script>
+  // ===================================================================================
+  // JS GLOBAL: FUNGSI EXPORT TABEL KE CSV/EXCEL (Khusus Modul Laporan)
+  // ===================================================================================
+  function exportToCSV(namaFilePrefix = "Laporan") {
+    let table = document.getElementById("tableLaporan");
+    if (!table) return; // Jika bukan halaman laporan, hentikan
+
+    let rows = table.querySelectorAll("tr");
+    let csvContent = "";
+
+    rows.forEach(function(row) {
+      let cols = row.querySelectorAll("td, th");
+      let rowData = [];
+      cols.forEach(function(col) {
+        // Bersihkan enter dan koma agar CSV tidak rusak
+        let text = col.innerText.replace(/(\r\n|\n|\r)/gm, " ").replace(/"/g, '""');
+        rowData.push('"' + text + '"');
+      });
+      csvContent += rowData.join(",") + "\r\n";
+    });
+
+    let blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], {
+      type: "text/csv;charset=utf-8;"
+    });
+    let link = document.createElement("a");
+    let url = URL.createObjectURL(blob);
+    let fileName = namaFilePrefix + "_Astarrent_" + new Date().toISOString().slice(0, 10) + ".csv";
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", fileName);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 </script>
 
 </body>

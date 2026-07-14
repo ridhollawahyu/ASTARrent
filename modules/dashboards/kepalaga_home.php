@@ -149,14 +149,27 @@ include '../../components/header.php';
             </div>
         </div>
 
-        <!-- Menu: Laporan Transaksi -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card menu-card h-100 p-4">
-                <div class="card-body d-flex flex-column">
-                    <div class="icon-box"><i class="bi bi-bar-chart-line-fill"></i></div>
-                    <h5 class="fw-bold text-dark mb-3">Laporan Transaksi</h5>
-                    <p class="text-secondary mb-4 flex-grow-1">Lihat dan ekspor laporan monitoring peminjaman, pengembalian, reparasi, dan pengadaan.</p>
-                    <a href="../05_laporan_sistem/index.php" class="btn btn-astar mt-auto py-2 fw-bold">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
+        <!-- ZONA LAPORAN KEPALA GA -->
+        <h4 class="fw-bold mt-5 mb-3 text-astar border-bottom pb-2"><i class="bi bi-graph-up-arrow me-2"></i>Zona Laporan Manajerial</h4>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card menu-card h-100 p-4">
+                    <div class="card-body d-flex flex-column">
+                        <div class="icon-box"><i class="bi bi-tools"></i></div>
+                        <h5 class="fw-bold text-dark mb-3">Laporan Global Reparasi</h5>
+                        <p class="text-secondary mb-4 flex-grow-1">Pantauan performa perbaikan seluruh aset & fasilitas kampus oleh tim Staff GA.</p>
+                        <a href="../05_laporan_sistem/kepala_ga/laporan_reparasi.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card menu-card h-100 p-4">
+                    <div class="card-body d-flex flex-column">
+                        <div class="icon-box"><i class="bi bi-boxes"></i></div>
+                        <h5 class="fw-bold text-dark mb-3">Laporan Pertumbuhan Aset</h5>
+                        <p class="text-secondary mb-4 flex-grow-1">Daftar seluruh pengadaan aset yang sudah ACC/Tiba beserta kuantitas barang barunya.</p>
+                        <a href="../05_laporan_sistem/kepala_ga/laporan_pertumbuhan.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
+                    </div>
                 </div>
             </div>
         </div>

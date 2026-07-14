@@ -1,4 +1,3 @@
 <?php
-header('Location: laporan_peminjaman.php');
+header('Location: ../../dashboards/kepalaga_home.php');
 exit;
-?>

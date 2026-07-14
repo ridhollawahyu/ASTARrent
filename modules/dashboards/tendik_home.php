@@ -263,18 +263,6 @@ include '../../components/header.php';
             </div>
         </div>
 
-        <!-- Menu 7: Laporan Transaksi -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card menu-card h-100 p-4">
-                <div class="card-body d-flex flex-column">
-                    <div class="icon-box"><i class="bi bi-bar-chart-line-fill"></i></div>
-                    <h5 class="fw-bold text-dark mb-3">Laporan Transaksi</h5>
-                    <p class="text-secondary mb-4 flex-grow-1">Lihat dan ekspor laporan monitoring peminjaman, pengembalian, dan pengadaan prodi Anda.</p>
-                    <a href="../05_laporan_sistem/index.php" class="btn btn-astar mt-auto py-2 fw-bold">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
-                </div>
-            </div>
-        </div>
-
         <!-- Menu 7: Pelunasan Sanksi -->
         <div class="col-md-6 col-lg-4">
             <div class="card menu-card h-100 p-4">
@@ -290,6 +278,42 @@ include '../../components/header.php';
                             </span>
                         <?php endif; ?>
                     </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ZONA LAPORAN TENDIK -->
+        <h4 class="fw-bold mt-5 mb-3 text-astar border-bottom pb-2"><i class="bi bi-printer-fill me-2"></i>Zona Laporan Operasional</h4>
+        <div class="row g-4">
+            <!-- Menu 3: Master Fasilitas -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card menu-card h-100 p-4">
+                    <div class="card-body d-flex flex-column">
+                        <div class="icon-box"><i class="bi bi-repeat"></i></div>
+                        <h5 class="fw-bold text-dark mb-3">Laporan Sirkulasi</h5>
+                        <p class="text-secondary mb-4 flex-grow-1">Daftar peminjaman, rekap mahasiswa sering telat, dan barang paling laris.</p>
+                        <a href="../05_laporan_sistem/tendik/laporan_sirkulasi.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card menu-card h-100 p-4">
+                    <div class="card-body d-flex flex-column">
+                        <div class="icon-box"><i class="bi bi-cart-plus"></i></div>
+                        <h5 class="fw-bold text-dark mb-3">Laporan Pengajuan</h5>
+                        <p class="text-secondary mb-4 flex-grow-1">Rekapitulasi riwayat pengajuan pengadaan aset oleh departemen Anda.</p>
+                        <a href="../05_laporan_sistem/tendik/laporan_pengadaan.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card menu-card h-100 p-4">
+                    <div class="card-body d-flex flex-column">
+                        <div class="icon-box"><i class="bi bi-box-seam"></i></div>
+                        <h5 class="fw-bold text-dark mb-3">Laporan Inventaris</h5>
+                        <p class="text-secondary mb-4 flex-grow-1">Daftar stok fisik Aset & Fasilitas Akademik untuk Stock Opname.</p>
+                        <a href="../05_laporan_sistem/tendik/laporan_inventaris.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
+                    </div>
                 </div>
             </div>
         </div>

@@ -263,14 +263,37 @@ include '../../components/header.php';
             </div>
         </div>
 
-        <!-- Menu 7: Laporan Transaksi -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card menu-card h-100 p-4">
-                <div class="card-body d-flex flex-column">
-                    <div class="icon-box"><i class="bi bi-bar-chart-line-fill"></i></div>
-                    <h5 class="fw-bold text-dark mb-3">Laporan Transaksi</h5>
-                    <p class="text-secondary mb-4 flex-grow-1">Lihat dan ekspor laporan monitoring peminjaman, pengembalian, dan reparasi fasilitas/aset.</p>
-                    <a href="../05_laporan_sistem/index.php" class="btn btn-astar mt-auto py-2 fw-bold">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
+        <!-- ZONA LAPORAN STAFF GA -->
+        <h4 class="fw-bold mt-5 mb-3 text-astar border-bottom pb-2"><i class="bi bi-printer-fill me-2"></i>Zona Laporan Operasional</h4>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card menu-card h-100 p-4">
+                    <div class="card-body d-flex flex-column">
+                        <div class="icon-box"><i class="bi bi-arrow-repeat"></i></div>
+                        <h5 class="fw-bold text-dark mb-3">Laporan Sirkulasi</h5>
+                        <p class="text-secondary mb-4 flex-grow-1">Daftar peminjaman Fasilitas Non-Akademik (Lapangan, Komunal, dll).</p>
+                        <a href="../05_laporan_sistem/staffga/laporan_sirkulasi.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card menu-card h-100 p-4">
+                    <div class="card-body d-flex flex-column">
+                        <div class="icon-box"><i class="bi bi-tools"></i></div>
+                        <h5 class="fw-bold text-dark mb-3">Laporan Reparasi</h5>
+                        <p class="text-secondary mb-4 flex-grow-1">Rekap tiket perbaikan dan total suku cadang yang diselamatkan (Kanibal).</p>
+                        <a href="../05_laporan_sistem/staffga/laporan_reparasi.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card menu-card h-100 p-4">
+                    <div class="card-body d-flex flex-column">
+                        <div class="icon-box"><i class="bi bi-box-seam"></i></div>
+                        <h5 class="fw-bold text-dark mb-3">Laporan Inventaris</h5>
+                        <p class="text-secondary mb-4 flex-grow-1">Daftar ketersediaan Fasilitas Non-Akademik dan Komponen Suku Cadang.</p>
+                        <a href="../05_laporan_sistem/staffga/laporan_inventaris.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
+                    </div>
                 </div>
             </div>
         </div>

@@ -145,18 +145,6 @@ include '../../components/header.php';
             </div>
         </div>
 
-        <!-- Menu: Laporan Transaksi -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card menu-card h-100 p-4">
-                <div class="card-body d-flex flex-column">
-                    <div class="icon-box"><i class="bi bi-bar-chart-line-fill"></i></div>
-                    <h5 class="fw-bold text-dark mb-3">Laporan Transaksi</h5>
-                    <p class="text-secondary mb-4 flex-grow-1">Lihat dan ekspor laporan monitoring peminjaman dan pengadaan aset baru.</p>
-                    <a href="../05_laporan_sistem/index.php" class="btn btn-astar mt-auto py-2 fw-bold">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
-                </div>
-            </div>
-        </div>
-
         <!-- Menu 2: Pelunasan Denda -->
         <div class="col-md-6 col-lg-4">
             <div class="card menu-card h-100 p-4">
@@ -172,6 +160,31 @@ include '../../components/header.php';
                             </span>
                         <?php endif; ?>
                     </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ZONA LAPORAN FINANCE -->
+        <h4 class="fw-bold mt-5 mb-3 text-astar border-bottom pb-2"><i class="bi bi-wallet2 me-2"></i>Zona Laporan Keuangan</h4>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card menu-card h-100 p-4">
+                    <div class="card-body d-flex flex-column">
+                        <div class="icon-box"><i class="bi bi-cash-stack"></i></div>
+                        <h5 class="fw-bold text-dark mb-3">Laporan Penerimaan Denda</h5>
+                        <p class="text-secondary mb-4 flex-grow-1">Rekapitulasi sanksi denda mahasiswa yang telah masuk ke kas kampus.</p>
+                        <a href="../05_laporan_sistem/finance/laporan_denda.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card menu-card h-100 p-4">
+                    <div class="card-body d-flex flex-column">
+                        <div class="icon-box"><i class="bi bi-cash-stack"></i></div>
+                        <h5 class="fw-bold text-dark mb-3">Laporan Pengeluaran Pengadaan</h5>
+                        <p class="text-secondary mb-4 flex-grow-1">Rincian belanja, Vendor pemenang, Subtotal, PPN 12%, dan Grand Total pengadaan.</p>
+                        <a href="../05_laporan_sistem/finance/laporan_pengeluaran.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>
+                    </div>
                 </div>
             </div>
         </div>

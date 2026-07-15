@@ -2,8 +2,6 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
-
-// 1. WAJIB PANGGIL KONEKSI & FUNGSI SEBELUM QUERY (Perbaikan Fatal Error!)
 include '../../config/database.php';
 include '../../config/functions.php';
 

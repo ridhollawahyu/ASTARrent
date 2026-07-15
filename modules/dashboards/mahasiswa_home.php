@@ -2,8 +2,8 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
+include '../../config/database.php';
 include '../../config/functions.php';
-include '../../components/header.php';
 
 /** @var mysqli $koneksi */
 
@@ -22,6 +22,8 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Mahasiswa') {
 $nim = $_SESSION['id'];
 $query_mhs = mysqli_query($koneksi, "SELECT * FROM mahasiswa WHERE nimMahasiswa = '$nim'");
 $data_mhs = mysqli_fetch_assoc($query_mhs);
+
+include '../../components/header.php';
 ?>
 
 <div class="container mt-4 mb-5">

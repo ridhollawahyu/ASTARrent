@@ -41,7 +41,6 @@ if (isset($_GET['kategori']) && $_GET['kategori'] != '') {
     $where_sql .= " AND aset.idKategori = '$kategori_terpilih'";
 }
 
-// Panggil header HTML setelah semua logika selesai
 include '../../../components/header.php';
 ?>
 

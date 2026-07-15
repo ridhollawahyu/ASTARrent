@@ -5,7 +5,6 @@ session_start();
 // Panggil header global
 include '../../config/database.php';
 include '../../config/functions.php';
-include '../../components/header.php';
 
 /** @var mysqli $koneksi */
 
@@ -32,6 +31,8 @@ $total_aset = $q_aset ? mysqli_fetch_assoc($q_aset)['total'] : 0;
 
 $q_fas = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM fasilitas WHERE ketersediaanFasilitas != 'Nonaktif'");
 $total_fas = $q_fas ? mysqli_fetch_assoc($q_fas)['total'] : 0;
+
+include '../../components/header.php';
 ?>
 
 <!-- Tambahkan CDN Bootstrap Icons khusus untuk halaman ini -->

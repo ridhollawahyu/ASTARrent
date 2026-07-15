@@ -866,12 +866,13 @@ function buat_pdf_pengajuan($id_pengadaan)
 }
 
 /**
- * FUNGSI 26: GENERATE ULANG PDF PENAWARAN (TIDAK LAGI PAKAI JSON)
+ * FUNGSI 26: GENERATE ULANG PDF PENAWARAN (FORMAT MATRIKS PERBANDINGAN)
  */
 function buat_pdf_penawaran($id_pengadaan)
 {
     global $koneksi;
 
+    // 1. AMBIL DATA UTAMA TRANSAKSI
     $q = "SELECT tp.*, k.namaKategori, us.namaSupplier, uf.namaUser AS namaFinance
           FROM transaksi_pengadaan tp
           JOIN kategori k ON tp.idKategori = k.idKategori
@@ -885,6 +886,7 @@ function buat_pdf_penawaran($id_pengadaan)
     $is_finance_acc = ($data['statusPengadaan'] === 'Disetujui Finance');
     $is_rejected = ($data['statusPengadaan'] === 'Ditolak');
 
+    // 2. LOGIKA STEMPEL (BASE64)
     $path_supplier = __DIR__ . '/../assets/images/stamp_supplier.png';
     $path_finance = __DIR__ . '/../assets/images/stamp_finance.png';
     $path_reject_finance = __DIR__ . '/../assets/images/stamp_reject_finance.png';
@@ -899,83 +901,185 @@ function buat_pdf_penawaran($id_pengadaan)
         $img_finance = '<br><br><br>';
     }
 
-    $q_vendor = mysqli_query($koneksi, "SELECT * FROM detail_pengadaan_vendor WHERE idPengadaan = '$id_pengadaan' ORDER BY hargaSatuan ASC");
-
-    $html_baris = '';
+    // 3. AMBIL DATA VENDOR LALU MASUKKAN KE DALAM ARRAY (UNTUK DI-PIVOT/MATRIKS)
+    $vendors = [];
     $subtotal_dana = 0;
     $total_unit_acc = 0;
-    $no = 1;
 
+    $q_vendor = mysqli_query($koneksi, "SELECT * FROM detail_pengadaan_vendor WHERE idPengadaan = '$id_pengadaan' ORDER BY hargaSatuan ASC");
     while ($v = mysqli_fetch_assoc($q_vendor)) {
-        $harga_rp = "Rp " . number_format($v['hargaSatuan'], 0, ',', '.');
-        $estimasi_teks = $v['estimasiTiba'] . " Hari";
-
-        if ($is_finance_acc || $is_rejected) {
-            if ($is_rejected) {
-                $status_html = "<span style='color:#dc3545; font-weight:bold;'>Ditolak</span>";
-                $total_rp_tampil = "-";
-            } else {
-                $is_selected = ($v['statusPilihan'] == 'Terpilih');
-                if ($is_selected) {
-                    $status_html = "<span style='color:#198754; font-weight:bold;'>Disetujui</span>";
-                    $subtotal_acc = $v['stok'] * $v['hargaSatuan'];
-                    $subtotal_dana += $subtotal_acc; // Hitung Subtotal (Tanpa Pajak)
-                    $total_unit_acc += $v['stok'];
-                    $total_rp_tampil = "Rp " . number_format($subtotal_acc, 0, ',', '.');
-                } else {
-                    $status_html = "<span style='color:#dc3545; font-weight:bold;'>Ditolak</span>";
-                    $total_rp_tampil = "-";
-                }
-            }
-            $html_baris .= "<tr><td style='text-align:center;'>{$no}</td><td><strong>{$v['namaVendor']}</strong></td><td>{$v['spesifikasi']}</td><td style='text-align:center;'>{$v['stok']} Unit<br><small>({$estimasi_teks})</small></td><td style='text-align:right;'>{$harga_rp}</td><td style='text-align:center;'>{$status_html}</td><td style='text-align:right; font-weight:bold;'>{$total_rp_tampil}</td></tr>";
-        } else {
-            $total_stok_rp = "Rp " . number_format($v['stok'] * $v['hargaSatuan'], 0, ',', '.');
-            $html_baris .= "<tr><td style='text-align:center;'>{$no}</td><td><strong>{$v['namaVendor']}</strong></td><td>{$v['spesifikasi']}</td><td style='text-align:center;'>{$v['stok']} Unit<br><small>({$estimasi_teks})</small></td><td style='text-align:right;'>{$harga_rp}</td><td style='text-align:right; font-weight:bold;'>{$total_stok_rp}</td></tr>";
+        $vendors[] = $v;
+        // Jika sudah di-ACC, hitung subtotal dari vendor yang Terpilih saja
+        if ($v['statusPilihan'] == 'Terpilih') {
+            $subtotal_dana += ($v['stok'] * $v['hargaSatuan']);
+            $total_unit_acc += $v['stok'];
         }
-        $no++;
     }
 
-    $tfoot_html = '';
+    // 4. HITUNG LEBAR KOLOM DINAMIS (Agar rapi berapapun jumlah vendornya)
+    $jumlah_vendor = count($vendors);
+    $lebar_kriteria = 20; // Kolom kiri (Kriteria) memakan 20% ruang
+    $lebar_vendor = ($jumlah_vendor > 0) ? (80 / $jumlah_vendor) : 80;
+
     // =========================================================================
-    // HITUNGAN PPN 12% UNTUK PDF FINANCE
+    // 5. RAKIT HTML MATRIKS PERBANDINGAN
     // =========================================================================
+    $html_matriks = '<table class="table-matrix">';
+
+    // ---> BARIS HEADER: NAMA VENDOR
+    $html_matriks .= '<thead><tr><th width="' . $lebar_kriteria . '%" style="background-color:#1d4197; color:white; text-align:left;">KRITERIA PENILAIAN</th>';
+    foreach ($vendors as $v) {
+        // Jika vendor terpilih, beri warna Hijau agar menonjol
+        $bg_color = ($v['statusPilihan'] == 'Terpilih') ? '#198754' : '#1d4197';
+        $html_matriks .= '<th width="' . $lebar_vendor . '%" style="background-color:' . $bg_color . '; color:white;">' . htmlspecialchars($v['namaVendor']) . '</th>';
+    }
+    $html_matriks .= '</tr></thead><tbody>';
+
+    // ---> BARIS 1: SPESIFIKASI
+    $html_matriks .= '<tr><td class="kriteria">Spesifikasi Detail</td>';
+    foreach ($vendors as $v) {
+        $html_matriks .= '<td>' . htmlspecialchars($v['spesifikasi']) . '</td>';
+    }
+    $html_matriks .= '</tr>';
+
+    // ---> BARIS 2: KETERSEDIAAN STOK & ESTIMASI TIBA
+    $html_matriks .= '<tr><td class="kriteria">Stok & Waktu Tiba</td>';
+    foreach ($vendors as $v) {
+        $html_matriks .= '<td><b>' . $v['stok'] . ' Unit</b><br><small>Estimasi: ' . $v['estimasiTiba'] . ' Hari</small></td>';
+    }
+    $html_matriks .= '</tr>';
+
+    // ---> BARIS 3: HARGA SATUAN
+    $html_matriks .= '<tr><td class="kriteria">Harga Satuan</td>';
+    foreach ($vendors as $v) {
+        $html_matriks .= '<td class="rp">Rp ' . number_format($v['hargaSatuan'], 0, ',', '.') . '</td>';
+    }
+    $html_matriks .= '</tr>';
+
+    // ---> BARIS 4: TOTAL HARGA
+    $html_matriks .= '<tr><td class="kriteria">Total Biaya (Max)</td>';
+    foreach ($vendors as $v) {
+        $tot = $v['stok'] * $v['hargaSatuan'];
+        $html_matriks .= '<td class="rp">Rp ' . number_format($tot, 0, ',', '.') . '</td>';
+    }
+    $html_matriks .= '</tr>';
+
+    // ---> BARIS 5: KEPUTUSAN (Hanya muncul jika sudah diproses Finance)
+    if ($is_finance_acc || $is_rejected) {
+        $html_matriks .= '<tr><td class="kriteria">Keputusan Akhir</td>';
+        foreach ($vendors as $v) {
+            if ($is_rejected) {
+                $html_matriks .= '<td style="color:#dc3545; font-weight:bold;">DIBATALKAN</td>';
+            } else {
+                if ($v['statusPilihan'] == 'Terpilih') {
+                    $html_matriks .= '<td style="color:#198754; font-weight:bold; background-color:#e8f5e9;">DISETUJUI</td>';
+                } else {
+                    $html_matriks .= '<td style="color:#dc3545; font-weight:bold;">Ditolak</td>';
+                }
+            }
+        }
+        $html_matriks .= '</tr>';
+    }
+
+    $html_matriks .= '</tbody></table>';
+
+    // =========================================================================
+    // 6. RAKIT KOTAK SUMMARY PPN 12% KHUSUS FINANCE
+    // =========================================================================
+    $html_summary = '';
     if ($is_finance_acc) {
         $ppn_12 = $subtotal_dana * 0.12;
         $grand_total = $subtotal_dana + $ppn_12;
 
-        $header_tabel = '<tr><th width="5%">No.</th><th width="15%">Nama Toko</th><th width="25%">Spesifikasi</th><th width="10%">Stok (Est)</th><th width="15%">Harga Satuan</th><th width="10%">Keputusan</th><th width="20%">Total Harga</th></tr>';
-
-        $subtotal_rp = "Rp " . number_format($subtotal_dana, 0, ',', '.');
-        $ppn_rp = "Rp " . number_format($ppn_12, 0, ',', '.');
-        $grand_total_rp = "Rp " . number_format($grand_total, 0, ',', '.');
-
-        $tfoot_html = "
-        <tfoot>
-            <tr>
-                <td colspan='6' style='text-align:right; font-weight:bold; color:#555;'>SUBTOTAL ({$total_unit_acc} Unit) :</td>
-                <td style='text-align:right; font-weight:bold; color:#555;'>{$subtotal_rp}</td>
-            </tr>
-            <tr>
-                <td colspan='6' style='text-align:right; font-weight:bold; color:#555;'>PPN (12%) :</td>
-                <td style='text-align:right; font-weight:bold; color:#555;'>{$ppn_rp}</td>
-            </tr>
-            <tr style='background-color:#e8f0fe;'>
-                <td colspan='6' style='text-align:right; font-weight:bold; color:#198754;'>TOTAL DICAIRKAN :</td>
-                <td style='text-align:right; font-weight:bold; color:#198754;'>{$grand_total_rp}</td>
-            </tr>
-        </tfoot>";
-    } elseif ($is_rejected) {
-        $header_tabel = '<tr><th width="5%">No.</th><th width="15%">Nama Toko</th><th width="25%">Spesifikasi</th><th width="10%">Stok (Est)</th><th width="15%">Harga Satuan</th><th width="10%">Keputusan</th><th width="20%">Total Harga</th></tr>';
-    } else {
-        $header_tabel = '<tr><th width="5%">No.</th><th width="20%">Nama Toko/Vendor</th><th width="25%">Spesifikasi</th><th width="15%">Stok (Estimasi)</th><th width="15%">Harga Satuan</th><th width="20%">Total Harga (Max)</th></tr>';
+        $html_summary = '
+        <div class="summary-box">
+            <table width="100%" cellpadding="5">
+                <tr>
+                    <td width="60%" style="text-align:right; color:#555; font-weight:bold;">Subtotal Belanja (' . $total_unit_acc . ' Unit) :</td>
+                    <td width="40%" style="text-align:right; font-weight:bold;">Rp ' . number_format($subtotal_dana, 0, ',', '.') . '</td>
+                </tr>
+                <tr>
+                    <td style="text-align:right; color:#555; font-weight:bold;">PPN (12%) :</td>
+                    <td style="text-align:right; font-weight:bold;">Rp ' . number_format($ppn_12, 0, ',', '.') . '</td>
+                </tr>
+                <tr style="background-color:#e8f0fe;">
+                    <td style="text-align:right; font-size:14px; color:#198754; font-weight:bold;">GRAND TOTAL DICAIRKAN :</td>
+                    <td style="text-align:right; font-size:14px; color:#198754; font-weight:bold;">Rp ' . number_format($grand_total, 0, ',', '.') . '</td>
+                </tr>
+            </table>
+        </div>';
     }
 
     $alasan_tolak_html = '';
     if ($is_rejected && !empty($data['alasanPenolakan_pengadaan'])) {
-        $alasan_tolak_html = '<div style="background-color: #fff3f3; color: #dc3545; padding: 10px; border: 1px solid #f5c6cb; border-radius: 5px; margin-bottom: 20px;"><strong>ALASAN PENOLAKAN:</strong><br>' . nl2br(htmlspecialchars($data['alasanPenolakan_pengadaan'])) . '</div>';
+        $alasan_tolak_html = '<div class="alert-tolak"><strong>ALASAN PENOLAKAN FINANCE:</strong><br>' . nl2br(htmlspecialchars($data['alasanPenolakan_pengadaan'])) . '</div>';
     }
 
-    $html = '<!DOCTYPE html><html lang="id"><head><style>body { font-family: "Helvetica", "Arial", sans-serif; font-size: 13px; color: #333; line-height: 1.6; } .kop-surat { text-align: center; border-bottom: 3px solid #1d4197; padding-bottom: 15px; margin-bottom: 30px; } .kop-surat h2 { margin: 0; color: #1d4197; font-size: 20px; } .info-box { background-color: #f4f6f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; } .table-vendor { width: 100%; border-collapse: collapse; margin-top: 10px; } .table-vendor th, .table-vendor td { border: 1px solid #ddd; padding: 8px; } .table-vendor th { background-color: #1d4197; color: white; text-align: center; } .tabel-ttd { width: 100%; text-align: center; margin-top: 50px; } .tabel-ttd td { width: 50%; vertical-align: bottom; } .stempel-box { height: 75px; margin: 10px 0; } .footer { position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 10px; }</style></head><body><div class="kop-surat"><h2>DOKUMEN PENAWARAN HARGA VENDOR</h2><p>Sistem Manajemen Aset & Fasilitas Terpadu (ASTARrent) - ASTRAtech</p></div><div class="info-box"><p style="margin:0;"><strong>ID Pengadaan :</strong> ' . $id_pengadaan . '</p><p style="margin:5px 0;"><strong>Kebutuhan :</strong> ' . $data['namaKategori'] . ' - ' . $data['namaKebutuhan'] . ' (' . $data['jumlah'] . ' Unit Dibutuhkan)</p></div>' . $alasan_tolak_html . '<table class="table-vendor"><thead>' . $header_tabel . '</thead><tbody>' . $html_baris . '</tbody>' . $tfoot_html . '</table><table class="tabel-ttd"><tr><td>Disurvei Oleh (Supplier),<br><div class="stempel-box">' . $img_supplier . '</div><b><u>' . $nama_supplier . '</u></b></td><td>Disetujui Oleh (Finance),<br><div class="stempel-box">' . $img_finance . '</div><b><u>' . $nama_finance . '</u></b></td></tr></table><div class="footer">Dokumen ini dicetak otomatis oleh ASTARrent.</div></body></html>';
+    // =========================================================================
+    // 7. RENDER FULL HTML KE DOMPDF
+    // =========================================================================
+    $html = '<!DOCTYPE html><html lang="id"><head><style>
+        body { font-family: "Helvetica", "Arial", sans-serif; font-size: 12px; color: #333; line-height: 1.5; } 
+        .kop-surat { text-align: center; border-bottom: 3px solid #1d4197; padding-bottom: 10px; margin-bottom: 20px; } 
+        .kop-surat h2 { margin: 0; color: #1d4197; font-size: 18px; text-transform: uppercase;} 
+        .info-box { background-color: #f4f6f9; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e0e6ed;} 
+        .alert-tolak { background-color: #fff3f3; color: #dc3545; padding: 10px; border: 1px solid #f5c6cb; border-radius: 5px; margin-bottom: 15px; }
+        
+        /* CSS MATRIKS PERBANDINGAN */
+        .table-matrix { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; word-wrap: break-word; } 
+        .table-matrix th, .table-matrix td { border: 1px solid #555; padding: 8px; text-align: center; vertical-align: middle; } 
+        .table-matrix .kriteria { font-weight: bold; background-color: #f0f0f0; text-align: left; }
+        .table-matrix .rp { font-weight: bold; color: #1d4197; }
+
+        /* CSS SUMMARY BOX */
+        .summary-wrapper { width: 100%; display: block; margin-top: 15px; clear: both; }
+        .summary-box { width: 300px; float: right; border: 2px solid #1d4197; padding: 5px; border-radius: 5px; background-color: #fafafa; }
+        
+        .tabel-ttd { width: 100%; text-align: center; margin-top: 60px; clear: both; } 
+        .tabel-ttd td { width: 50%; vertical-align: bottom; } 
+        .stempel-box { height: 75px; margin: 10px 0; } 
+        .footer { position: fixed; bottom: -10px; width: 100%; text-align: center; font-size: 9px; color: #999; border-top: 1px solid #eee; padding-top: 5px; }
+    </style></head><body>
+    
+    <div class="kop-surat">
+        <h2>DOKUMEN PENAWARAN & PERBANDINGAN VENDOR</h2>
+        <p style="margin: 3px 0 0 0; color: #555;">Sistem Manajemen Aset & Fasilitas Terpadu (ASTARrent) - ASTRAtech</p>
+    </div>
+    
+    <div class="info-box">
+        <table width="100%">
+            <tr>
+                <td width="20%"><strong>ID Pengadaan</strong></td>
+                <td width="80%">: ' . $id_pengadaan . '</td>
+            </tr>
+            <tr>
+                <td><strong>Kebutuhan</strong></td>
+                <td>: ' . $data['namaKategori'] . ' - ' . $data['namaKebutuhan'] . '</td>
+            </tr>
+            <tr>
+                <td><strong>Target Minimal</strong></td>
+                <td>: <span style="color:#dc3545; font-weight:bold;">' . $data['jumlah'] . ' Unit</span></td>
+            </tr>
+        </table>
+    </div>
+    
+    ' . $alasan_tolak_html . '
+    
+    ' . $html_matriks . '
+
+    <div class="summary-wrapper">
+        ' . $html_summary . '
+    </div>
+    
+    <table class="tabel-ttd">
+        <tr>
+            <td>Disurvei Oleh (Supplier),<br><div class="stempel-box">' . $img_supplier . '</div><b><u>' . $nama_supplier . '</u></b></td>
+            <td>Disetujui Oleh (Finance),<br><div class="stempel-box">' . $img_finance . '</div><b><u>' . $nama_finance . '</u></b></td>
+        </tr>
+    </table>
+    
+    <div class="footer">Dokumen matriks ini dicetak secara otomatis oleh sistem keamanan ASTARrent.</div>
+    </body></html>';
 
     $options = new \Dompdf\Options();
     $options->set('isHtml5ParserEnabled', true);

@@ -152,7 +152,31 @@ include '../../components/header.php';
 
     <div class="row g-4">
 
-        <!-- Menu 1: Master Komponen -->
+        <!-- Menu 1: Master Kategori (Fasilitas) -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card menu-card h-100 p-4">
+                <div class="card-body d-flex flex-column">
+                    <div class="icon-box"><i class="bi bi-tags-fill"></i></div>
+                    <h5 class="fw-bold text-dark mb-3">Pengelolaan Kategori Non-Akademik</h5>
+                    <p class="text-secondary mb-4 flex-grow-1">Kelola data Fasilitas Non-Akademik, cek ketersediaan, dan update kondisi aset.</p>
+                    <a href="../04_rantai_pasok/master_kategori/staffga/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Aset <i class="bi bi-arrow-right ms-2"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu 2: Master Fasilitas -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card menu-card h-100 p-4">
+                <div class="card-body d-flex flex-column">
+                    <div class="icon-box"><i class="bi bi-building-gear"></i></div>
+                    <h5 class="fw-bold text-dark mb-3">Pengelolaan Fasilitas</h5>
+                    <p class="text-secondary mb-4 flex-grow-1">Kelola data Fasilitas ruangan, lapangan, lalu cek ketersediaan, dan update kondisi fasilitas.</p>
+                    <a href="../02_kedisiplinan/master_fasilitas/staffga/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Aset <i class="bi bi-arrow-right ms-2"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu 3: Master Komponen -->
         <div class="col-md-6 col-lg-4">
             <div class="card menu-card h-100 p-4">
                 <div class="card-body d-flex flex-column">
@@ -172,35 +196,11 @@ include '../../components/header.php';
             </div>
         </div>
 
-        <!-- Menu 2: Master Kategori (Fasilitas) -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card menu-card h-100 p-4">
-                <div class="card-body d-flex flex-column">
-                    <div class="icon-box"><i class="bi bi-pc-display"></i></div>
-                    <h5 class="fw-bold text-dark mb-3">Pengelolaan Kategori Fasilitas</h5>
-                    <p class="text-secondary mb-4 flex-grow-1">Kelola data inventaris barang elektronik, cek ketersediaan, dan update kondisi aset.</p>
-                    <a href="../04_rantai_pasok/master_kategori/staffga/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Aset <i class="bi bi-arrow-right ms-2"></i></a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Menu 3: Master Fasilitas -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card menu-card h-100 p-4">
-                <div class="card-body d-flex flex-column">
-                    <div class="icon-box"><i class="bi bi-house-up-fill"></i></div>
-                    <h5 class="fw-bold text-dark mb-3">Pengelolaan Fasilitas</h5>
-                    <p class="text-secondary mb-4 flex-grow-1">Kelola data Fasilitas ruangan, lapangan, lalu cek ketersediaan, dan update kondisi fasilitas.</p>
-                    <a href="../02_kedisiplinan/master_fasilitas/staffga/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Aset <i class="bi bi-arrow-right ms-2"></i></a>
-                </div>
-            </div>
-        </div>
-
         <!-- Menu 4: Approval Peminjaman -->
         <div class="col-md-6 col-lg-4">
             <div class="card menu-card h-100 p-4">
                 <div class="card-body d-flex flex-column">
-                    <div class="icon-box"><i class="bi bi-check-circle-fill"></i></div>
+                    <div class="icon-box"><i class="bi bi-clipboard-check-fill"></i></div>
                     <h5 class="fw-bold text-dark mb-3">Persetujuan Peminjaman</h5>
                     <p class="text-secondary mb-4 flex-grow-1">Tinjau dan berikan persetujuan (Approve) untuk permintaan peminjaman mahasiswa.</p>
 
@@ -224,7 +224,7 @@ include '../../components/header.php';
         <div class="col-md-6 col-lg-4">
             <div class="card menu-card h-100 p-4">
                 <div class="card-body d-flex flex-column">
-                    <div class="icon-box"><i class="bi bi-check-circle-fill"></i></div>
+                    <div class="icon-box"><i class="bi bi-box-arrow-in-down-left"></i></div>
                     <h5 class="fw-bold text-dark mb-3">Persetujuan Pengembalian</h5>
                     <p class="text-secondary mb-4 flex-grow-1">Tinjau dan berikan persetujuan (Approve) untuk Pengembalian mahasiswa.</p>
 
@@ -279,7 +279,7 @@ include '../../components/header.php';
             <div class="col-md-6 col-lg-4">
                 <div class="card menu-card h-100 p-4">
                     <div class="card-body d-flex flex-column">
-                        <div class="icon-box"><i class="bi bi-tools"></i></div>
+                        <div class="icon-box"><i class="bi bi-clipboard-pulse"></i></div>
                         <h5 class="fw-bold text-dark mb-3">Laporan Reparasi</h5>
                         <p class="text-secondary mb-4 flex-grow-1">Rekap tiket perbaikan dan total suku cadang yang diselamatkan (Kanibal).</p>
                         <a href="../05_laporan_sistem/staffga/laporan_reparasi.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Buka Laporan <i class="bi bi-arrow-right ms-2"></i></a>

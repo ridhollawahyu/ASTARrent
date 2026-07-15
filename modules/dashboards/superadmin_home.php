@@ -156,7 +156,7 @@ $total_fas = $q_fas ? mysqli_fetch_assoc($q_fas)['total'] : 0;
         <div class="col-md-6 col-lg-4">
             <div class="card menu-card h-100 p-4">
                 <div class="card-body d-flex flex-column">
-                    <div class="icon-box"><i class="bi bi-slash-circle"></i></div>
+                    <div class="icon-box"><i class="bi bi-shield-exclamation"></i></div>
                     <h5 class="fw-bold text-dark mb-3">Pengelolaan Sanksi</h5>
                     <p class="text-secondary mb-4 flex-grow-1">Kelola data Sanksi jam minus dan denda, cek data pelanggaran, dan update detail pelanggaran.</p>
                     <a href="../02_kedisiplinan/master_sanksi/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Sanksi <i class="bi bi-arrow-right ms-2"></i></a>
@@ -198,7 +198,7 @@ $total_fas = $q_fas ? mysqli_fetch_assoc($q_fas)['total'] : 0;
             <div class="card menu-card h-100 p-4">
                 <div class="card-body d-flex flex-column">
                     <div class="icon-box">
-                        <i class="bi bi-person-badge-fill"></i>
+                        <i class="bi bi-truck"></i>
                     </div>
                     <h5 class="fw-bold text-dark mb-3">Kelola Supplier (Pencari Vendor)</h5>
                     <p class="text-secondary mb-4 flex-grow-1">Kelola Data Supplier dan Supplier (Hak Akses Pengelolaan Supplier).</p>

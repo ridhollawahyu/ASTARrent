@@ -71,6 +71,7 @@ include '../../../components/header.php';
 <div class="card shadow-sm border-0 mb-4" style="border-radius: 15px;">
     <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #1d4197; border-radius: 15px 15px 0 0;">
         <h5 class="mb-0 text-white fw-bold"><i class="bi bi-wallet2 me-2"></i>Laporan Pengeluaran Anggaran Pengadaan</h5>
+        <a href="../../dashboards/finance_home.php" class="btn btn-outline-light btn-sm fw-bold"><i class="bi bi-arrow-left"></i> Kembali ke Dashboard</a>
     </div>
     <div class="card-body p-4 bg-light" style="border-radius: 0 0 15px 15px;">
         <form method="GET" action="" class="row g-3">

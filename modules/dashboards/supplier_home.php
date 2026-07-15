@@ -132,9 +132,9 @@ include '../../components/header.php';
         <div class="col-md-6 col-lg-4">
             <div class="card menu-card h-100 p-4">
                 <div class="card-body d-flex flex-column">
-                    <div class="icon-box"><i class="bi bi-shop"></i></div>
-                    <h5 class="fw-bold text-dark mb-3">Tugas Pencarian Harga</h5>
-                    <p class="text-secondary mb-4 flex-grow-1">Bandingkan 3 harga vendor eksternal untuk pengadaan yang disetujui Kepala GA.</p>
+                    <div class="icon-box"><i class="bi bi-shop-window"></i></div>
+                    <h5 class="fw-bold text-dark mb-3">Tugas Pencarian Vendor</h5>
+                    <p class="text-secondary mb-4 flex-grow-1">cari vendor eksternal yang bersedia menyediakan untuk pengadaan yang disetujui Kepala GA.</p>
                     <a href="../04_rantai_pasok/transaksi_pengadaan/supplier/index.php" class="btn btn-astar mt-auto py-2 fw-bold position-relative">
                         Lihat Tugas Saya <i class="bi bi-arrow-right ms-2"></i>
                         <?php if ($total_tugas > 0): ?>

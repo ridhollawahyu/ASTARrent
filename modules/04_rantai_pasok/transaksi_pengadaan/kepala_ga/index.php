@@ -108,13 +108,13 @@ include '../../../../components/header.php';
                 <table class="datatable-astar table table-hover table-striped mb-0 align-middle ">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <th width="5%">No.</th>
+                            <th class="text-center" width="5%">No.</th>
                             <th>Tgl Pengajuan</th>
                             <th>Pemohon (Tendik)</th>
                             <th>Kebutuhan Aset</th>
-                            <th>Jumlah</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
+                            <th class="text-center">Jumlah</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -133,15 +133,15 @@ include '../../../../components/header.php';
                         while ($data = mysqli_fetch_array($query)) {
                         ?>
                             <tr>
-                                <td class="fw-bold"><?= $no++; ?></td>
+                                <td class="text-center fw-bold"><?= $no++; ?></td>
                                 <td><?= date('d M Y, H:i', strtotime($data['tanggalPengadaan'])); ?></td>
                                 <td class="text-start fw-bold text-secondary"><?= $data['namaTendik']; ?></td>
                                 <td>
                                     <span class="badge bg-secondary mb-1"><?= $data['namaKategori']; ?></span><br>
                                     <span class="fw-bold text-dark"><?= $data['namaKebutuhan']; ?></span>
                                 </td>
-                                <td class="fw-bold fs-5 text-primary"><?= $data['jumlah']; ?></td>
-                                <td>
+                                <td class="text-center fw-bold fs-5 text-primary"><?= $data['jumlah']; ?></td>
+                                <td class="text-center">
                                     <?php if ($data['statusPengadaan'] == 'Draft'): ?>
                                         <span class="badge bg-warning text-dark px-3 py-2">Menunggu GA</span>
                                     <?php elseif ($data['statusPengadaan'] == 'Ditolak'): ?>
@@ -150,7 +150,7 @@ include '../../../../components/header.php';
                                         <span class="badge bg-success px-3 py-2"><i class="bi bi-check-circle-fill"></i> Disetujui GA</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['statusPengadaan'] == 'Draft'): ?>
                                         <a href="approve.php?id=<?= $data['idPengadaan']; ?>" class="btn btn-astar btn-sm fw-bold px-3 shadow-sm">
                                             <i class="bi bi-clipboard-check me-1"></i> Proses Validasi

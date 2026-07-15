@@ -123,7 +123,7 @@ include '../../../../components/header.php';
                             <th>Kategori</th>
                             <th>Nama Fasilitas</th>
                             <th>Lokasi Fasilitas</th>
-                            <th>Kondisi Fisik</th>
+                            <th class="text-center">Kondisi Fisik</th>
                             <th class="text-center">Ketersediaan</th>
                             <th class="text-center">Aksi</th>
                         </tr>
@@ -141,7 +141,7 @@ include '../../../../components/header.php';
                                 <td class="text-center"><?= $data['lokasiFasilitas']; ?></td>
 
                                 <!-- PEWARNAAN KONDISI FISIK -->
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['kondisiFasilitas'] == 'Normal') echo '<span class="text-success fw-bold">Normal</span>';
                                     else if ($data['kondisiFasilitas'] == 'Tidak Berfungsi') echo '<span class="text-danger fw-bold">Tidak Berfungsi</span>';
                                     else echo '<span class="text-warning text-dark fw-bold">' . $data['kondisiFasilitas'] . '</span>';

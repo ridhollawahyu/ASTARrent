@@ -65,12 +65,12 @@ include '../../../components/header.php';
                 <table class="datatable-astar table table-hover align-middle ">
                     <thead style="background-color: #f4f6f9; color: #1d4197; border-bottom: 2px solid #e0e6ed;">
                         <tr>
-                            <th width="5%" class="py-3">No.</th>
+                            <th width="5%" class="py-3 text-center">No.</th>
                             <th>ID Tiket</th>
                             <th>Barang yang Rusak</th>
                             <th>Klasifikasi</th>
-                            <th>Ketersediaan</th>
-                            <th>Aksi GA</th>
+                            <th class="text-center">Ketersediaan</th>
+                            <th class="text-center">Aksi GA</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -92,7 +92,7 @@ include '../../../components/header.php';
                             $is_diperbaiki = ($data['statusReparasi'] == 'Sedang Dikerjakan'); // Patokan status tiket!
                         ?>
                             <tr>
-                                <td class="fw-bold"><?= $no++ ?></td>
+                                <td class="text-center fw-bold"><?= $no++ ?></td>
                                 <td><code class="text-primary fw-bold"><?= $data['idReparasi'] ?></code></td>
                                 <td class="text-start fw-bold text-secondary">
                                     <span class="badge bg-<?= ($tipe_barang == 'Aset') ? 'secondary' : 'dark' ?> me-1"><?= $tipe_barang ?></span>
@@ -107,7 +107,7 @@ include '../../../components/header.php';
                                         <span class="text-danger fw-bold">Tidak Berfungsi</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <!-- Badge Ketersediaan -->
                                     <?php if ($is_dipinjam): ?>
                                         <span class="badge bg-primary px-3 py-2">Sedang Dipinjam</span>
@@ -117,7 +117,7 @@ include '../../../components/header.php';
                                         <span class="badge bg-success px-3 py-2">Tersedia (Di Gudang)</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <!-- Tombol Aksi Menyesuaikan Status Tiket -->
                                     <?php if ($is_dipinjam): ?>
                                         <button class="btn btn-secondary btn-sm fw-bold px-3 shadow-sm" disabled><i class="bi bi-lock-fill"></i> Di Tangan Mahasiswa</button>

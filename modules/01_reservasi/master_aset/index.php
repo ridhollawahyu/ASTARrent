@@ -122,8 +122,8 @@ include '../../../components/header.php';
                             <th class="text-center" width="5%">No.</th>
                             <th>Kategori</th>
                             <th>Nama Aset</th>
-                            <th>Kondisi Fisik</th>
-                            <th>Ketersediaan</th>
+                            <th class="text-center">Kondisi Fisik</th>
+                            <th class="text-center">Ketersediaan</th>
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -139,7 +139,7 @@ include '../../../components/header.php';
                                 <td><?= $data['namaAset']; ?></td>
 
                                 <!-- PEWARNAAN KONDISI FISIK -->
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['kondisiAset'] == 'Normal') echo '<span class="text-success fw-bold">Normal</span>';
                                     else if ($data['kondisiAset'] == 'Tidak Berfungsi') echo '<span class="text-danger fw-bold">Tidak Berfungsi</span>';
                                     else echo '<span class="text-warning text-dark fw-bold">' . $data['kondisiAset'] . '</span>';
@@ -147,7 +147,7 @@ include '../../../components/header.php';
                                 </td>
 
                                 <!-- PEWARNAAN KETERSEDIAAN (Sesuai Logika Terbaru Anda) -->
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['ketersediaanAset'] == 'Tersedia'): ?>
                                         <span class="badge bg-success rounded-pill px-3">Tersedia</span>
                                     <?php elseif ($data['ketersediaanAset'] == 'Dipinjam'): ?>

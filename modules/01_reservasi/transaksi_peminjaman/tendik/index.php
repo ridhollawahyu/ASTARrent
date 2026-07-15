@@ -49,9 +49,9 @@ include '../../../../components/header.php';
                             <th style="width: 18%;">Mahasiswa</th>
                             <th style="width: 15%;">Barang Dipinjam</th>
                             <th style="width: 18%;">Rencana Kembali</th>
-                            <th style="width: 10%;">Alasan</th>
+                            <th class="text-center" style="width: 10%;">Alasan</th>
                             <th style="width: 12%;">Pengurus</th>
-                            <th style="width: 10%;">Status</th>
+                            <th class="text-center" style="width: 10%;">Status</th>
                             <th class="text-center" style="width: 15%;">Aksi</th>
                         </tr>
                     </thead>
@@ -68,14 +68,14 @@ include '../../../../components/header.php';
                                 <td><?= $data['namaMahasiswa']; ?></td>
                                 <td class="text-start fw-bold text-secondary"><?= $nama_barang; ?></td>
                                 <td><?= date('d M Y, H:i', strtotime($data['tanggalRencana_kembali'])); ?></td>
-                                <td>
+                                <td class="text-center">
                                     <button type="button" class="btn btn-sm fw-bold" style="color: #1d4197; background-color: #e8f0fe; border: none; border-radius: 6px;"
                                         onclick="lihatDetailTeks('<?= htmlspecialchars(addslashes($data['keperluan'])) ?>')">
                                         <i class="bi bi-eye-fill me-1"></i> Detail
                                     </button>
                                 </td>
                                 <td class="fw-bold text-secondary"><?= $nama_tendik; ?></td>
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['statusPeminjaman'] == 'Menunggu'): ?>
                                         <span class="badge bg-warning text-dark">Menunggu</span>
                                     <?php elseif ($data['statusPeminjaman'] == 'Disetujui'): ?>

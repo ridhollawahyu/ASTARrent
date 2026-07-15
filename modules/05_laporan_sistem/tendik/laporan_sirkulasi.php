@@ -252,12 +252,12 @@ include '../../../components/header.php';
                 <table class="datatable-astar table table-hover border  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <th width="5%">No.</th>
+                            <th class="text-center" width="5%">No.</th>
                             <th width="15%">ID Transaksi</th>
                             <th width="20%">Peminjam (NIM)</th>
                             <th width="25%">Barang / Fasilitas</th>
                             <th width="15%">Tgl Pengajuan</th>
-                            <th width="15%">Status</th>
+                            <th class="text-center" width="15%">Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -271,7 +271,7 @@ include '../../../components/header.php';
                             elseif ($row['statusPeminjaman'] === 'Ditolak') $badge_class = 'bg-danger';
                         ?>
                             <tr>
-                                <td class="fw-bold"><?= $no++ ?></td>
+                                <td class="text-center fw-bold"><?= $no++ ?></td>
                                 <td><span class="text-primary fw-bold"><?= $row['idPeminjaman'] ?></span></td>
                                 <td>
                                     <div class="fw-bold"><?= $row['namaMahasiswa'] ?></div>
@@ -279,7 +279,7 @@ include '../../../components/header.php';
                                 </td>
                                 <td class="text-start fw-bold text-secondary"><?= $nm_barang ?></td>
                                 <td><?= date('d M Y, H:i', strtotime($row['tanggalPengajuan'])) ?></td>
-                                <td><span class="badge <?= $badge_class ?> rounded-pill px-3 py-2"><?= $row['statusPeminjaman'] ?></span></td>
+                                <td class="text-center"><span class="badge <?= $badge_class ?> rounded-pill px-3 py-2"><?= $row['statusPeminjaman'] ?></span></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

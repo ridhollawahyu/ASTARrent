@@ -110,26 +110,26 @@ include '../../../components/header.php';
                 <table class="datatable-astar table table-hover border  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <th width="5%">No.</th>
+                            <th class="text-center" width="5%">No.</th>
                             <th width="15%">ID Pengadaan</th>
                             <th width="25%">Nama Kebutuhan</th>
                             <th width="15%">Vendor Menang</th>
                             <th width="15%">Tgl Selesai</th>
-                            <th width="25%">Grand Total Cair</th>
+                            <th class="text-center" width="25%">Grand Total Cair</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php $no = 1;
                         foreach ($data_report as $row): ?>
                             <tr>
-                                <td><?= $no++ ?></td>
+                                <td class="text-center"><?= $no++ ?></td>
                                 <td><span class="text-primary fw-bold"><?= $row['idPengadaan'] ?></span></td>
                                 <td>
                                     <div class="fw-bold text-dark"><?= $row['namaKebutuhan'] ?></div><small class="text-muted"><?= $row['jumlah'] ?> Unit Diproses</small>
                                 </td>
                                 <td><span class="badge bg-secondary"><?= $row['namaVendor'] ?? 'Toko N/A' ?></span></td>
                                 <td><?= date('d M Y', strtotime($row['tanggalPengadaan'])) ?></td>
-                                <td class="text-success fw-bold fs-5">Rp <?= number_format($row['totalBiaya'], 0, ',', '.') ?></td>
+                                <td class="text-center text-success fw-bold fs-5">Rp <?= number_format($row['totalBiaya'], 0, ',', '.') ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

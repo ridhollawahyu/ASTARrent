@@ -94,9 +94,9 @@ include '../../../components/header.php';
                         <tr>
                             <th class="text-center pe-5" width="10%">No.</th>
                             <th>Nama Sanksi</th>
-                            <th>Jam Minus (Jam/Hour)</th>
-                            <th>Denda (Rp)</th>
-                            <th>Aksi</th>
+                            <th class="text-center">Jam Minus (Jam/Hour)</th>
+                            <th class="text-center">Denda (Rp)</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -106,12 +106,12 @@ include '../../../components/header.php';
                         while ($data = mysqli_fetch_array($query)) {
                         ?>
                             <tr>
-                                <td class="fw-bold pe-5"><?= $no++; ?></td>
+                                <td class="text-center fw-bold pe-5"><?= $no++; ?></td>
                                 <td><?= $data['namaSanksi']; ?></td>
                                 <td class="text-center"><?= $data['sanksi_jamMinus']; ?></td>
                                 <td class="text-center"><?= $data['sanksi_denda']; ?></td>
 
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['statusSanksi'] == 'Aktif'): ?>
                                         <!-- Tombol Edit -->
                                         <a href="edit.php?id=<?= $data['idSanksi']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>

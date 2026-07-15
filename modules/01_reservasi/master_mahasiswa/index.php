@@ -123,7 +123,7 @@ include '../../../components/header.php';
                             <th>Prodi</th>
                             <th>No. Telp</th>
                             <th>Email</th>
-                            <th>Status</th>
+                            <th class="text-center">Status</th>
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>

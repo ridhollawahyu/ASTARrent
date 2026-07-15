@@ -55,11 +55,11 @@ include '../../../../components/header.php';
                 <table class="datatable-astar table table-hover align-middle ">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <th width="5%">No.</th>
+                            <th class="text-center" width="5%">No.</th>
                             <th>Mahasiswa</th>
                             <th>Barang yang Dipinjam</th>
                             <th>Batas Kembali</th>
-                            <th>Status Waktu</th>
+                            <th class="text-center">Status Waktu</th>
                             <th class="text-center">Pengurus (Tendik)</th>
                         </tr>
                     </thead>
@@ -73,7 +73,7 @@ include '../../../../components/header.php';
                             $nama_tendik = ($data['idPengurus'] != NULL) ? $data['namaUser'] : "Belum Dikelola";
                         ?>
                             <tr>
-                                <td class="fw-bold"><?= $no++ ?></td>
+                                <td class="text-center fw-bold"><?= $no++ ?></td>
                                 <td>
                                     <div class="fw-bold text-dark"><?= $data['namaMahasiswa'] ?></div>
                                     <div class="text-muted" style="font-size:0.8rem;"><?= $data['nim'] ?></div>
@@ -82,7 +82,7 @@ include '../../../../components/header.php';
                                 <td class="fw-bold <?= $is_terlambat ? 'text-danger' : 'text-success' ?>">
                                     <?= date('d M Y, H:i', strtotime($data['tanggalRencana_kembali'])) ?>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <?php if ($is_terlambat): ?>
                                         <span class="badge bg-danger rounded-pill px-3 py-2" style="white-space: normal; line-height: 1.5;"><i class="bi bi-alarm-fill me-1"></i> Telat <?= $teks_waktu ?></span>
                                     <?php else: ?>

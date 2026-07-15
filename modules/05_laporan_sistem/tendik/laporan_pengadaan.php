@@ -138,26 +138,26 @@ include '../../../components/header.php';
                 <table class="datatable-astar table table-hover border  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <th width="5%">No.</th>
+                            <th class="text-center" width="5%">No.</th>
                             <th width="15%">ID Pengadaan</th>
                             <th width="25%">Nama Kebutuhan</th>
-                            <th width="10%">Jumlah</th>
+                            <th class="text-center" width="10%">Jumlah</th>
                             <th width="20%">Tgl Pengajuan</th>
-                            <th width="25%">Status</th>
+                            <th class="text-center" width="25%">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php $no = 1;
                         foreach ($data_report as $row): ?>
                             <tr>
-                                <td><?= $no++ ?></td>
+                                <td class="text-center"><?= $no++ ?></td>
                                 <td><span class="text-primary fw-bold"><?= $row['idPengadaan'] ?></span></td>
                                 <td>
                                     <div class="fw-bold"><?= $row['namaKebutuhan'] ?></div><small class="text-muted"><?= $row['namaKategori'] ?></small>
                                 </td>
-                                <td><?= $row['jumlah'] ?> Unit</td>
+                                <td class="text-center"><?= $row['jumlah'] ?> Unit</td>
                                 <td><?= date('d M Y', strtotime($row['tanggalPengadaan'])) ?></td>
-                                <td><span class="badge bg-<?= ($row['statusPengadaan'] == 'Disetujui Finance') ? 'success' : (($row['statusPengadaan'] == 'Ditolak') ? 'danger' : 'warning text-dark') ?> rounded-pill px-3 py-2"><?= $row['statusPengadaan'] ?></span></td>
+                                <td class="text-center"><span class="badge bg-<?= ($row['statusPengadaan'] == 'Disetujui Finance') ? 'success' : (($row['statusPengadaan'] == 'Ditolak') ? 'danger' : 'warning text-dark') ?> rounded-pill px-3 py-2"><?= $row['statusPengadaan'] ?></span></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

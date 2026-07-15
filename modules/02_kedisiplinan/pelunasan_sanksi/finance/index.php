@@ -51,24 +51,24 @@ include '../../../../components/header.php';
                 <table class="datatable-astar table table-hover table-striped mb-0  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <th>No.</th>
+                            <th class="text-center">No.</th>
                             <th>NIM - Nama Mahasiswa</th>
                             <th>Prodi</th>
-                            <th>Tagihan Denda (Rp)</th>
-                            <th>Jam Minus</th>
-                            <th>Aksi Finance</th>
+                            <th class="text-center">Tagihan Denda (Rp)</th>
+                            <th class="text-center">Jam Minus</th>
+                            <th class="text-center">Aksi Finance</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php $no = 1;
                         while ($data = mysqli_fetch_array($query)): ?>
                             <tr>
-                                <td class="fw-bold"><?= $no++ ?></td>
+                                <td class="text-center fw-bold"><?= $no++ ?></td>
                                 <td class="text-start fw-bold text-dark"><?= $data['nimMahasiswa'] ?> <br><small class="text-muted"><?= $data['namaMahasiswa'] ?></small></td>
                                 <td><span class="badge bg-secondary"><?= $data['kodeProdi_mahasiswa'] ?></span></td>
-                                <td class="text-danger fw-bold fs-5">Rp <?= number_format($data['dendaMahasiswa'], 0, ',', '.') ?></td>
-                                <td class="text-muted"><?= $data['jamMinus_mahasiswa'] ?> Jam</td>
-                                <td>
+                                <td class="text-center text-danger fw-bold fs-5">Rp <?= number_format($data['dendaMahasiswa'], 0, ',', '.') ?></td>
+                                <td class="text-center text-muted"><?= $data['jamMinus_mahasiswa'] ?> Jam</td>
+                                <td class="text-center">
                                     <button type="button" class="btn btn-success btn-sm fw-bold shadow-sm" onclick="bukaModalLunas('<?= $data['nimMahasiswa'] ?>', '<?= $data['namaMahasiswa'] ?>', 'proses_lunas.php')">
                                         <i class="bi bi-check-circle-fill me-1"></i> Lunasi Denda
                                     </button>

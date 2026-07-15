@@ -107,11 +107,11 @@ include '../../../components/header.php';
                 <table class="datatable-astar table table-hover border  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <th width="5%">No.</th>
+                            <th class="text-center" width="5%">No.</th>
                             <th width="15%">ID Pengadaan</th>
                             <th width="30%">Nama Barang/Fasilitas</th>
                             <th width="20%">Pemohon</th>
-                            <th width="15%">Total Unit Tiba</th>
+                            <th class="text-center" width="15%">Total Unit Tiba</th>
                             <th width="15%">Tgl Diajukan</th>
                         </tr>
                     </thead>
@@ -119,13 +119,13 @@ include '../../../components/header.php';
                         <?php $no = 1;
                         foreach ($data_report as $row): ?>
                             <tr>
-                                <td><?= $no++ ?></td>
+                                <td class="text-center"><?= $no++ ?></td>
                                 <td><span class="text-primary fw-bold"><?= $row['idPengadaan'] ?></span></td>
                                 <td>
                                     <div class="fw-bold text-dark"><?= $row['namaKebutuhan'] ?></div><small class="text-muted"><?= $row['namaKategori'] ?></small>
                                 </td>
                                 <td><?= $row['namaTendik'] ?></td>
-                                <td class="fw-bold text-success fs-5">+ <?= $row['jumlah'] ?></td>
+                                <td class="text-center fw-bold text-success fs-5">+ <?= $row['jumlah'] ?></td>
                                 <td><?= date('d M Y', strtotime($row['tanggalPengadaan'])) ?></td>
                             </tr>
                         <?php endforeach; ?>

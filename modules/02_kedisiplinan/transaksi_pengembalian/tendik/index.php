@@ -56,12 +56,12 @@ include '../../../../components/header.php';
                 <table class="datatable-astar table table-hover align-middle ">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <th width="5%">No.</th>
+                            <th class="text-center" width="5%">No.</th>
                             <th>Mahasiswa</th>
                             <th>Barang yang Dipinjam</th>
                             <th>Batas Kembali</th>
-                            <th>Status Waktu</th>
-                            <th>Aksi</th>
+                            <th class="text-center">Status Waktu</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -73,7 +73,7 @@ include '../../../../components/header.php';
                             $nama_barang = !empty($data['idAset']) ? $data['namaAset'] : $data['namaFasilitas'];
                         ?>
                             <tr>
-                                <td class="fw-bold"><?= $no++ ?></td>
+                                <td class="text-center fw-bold"><?= $no++ ?></td>
                                 <td>
                                     <div class="fw-bold text-dark"><?= $data['namaMahasiswa'] ?></div>
                                     <div class="text-muted" style="font-size:0.8rem;"><?= $data['nim'] ?></div>
@@ -82,14 +82,14 @@ include '../../../../components/header.php';
                                 <td class="fw-bold <?= $is_terlambat ? 'text-danger' : 'text-success' ?>">
                                     <?= date('d M Y, H:i', strtotime($data['tanggalRencana_kembali'])) ?>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <?php if ($is_terlambat): ?>
                                         <span class="badge bg-danger rounded-pill px-3 py-2" style="white-space: normal; line-height: 1.5;"><i class="bi bi-alarm-fill me-1"></i> Telat <?= $teks_waktu ?></span>
                                     <?php else: ?>
                                         <span class="badge bg-success rounded-pill px-3 py-2"><i class="bi bi-check2-circle me-1"></i> Tepat Waktu</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <!-- MENGARAH KE HALAMAN PROSES APPROVE -->
                                     <a href="proses_approve.php?id=<?= $data['idPeminjaman'] ?>" class="btn text-white btn-sm fw-bold px-3" style="background-color: #1d4197; border-radius: 8px;">
                                         <i class="bi bi-clipboard-check me-1"></i> Proses

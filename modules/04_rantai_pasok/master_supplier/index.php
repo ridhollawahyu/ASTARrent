@@ -74,13 +74,13 @@ include '../../../components/header.php';
                 <table class="datatable-astar table table-hover table-striped mb-0  align-middle border">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <th width="5%">No.</th>
+                            <th class="text-center" width="5%">No.</th>
                             <th>Nama Lengkap</th>
                             <th>Telepon</th>
                             <th>Email</th>
-                            <th>Jumlah Tugas</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
+                            <th class="text-center">Jumlah Tugas</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -89,25 +89,25 @@ include '../../../components/header.php';
                         while ($data = mysqli_fetch_assoc($query)) {
                         ?>
                             <tr>
-                                <td><?= $no++; ?></td>
+                                <td class="text-center"><?= $no++; ?></td>
                                 <td><?= $data['namaSupplier']; ?></td>
                                 <td><?= $data['noTelp_supplier']; ?></td>
                                 <td><?= $data['emailSupplier']; ?></td>
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['jumlahTugas_aktif'] < 3): ?>
                                         <span class="badge bg-success rounded-pill px-3"><?= $data['jumlahTugas_aktif']; ?></span>
                                     <?php else: ?>
                                         <span class="badge bg-danger rounded-pill px-3"><?= $data['jumlahTugas_aktif']; ?></span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['statusSupplier'] == 'Aktif'): ?>
                                         <span class="badge bg-success rounded-pill px-3">Aktif</span>
                                     <?php else: ?>
                                         <span class="badge bg-danger rounded-pill px-3">Nonaktif</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['statusSupplier'] == 'Aktif'): ?>
                                         <a href="edit.php?id=<?= $data['idSupplier']; ?>" class="btn btn-warning btn-sm shadow-sm" title="Edit Data"><i class="bi bi-pencil-square"></i></a>
                                         <button type="button" class="btn btn-danger btn-sm shadow-sm" onclick="konfirmasiHapus('delete.php?id=<?= $data['idSupplier']; ?>')" title="Arsipkan">

@@ -112,8 +112,8 @@ include '../../../../components/header.php';
                             <th class="text-center pe-5" width="10%">No.</th>
                             <th>Nama Kategori</th>
                             <th>Tipe</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>

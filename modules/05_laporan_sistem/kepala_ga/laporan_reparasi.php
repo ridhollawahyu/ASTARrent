@@ -123,26 +123,26 @@ include '../../../components/header.php';
                 <table class="datatable-astar table table-hover border  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <th width="5%">No.</th>
+                            <th class="text-center" width="5%">No.</th>
                             <th width="15%">ID Tiket</th>
                             <th width="25%">Barang/Fasilitas</th>
                             <th width="15%">Teknisi / Pelapor</th>
-                            <th width="15%">Kerusakan</th>
-                            <th width="15%">Status</th>
+                            <th class="text-center" width="15%">Kerusakan</th>
+                            <th class="text-center" width="15%">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php $no = 1;
                         foreach ($data_report as $row): $nm_barang = !empty($row['idAset']) ? $row['namaAset'] : $row['namaFasilitas']; ?>
                             <tr>
-                                <td><?= $no++ ?></td>
+                                <td class="text-center"><?= $no++ ?></td>
                                 <td><span class="text-primary fw-bold"><?= $row['idReparasi'] ?></span></td>
                                 <td class="text-start fw-bold text-secondary"><?= $nm_barang ?></td>
                                 <td>
                                     <div class="fw-bold text-dark"><?= $row['namaTeknisi'] ?? '<i>Belum Diambil</i>' ?></div><small class="text-muted">Pelapor: <?= $row['namaPelapor'] ?></small>
                                 </td>
-                                <td><span class="badge bg-light text-dark border"><?= $row['klasifikasiKerusakan'] ?></span></td>
-                                <td><span class="badge bg-<?= ($row['statusReparasi'] == 'Selesai') ? 'success' : (($row['statusReparasi'] == 'Dikanibal') ? 'danger' : 'warning text-dark') ?> rounded-pill px-3 py-2"><?= $row['statusReparasi'] == 'Dikanibal' ? 'Dibongkar' : $row['statusReparasi'] ?></span></td>
+                                <td class="text-center"><span class="badge bg-light text-dark border"><?= $row['klasifikasiKerusakan'] ?></span></td>
+                                <td class="text-center"><span class="badge bg-<?= ($row['statusReparasi'] == 'Selesai') ? 'success' : (($row['statusReparasi'] == 'Dikanibal') ? 'danger' : 'warning text-dark') ?> rounded-pill px-3 py-2"><?= $row['statusReparasi'] == 'Dikanibal' ? 'Dibongkar' : $row['statusReparasi'] ?></span></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

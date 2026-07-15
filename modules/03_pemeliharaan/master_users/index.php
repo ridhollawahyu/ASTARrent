@@ -84,13 +84,13 @@ include '../../../components/header.php';
                 <table class="datatable-astar table table-hover table-striped mb-0  align-middle border">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <th width="5%">No.</th>
+                            <th class="text-center" width="5%">No.</th>
                             <th>ID User</th>
                             <th>Nama Lengkap</th>
                             <th>Jabatan</th>
                             <th>Departemen</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -99,19 +99,19 @@ include '../../../components/header.php';
                         while ($data = mysqli_fetch_assoc($query)) {
                         ?>
                             <tr>
-                                <td><?= $no++; ?></td>
+                                <td class="text-center"><?= $no++; ?></td>
                                 <td class="fw-bold"><?= $data['idUser']; ?></td>
                                 <td><?= $data['namaUser']; ?></td>
                                 <td><span class="badge bg-primary text-white px-3"><?= $data['jabatanUser']; ?></span></td>
                                 <td><span class="badge bg-secondary px-3"><?= $data['kodeDepartemen']; ?></span></td>
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['statusUser'] == 'Aktif'): ?>
                                         <span class="badge bg-success rounded-pill px-3">Aktif</span>
                                     <?php else: ?>
                                         <span class="badge bg-danger rounded-pill px-3">Nonaktif</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <a href="edit.php?id=<?= $data['idUser']; ?>" class="btn btn-warning btn-sm shadow-sm" title="Edit Data"><i class="bi bi-pencil-square"></i></a>
 
                                     <?php if ($data['statusUser'] == 'Aktif'): ?>

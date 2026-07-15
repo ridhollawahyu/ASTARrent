@@ -150,24 +150,24 @@ include '../../../components/header.php';
                 <table class="datatable-astar table table-hover border  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <th width="5%">No.</th>
+                            <th class="text-center" width="5%">No.</th>
                             <th width="15%">ID Barang</th>
                             <th width="35%">Nama Barang/Fasilitas</th>
                             <th width="15%">Tipe</th>
-                            <th width="15%">Kondisi Fisik</th>
-                            <th width="15%">Status</th>
+                            <th class="text-center" width="15%">Kondisi Fisik</th>
+                            <th class="text-center" width="15%">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php $no = 1;
                         foreach ($data_report as $row): ?>
                             <tr>
-                                <td><?= $no++ ?></td>
+                                <td class="text-center"><?= $no++ ?></td>
                                 <td><span class="text-primary fw-bold"><?= $row['id_brg'] ?></span></td>
                                 <td class="text-start fw-bold text-dark"><?= $row['nama'] ?></td>
                                 <td><span class="badge bg-secondary"><?= $row['tipe'] ?></span></td>
-                                <td><?= ($row['kondisi'] == 'Normal') ? '<span class="text-success fw-bold">Normal</span>' : '<span class="text-danger fw-bold">' . $row['kondisi'] . '</span>' ?></td>
-                                <td><span class="badge bg-<?= ($row['sedia'] == 'Tersedia') ? 'success' : (($row['sedia'] == 'Dipinjam') ? 'primary' : 'warning text-dark') ?> rounded-pill px-3 py-2"><?= $row['sedia'] ?></span></td>
+                                <td class="text-center"><?= ($row['kondisi'] == 'Normal') ? '<span class="text-success fw-bold">Normal</span>' : '<span class="text-danger fw-bold">' . $row['kondisi'] . '</span>' ?></td>
+                                <td class="text-center"><span class="badge bg-<?= ($row['sedia'] == 'Tersedia') ? 'success' : (($row['sedia'] == 'Dipinjam') ? 'primary' : 'warning text-dark') ?> rounded-pill px-3 py-2"><?= $row['sedia'] ?></span></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

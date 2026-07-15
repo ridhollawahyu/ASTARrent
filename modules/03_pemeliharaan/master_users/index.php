@@ -112,9 +112,8 @@ include '../../../components/header.php';
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-center">
-                                    <a href="edit.php?id=<?= $data['idUser']; ?>" class="btn btn-warning btn-sm shadow-sm" title="Edit Data"><i class="bi bi-pencil-square"></i></a>
-
                                     <?php if ($data['statusUser'] == 'Aktif'): ?>
+                                        <a href="edit.php?id=<?= $data['idUser']; ?>" class="btn btn-warning btn-sm shadow-sm" title="Edit Data"><i class="bi bi-pencil-square"></i></a>
                                         <button type="button" class="btn btn-danger btn-sm shadow-sm" onclick="konfirmasiHapus('delete.php?id=<?= $data['idUser']; ?>')" title="Arsipkan">
                                             <i class="bi bi-trash-fill"></i>
                                         </button>

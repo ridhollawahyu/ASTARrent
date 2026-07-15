@@ -150,11 +150,12 @@ include '../../../components/header.php';
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-center">
-
-                                    <a href="edit.php?nim=<?= $data['nimMahasiswa']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
-                                    <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?nim=<?= $data['nimMahasiswa']; ?>')">
-                                        <i class="bi bi-trash-fill"></i>
-                                    </button>
+                                    <?php if ($data['statusMahasiswa'] != 'Nonaktif'): ?>
+                                        <a href="edit.php?nim=<?= $data['nimMahasiswa']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
+                                        <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?nim=<?= $data['nimMahasiswa']; ?>')">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php } ?>

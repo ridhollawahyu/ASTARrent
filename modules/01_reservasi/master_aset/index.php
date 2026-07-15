@@ -178,7 +178,7 @@ include '../../../components/header.php';
                 </table>
             <?php else: ?>
                 <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
-                <div class=" py-5">
+                <div class="text-center py-5">
                     <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
                     <h4 class="text-success fw-bold">Aman!</h4>
                     <p class="text-muted">Tidak ada data Aset.</p>

@@ -71,15 +71,15 @@ include '../../../components/header.php';
                 <?php
                 $pilihan_filter = [
                     '' => '-- Tampilkan Semua --',
-                    'P4' => 'P4 - Prodi 1',
-                    'TPM' => 'TPM - Prodi 2',
-                    'MI' => 'MI - Prodi 3',
-                    'MO' => 'MO - Prodi 4',
-                    'MK' => 'MK - Prodi 5',
-                    'TKBG' => 'TKBG - Prodi 6',
-                    'TRPAB' => 'TRPAB - Prodi 7',
-                    'TRL' => 'TRL - Prodi 8',
-                    'TRPL' => 'TRPL - Prodi 9'
+                    'P3P' => 'P3P',
+                    'TPM' => 'TPM',
+                    'MIN' => 'MIN',
+                    'MOT' => 'MOT',
+                    'MEK' => 'MEK',
+                    'TKB' => 'TKB',
+                    'TAB' => 'TAB',
+                    'TRL' => 'TRL',
+                    'RPL' => 'RPL'
                 ];
                 echo buat_dropdown_astar('prodi', $pilihan_filter, $prodi_terpilih, false);
                 ?>

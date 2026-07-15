@@ -91,6 +91,7 @@ $tables = [
         namaKebutuhan VARCHAR(255) NOT NULL,
         tanggalPengadaan DATETIME NOT NULL,
         jumlah INT NOT NULL,
+        totalBiaya INT DEFAULT 0 NOT NULL,
         alasanKebutuhan TEXT NOT NULL,
         statusPengadaan ENUM('Draft', 'Disetujui GA', 'Harga Diinput Supplier', 'Disetujui Finance', 'Ditolak') DEFAULT 'Draft' NOT NULL,
         dokumen_pengajuan VARCHAR(255) NULL,

@@ -104,7 +104,7 @@ if (isset($_GET['export_pdf']) && $_GET['export_pdf'] == '1') {
 
     $no = 1;
     foreach ($data_report as $row) {
-        $nm_barang = !empty($row['idAset']) ? '[Aset] ' . $row['namaAset'] : '[Fasilitas] ' . $row['namaFasilitas'];
+        $nm_barang = !empty($row['idAset']) ? $row['namaAset'] : $row['namaFasilitas'];
         $html .= '<tr>
                     <td>' . $no++ . '</td>
                     <td>' . $row['idPeminjaman'] . '</td>
@@ -249,7 +249,7 @@ include '../../../components/header.php';
     <div class="card-body p-4">
         <div class="table-responsive mt-2">
             <?php if (count($data_report) > 0): ?>
-                <table class="datatable-astar table table-hover border text-center align-middle">
+                <table class="datatable-astar table table-hover border  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th width="5%">No.</th>
@@ -264,7 +264,7 @@ include '../../../components/header.php';
                         <?php
                         $no = 1;
                         foreach ($data_report as $row):
-                            $nm_barang = !empty($row['idAset']) ? '[Aset] ' . $row['namaAset'] : '[Fasilitas] ' . $row['namaFasilitas'];
+                            $nm_barang = !empty($row['idAset']) ? $row['namaAset'] : $row['namaFasilitas'];
                             $badge_class = 'bg-warning text-dark';
                             if ($row['statusPeminjaman'] === 'Disetujui') $badge_class = 'bg-primary';
                             elseif ($row['statusPeminjaman'] === 'Selesai') $badge_class = 'bg-success';
@@ -273,7 +273,7 @@ include '../../../components/header.php';
                             <tr>
                                 <td class="fw-bold"><?= $no++ ?></td>
                                 <td><span class="text-primary fw-bold"><?= $row['idPeminjaman'] ?></span></td>
-                                <td class="text-start">
+                                <td>
                                     <div class="fw-bold"><?= $row['namaMahasiswa'] ?></div>
                                     <small class="text-muted"><?= $row['nim'] ?></small>
                                 </td>

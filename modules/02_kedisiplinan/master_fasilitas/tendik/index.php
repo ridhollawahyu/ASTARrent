@@ -51,7 +51,7 @@ include '../../../../components/header.php';
     <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #1d4197; border-top-left-radius: 15px; border-top-right-radius: 15px;">
         <h5 class="mb-0 text-white fw-bold"><i class="bi bi-pc-display me-2"></i>Data Master Fasilitas</h5>
         <div>
-            <a href="../../dashboards/tendik_home.php" class="btn btn-outline-light btn-sm fw-bold me-2"><i class="bi bi-arrow-left"></i> Dashboard</a>
+            <a href="../../../dashboards/tendik_home.php" class="btn btn-outline-light btn-sm fw-bold me-2"><i class="bi bi-arrow-left"></i> Dashboard</a>
             <a href="create.php" class="btn btn-light btn-sm fw-bold text-astar">+ Tambah Fasilitas Manual</a>
         </div>
     </div>
@@ -116,7 +116,7 @@ include '../../../../components/header.php';
             $query = mysqli_query($koneksi, $query_sql);
             if (mysqli_num_rows($query) > 0):
             ?>
-                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
+                <table class="datatable-astar table table-hover table-striped mb-0  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th class="text-center" width="5%">No.</th>
@@ -124,8 +124,8 @@ include '../../../../components/header.php';
                             <th>Nama Fasilitas</th>
                             <th>Lokasi Fasilitas</th>
                             <th>Kondisi Fisik</th>
-                            <th>Ketersediaan</th>
-                            <th>Aksi</th>
+                            <th class="text-center">Ketersediaan</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -135,7 +135,7 @@ include '../../../../components/header.php';
                         while ($data = mysqli_fetch_array($query)) {
                         ?>
                             <tr>
-                                <td class="fw-bold"><?= $no++; ?></td>
+                                <td class="text-center fw-bold"><?= $no++; ?></td>
                                 <td><span class="badge bg-secondary"><?= $data['namaKategori']; ?></span></td>
                                 <td class="text-center"><?= $data['namaFasilitas']; ?></td>
                                 <td class="text-center"><?= $data['lokasiFasilitas']; ?></td>

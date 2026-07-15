@@ -53,14 +53,14 @@ include '../../../../components/header.php';
             $query = mysqli_query($koneksi, $query_sql);
             if (mysqli_num_rows($query) > 0):
             ?>
-                <table class="datatable-astar table table-hover align-middle text-center">
+                <table class="datatable-astar table table-hover align-middle ">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th class="text-center" width="5%">No.</th>
                             <th>Tanggal Pengajuan</th>
-                            <th class="text-start">Barang yang Dipinjam</th>
+                            <th>Barang yang Dipinjam</th>
                             <th>Rencana Kembali</th>
-                            <th>Status & Detail</th>
+                            <th class="text-center">Status & Detail</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -75,13 +75,13 @@ include '../../../../components/header.php';
                             }
                         ?>
                             <tr>
-                                <td class="fw-bold"><?= $no++; ?></td>
+                                <td class="text-center fw-bold"><?= $no++; ?></td>
                                 <td><?= date('d M Y, H:i', strtotime($data['tanggalPengajuan'])); ?></td>
                                 <td class="text-start fw-bold text-secondary"><?= $nama_barang; ?></td>
                                 <td class="text-danger fw-bold"><?= date('d M Y, H:i', strtotime($data['tanggalRencana_kembali'])); ?></td>
 
                                 <!-- STATUS & ALASAN PENOLAKAN -->
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['statusPeminjaman'] == 'Menunggu'): ?>
                                         <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">Menunggu</span>
 

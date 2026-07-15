@@ -106,11 +106,11 @@ include '../../../../components/header.php';
             $query = mysqli_query($koneksi, $query_sql);
             if (mysqli_num_rows($query) > 0):
             ?>
-                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
+                <table class="datatable-astar table table-hover table-striped mb-0  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th class="text-center pe-5" width="10%">No.</th>
-                            <th class="text-start">Nama Kategori</th>
+                            <th>Nama Kategori</th>
                             <th>Tipe</th>
                             <th>Status</th>
                             <th>Aksi</th>
@@ -123,14 +123,14 @@ include '../../../../components/header.php';
                         while ($data = mysqli_fetch_array($query)) {
                         ?>
                             <tr>
-                                <td class="fw-bold pe-5"><?= $no++; ?></td>
-                                <td class="text-start"><?= $data['namaKategori']; ?></td>
+                                <td class="text-center fw-bold pe-5"><?= $no++; ?></td>
+                                <td><?= $data['namaKategori']; ?></td>
 
                                 <!-- PEWARNAAN KONDISI FISIK -->
                                 <td class="text-secondary"><?= $data['tipeKategori']; ?></td>
 
                                 <!-- PEWARNAAN KETERSEDIAAN (Sesuai Logika Terbaru Anda) -->
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['statusKategori'] == 'Aktif'): ?>
                                         <span class="badge bg-success rounded-pill px-3">Aktif</span>
                                     <?php else: ?>
@@ -138,7 +138,7 @@ include '../../../../components/header.php';
                                     <?php endif; ?>
                                 </td>
 
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['statusKategori'] != 'Nonaktif'): ?>
                                         <!-- Tombol Edit -->
                                         <a href="edit.php?id=<?= $data['idKategori']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>

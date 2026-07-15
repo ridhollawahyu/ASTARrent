@@ -187,7 +187,7 @@ include '../../../../components/header.php';
                                 <thead style="background-color: #e8f0fe; color: #1d4197;">
                                     <tr>
                                         <th width="5%"><i class="bi bi-check2-square"></i></th>
-                                        <th class="text-start">Nama Toko</th>
+                                        <th>Nama Toko</th>
                                         <th>Harga Satuan</th>
                                         <th width="15%">Stok Tersedia</th>
                                         <th>Estimasi Tiba</th>

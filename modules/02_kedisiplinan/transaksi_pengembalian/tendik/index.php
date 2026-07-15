@@ -53,12 +53,12 @@ include '../../../../components/header.php';
 
         <div class="table-responsive">
             <?php if (mysqli_num_rows($queryTransaksi) > 0): ?>
-                <table class="datatable-astar table table-hover align-middle text-center">
+                <table class="datatable-astar table table-hover align-middle ">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th width="5%">No.</th>
-                            <th class="text-start">Mahasiswa</th>
-                            <th class="text-start">Barang yang Dipinjam</th>
+                            <th>Mahasiswa</th>
+                            <th>Barang yang Dipinjam</th>
                             <th>Batas Kembali</th>
                             <th>Status Waktu</th>
                             <th>Aksi</th>
@@ -70,11 +70,11 @@ include '../../../../components/header.php';
                         while ($data = mysqli_fetch_assoc($queryTransaksi)):
                             $is_terlambat = (int)$data['jam_terlambat'] > 0;
                             $teks_waktu = format_waktu_terlambat((int)$data['jam_terlambat']);
-                            $nama_barang = !empty($data['idAset']) ? '<span class="text-secondary fw-bold me-1">[Aset]</span>' . $data['namaAset'] : '<span class="text-secondary me-1 fw-bold">[Fasilitas]</span>' . $data['namaFasilitas'];
+                            $nama_barang = !empty($data['idAset']) ? $data['namaAset'] : $data['namaFasilitas'];
                         ?>
                             <tr>
                                 <td class="fw-bold"><?= $no++ ?></td>
-                                <td class="text-start">
+                                <td>
                                     <div class="fw-bold text-dark"><?= $data['namaMahasiswa'] ?></div>
                                     <div class="text-muted" style="font-size:0.8rem;"><?= $data['nim'] ?></div>
                                 </td>

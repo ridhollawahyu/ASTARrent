@@ -62,12 +62,12 @@ include '../../../components/header.php';
 
         <div class="table-responsive">
             <?php if (mysqli_num_rows($queryReparasi) > 0): ?>
-                <table class="datatable-astar table table-hover align-middle text-center">
+                <table class="datatable-astar table table-hover align-middle ">
                     <thead style="background-color: #f4f6f9; color: #1d4197; border-bottom: 2px solid #e0e6ed;">
                         <tr>
                             <th width="5%" class="py-3">No.</th>
                             <th>ID Tiket</th>
-                            <th class="text-start">Barang yang Rusak</th>
+                            <th>Barang yang Rusak</th>
                             <th>Klasifikasi</th>
                             <th>Ketersediaan</th>
                             <th>Aksi GA</th>

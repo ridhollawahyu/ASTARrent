@@ -81,12 +81,12 @@ include '../../../components/header.php';
             $query = mysqli_query($koneksi, "SELECT * FROM users $where_sql ORDER BY idUser ASC");
             if (mysqli_num_rows($query) > 0):
             ?>
-                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle border">
+                <table class="datatable-astar table table-hover table-striped mb-0  align-middle border">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th width="5%">No.</th>
                             <th>ID User</th>
-                            <th class="text-start">Nama Lengkap</th>
+                            <th>Nama Lengkap</th>
                             <th>Jabatan</th>
                             <th>Departemen</th>
                             <th>Status</th>
@@ -101,7 +101,7 @@ include '../../../components/header.php';
                             <tr>
                                 <td><?= $no++; ?></td>
                                 <td class="fw-bold"><?= $data['idUser']; ?></td>
-                                <td class="text-start"><?= $data['namaUser']; ?></td>
+                                <td><?= $data['namaUser']; ?></td>
                                 <td><span class="badge bg-primary text-white px-3"><?= $data['jabatanUser']; ?></span></td>
                                 <td><span class="badge bg-secondary px-3"><?= $data['kodeDepartemen']; ?></span></td>
                                 <td>

@@ -89,11 +89,11 @@ include '../../../components/header.php';
             $query = mysqli_query($koneksi, $query_sql);
             if (mysqli_num_rows($query) > 0):
             ?>
-                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
+                <table class="datatable-astar table table-hover table-striped mb-0  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th class="text-center pe-5" width="10%">No.</th>
-                            <th class="text-start">Nama Sanksi</th>
+                            <th>Nama Sanksi</th>
                             <th>Jam Minus (Jam/Hour)</th>
                             <th>Denda (Rp)</th>
                             <th>Aksi</th>
@@ -107,7 +107,7 @@ include '../../../components/header.php';
                         ?>
                             <tr>
                                 <td class="fw-bold pe-5"><?= $no++; ?></td>
-                                <td class="text-start"><?= $data['namaSanksi']; ?></td>
+                                <td><?= $data['namaSanksi']; ?></td>
                                 <td class="text-center"><?= $data['sanksi_jamMinus']; ?></td>
                                 <td class="text-center"><?= $data['sanksi_denda']; ?></td>
 

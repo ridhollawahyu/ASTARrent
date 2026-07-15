@@ -117,16 +117,16 @@ include '../../../../components/header.php';
             $query = mysqli_query($koneksi, $query_sql);
             if (mysqli_num_rows($query) > 0):
             ?>
-                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
+                <table class="datatable-astar table table-hover table-striped mb-0  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <th class="text-center" width="5%">No.</th>
+                            <th class="text-center" width="3%">No.</th>
                             <th>Kategori</th>
                             <th>Nama Fasilitas</th>
                             <th>Lokasi Fasilitas</th>
                             <th>Kondisi Fisik</th>
-                            <th>Ketersediaan</th>
-                            <th>Aksi</th>
+                            <th class="text-center">Ketersediaan</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -144,10 +144,10 @@ include '../../../../components/header.php';
                         while ($data = mysqli_fetch_array($query)) {
                         ?>
                             <tr>
-                                <td class="fw-bold"><?= $no++; ?></td>
+                                <td class="text-center fw-bold"><?= $no++; ?></td>
                                 <td><span class="badge bg-secondary"><?= $data['namaKategori']; ?></span></td>
-                                <td class="text-center"><?= $data['namaFasilitas']; ?></td>
-                                <td class="text-center"><?= $data['lokasiFasilitas']; ?></td>
+                                <td><?= $data['namaFasilitas']; ?></td>
+                                <td><?= $data['lokasiFasilitas']; ?></td>
 
                                 <!-- PEWARNAAN KONDISI FISIK -->
                                 <td>
@@ -158,7 +158,7 @@ include '../../../../components/header.php';
                                 </td>
 
                                 <!-- PEWARNAAN KETERSEDIAAN (Sesuai Logika Terbaru Anda) -->
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['ketersediaanFasilitas'] == 'Tersedia'): ?>
                                         <span class="badge bg-success rounded-pill px-3">Tersedia</span>
                                     <?php elseif ($data['ketersediaanFasilitas'] == 'Dipinjam'): ?>
@@ -170,7 +170,7 @@ include '../../../../components/header.php';
                                     <?php endif; ?>
                                 </td>
 
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['ketersediaanFasilitas'] != 'Tidak Tersedia'): ?>
                                         <!-- Tombol Edit -->
                                         <a href="edit.php?id=<?= $data['idFasilitas']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>

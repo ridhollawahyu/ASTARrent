@@ -100,12 +100,12 @@ include '../../../../components/header.php';
                     ");
             if (mysqli_num_rows($query) > 0):
             ?>
-                <table class="datatable-astar table table-hover table-striped mb-0 align-middle text-center">
+                <table class="datatable-astar table table-hover table-striped mb-0 align-middle ">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th width="5%">No.</th>
-                            <th class="text-start">Tgl Pengajuan</th>
-                            <th class="text-start">Kebutuhan Aset</th>
+                            <th>Tgl Pengajuan</th>
+                            <th>Kebutuhan Aset</th>
                             <th>Jumlah</th>
                             <th>Proposal Tendik</th>
                             <th>Aksi</th>
@@ -118,8 +118,8 @@ include '../../../../components/header.php';
                         ?>
                             <tr>
                                 <td class="fw-bold"><?= $no++; ?></td>
-                                <td class="text-start"><?= date('d M Y', strtotime($data['tanggalPengadaan'])); ?></td>
-                                <td class="text-start">
+                                <td><?= date('d M Y', strtotime($data['tanggalPengadaan'])); ?></td>
+                                <td>
                                     <span class="badge bg-secondary mb-1"><?= $data['namaKategori']; ?></span><br>
                                     <span class="fw-bold text-dark"><?= $data['namaKebutuhan']; ?></span>
                                 </td>

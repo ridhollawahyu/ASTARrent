@@ -104,17 +104,17 @@ include '../../../components/header.php';
             $query = mysqli_query($koneksi, $query_sql);
             if (mysqli_num_rows($query) > 0):
             ?>
-                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
+                <table class="datatable-astar table table-hover table-striped mb-0  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <th width="5%">No.</th>
-                            <th>ID Komponen</th>
+                            <th class="text-center" width="5%">No.</th>
+                            <th width="12%">ID Komponen</th>
                             <th>Sumber Reparasi</th>
-                            <th>Nama Komponen</th>
+                            <th width="15%">Nama Komponen</th>
                             <th>Spesifikasi</th>
-                            <th>Kondisi</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
+                            <th class="text-center">Kondisi</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -128,22 +128,22 @@ include '../../../components/header.php';
                             }
                         ?>
                             <tr>
-                                <td class="fw-bold"><?= $no++; ?></td>
+                                <td class="text-center fw-bold"><?= $no++; ?></td>
                                 <td class="fw-bold text-astar"><?= $data['idKomponen']; ?></td>
-                                <td class="text-start">
+                                <td>
                                     <span class="fw-bold"><?= $data['idReparasi']; ?></span><br>
                                     <small class="text-muted"><?= $nama_barang; ?></small>
                                 </td>
                                 <td><?= $data['namaKomponen']; ?></td>
                                 <td><?= $data['spesifikasiKomponen'] ?: '-'; ?></td>
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['kondisiKomponen'] == 'Sangat Baik'): ?>
                                         <span class="badge bg-success rounded-pill px-3">Sangat Baik</span>
                                     <?php else: ?>
                                         <span class="badge bg-primary rounded-pill px-3">Layak Pakai</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['statusKomponen'] == 'Tersedia'): ?>
                                         <span class="badge bg-success rounded-pill px-3">Tersedia</span>
                                     <?php elseif ($data['statusKomponen'] == 'Sudah Dipakai'): ?>
@@ -152,7 +152,7 @@ include '../../../components/header.php';
                                         <span class="badge bg-secondary rounded-pill px-3">Nonaktif</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['statusKomponen'] != 'Nonaktif'): ?>
                                         <a href="edit.php?id=<?= $data['idKomponen']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
                                         <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?id=<?= $data['idKomponen']; ?>')">

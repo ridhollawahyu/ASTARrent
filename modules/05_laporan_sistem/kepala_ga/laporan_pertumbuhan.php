@@ -104,7 +104,7 @@ include '../../../components/header.php';
     <div class="card-body p-4">
         <div class="table-responsive mt-2">
             <?php if (count($data_report) > 0): ?>
-                <table class="datatable-astar table table-hover border text-center align-middle">
+                <table class="datatable-astar table table-hover border  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th width="5%">No.</th>
@@ -121,7 +121,7 @@ include '../../../components/header.php';
                             <tr>
                                 <td><?= $no++ ?></td>
                                 <td><span class="text-primary fw-bold"><?= $row['idPengadaan'] ?></span></td>
-                                <td class="text-start">
+                                <td>
                                     <div class="fw-bold text-dark"><?= $row['namaKebutuhan'] ?></div><small class="text-muted"><?= $row['namaKategori'] ?></small>
                                 </td>
                                 <td><?= $row['namaTendik'] ?></td>

@@ -43,7 +43,7 @@ if (isset($_GET['export_pdf']) && $_GET['export_pdf'] == '1') {
     $html .= '<table><thead><tr><th width="5%">No</th><th width="15%">ID Tiket</th><th width="30%">Nama Barang/Fasilitas</th><th width="15%">Teknisi GA</th><th width="15%">Kerusakan</th><th width="20%">Status Akhir</th></tr></thead><tbody>';
     $no = 1;
     foreach ($data_report as $row) {
-        $nm_barang = !empty($row['idAset']) ? '[Aset] ' . $row['namaAset'] : '[Fasilitas] ' . $row['namaFasilitas'];
+        $nm_barang = !empty($row['idAset']) ? $row['namaAset'] : $row['namaFasilitas'];
         $html .= '<tr><td>' . $no++ . '</td><td>' . $row['idReparasi'] . '</td><td style="text-align:left;">' . $nm_barang . '</td><td>' . ($row['namaTeknisi'] ?? 'Belum Diambil') . '</td><td>' . $row['klasifikasiKerusakan'] . '</td><td>' . ($row['statusReparasi'] == 'Dikanibal' ? 'Dibongkar' : $row['statusReparasi']) . '</td></tr>';
     }
     $html .= '</tbody></table></body></html>';
@@ -120,7 +120,7 @@ include '../../../components/header.php';
     <div class="card-body p-4">
         <div class="table-responsive mt-2">
             <?php if (count($data_report) > 0): ?>
-                <table class="datatable-astar table table-hover border text-center align-middle">
+                <table class="datatable-astar table table-hover border  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th width="5%">No.</th>
@@ -133,7 +133,7 @@ include '../../../components/header.php';
                     </thead>
                     <tbody>
                         <?php $no = 1;
-                        foreach ($data_report as $row): $nm_barang = !empty($row['idAset']) ? '[Aset] ' . $row['namaAset'] : '[Fasilitas] ' . $row['namaFasilitas']; ?>
+                        foreach ($data_report as $row): $nm_barang = !empty($row['idAset']) ? $row['namaAset'] : $row['namaFasilitas']; ?>
                             <tr>
                                 <td><?= $no++ ?></td>
                                 <td><span class="text-primary fw-bold"><?= $row['idReparasi'] ?></span></td>

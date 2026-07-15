@@ -116,15 +116,15 @@ include '../../../components/header.php';
             $query = mysqli_query($koneksi, $query_sql);
             if (mysqli_num_rows($query) > 0):
             ?>
-                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
+                <table class="datatable-astar table table-hover table-striped mb-0  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th class="text-center" width="5%">No.</th>
                             <th>Kategori</th>
-                            <th class="text-start">Nama Aset</th>
+                            <th>Nama Aset</th>
                             <th>Kondisi Fisik</th>
                             <th>Ketersediaan</th>
-                            <th>Aksi</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -134,9 +134,9 @@ include '../../../components/header.php';
                         while ($data = mysqli_fetch_array($query)) {
                         ?>
                             <tr>
-                                <td class="fw-bold"><?= $no++; ?></td>
+                                <td class="text-center fw-bold"><?= $no++; ?></td>
                                 <td><span class="badge bg-secondary"><?= $data['namaKategori']; ?></span></td>
-                                <td class="text-start"><?= $data['namaAset']; ?></td>
+                                <td><?= $data['namaAset']; ?></td>
 
                                 <!-- PEWARNAAN KONDISI FISIK -->
                                 <td>
@@ -161,7 +161,7 @@ include '../../../components/header.php';
                                     <?php endif; ?>
                                 </td>
 
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['ketersediaanAset'] != 'Tidak Tersedia'): ?>
                                         <!-- Tombol Edit -->
                                         <a href="edit.php?id=<?= $data['idAset']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
@@ -178,7 +178,7 @@ include '../../../components/header.php';
                 </table>
             <?php else: ?>
                 <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
-                <div class="text-center py-5">
+                <div class=" py-5">
                     <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
                     <h4 class="text-success fw-bold">Aman!</h4>
                     <p class="text-muted">Tidak ada data Aset.</p>

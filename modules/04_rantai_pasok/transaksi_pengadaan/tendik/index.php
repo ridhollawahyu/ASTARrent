@@ -106,15 +106,15 @@ include '../../../../components/header.php';
             $query = mysqli_query($koneksi, $query_sql);
             if (mysqli_num_rows($query) > 0):
             ?>
-                <table class="datatable-astar table table-hover table-striped mb-0 align-middle text-center">
+                <table class="datatable-astar table table-hover table-striped mb-0 align-middle ">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <th width="5%">No.</th>
-                            <th class="text-start">Tgl Pengajuan</th>
-                            <th class="text-start">Kebutuhan Aset</th>
-                            <th>Jumlah</th>
-                            <th>Status</th>
-                            <th>Dokumen PDF</th>
+                            <th class="text-center" width="5%">No.</th>
+                            <th>Tgl Pengajuan</th>
+                            <th>Kebutuhan Aset</th>
+                            <th class="text-center">Jumlah</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Dokumen PDF</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -124,14 +124,14 @@ include '../../../../components/header.php';
                         while ($data = mysqli_fetch_array($query)) {
                         ?>
                             <tr>
-                                <td class="fw-bold"><?= $no++; ?></td>
-                                <td class="text-start"><?= date('d M Y, H:i', strtotime($data['tanggalPengadaan'])); ?></td>
-                                <td class="text-start">
+                                <td class="text-center fw-bold"><?= $no++; ?></td>
+                                <td><?= date('d M Y, H:i', strtotime($data['tanggalPengadaan'])); ?></td>
+                                <td>
                                     <span class="badge bg-secondary mb-1"><?= $data['namaKategori']; ?></span><br>
                                     <span class="fw-bold text-dark"><?= $data['namaKebutuhan']; ?></span>
                                 </td>
-                                <td class="fw-bold fs-5 text-primary"><?= $data['jumlah']; ?></td>
-                                <td>
+                                <td class="text-center fw-bold fs-5 text-primary"><?= $data['jumlah']; ?></td>
+                                <td class="text-center">
                                     <?php if ($data['statusPengadaan'] == 'Draft'): ?>
                                         <span class="badge bg-warning text-dark px-3 py-2">Menunggu GA</span>
                                     <?php elseif ($data['statusPengadaan'] == 'Disetujui Finance'): ?>
@@ -139,10 +139,10 @@ include '../../../../components/header.php';
                                     <?php elseif ($data['statusPengadaan'] == 'Ditolak'): ?>
                                         <span class="badge bg-danger px-3 py-2">Ditolak</span>
                                     <?php else: ?>
-                                        <span class="badge bg-info text-dark px-3 py-2 shadow-sm"><i class="bi bi-arrow-repeat spin"></i> Diproses Manajemen</span>
+                                        <span class="badge bg-primary text-light px-3 py-2 shadow-sm"><i class="bi bi-arrow-repeat spin"></i> Diproses Manajemen</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <?php if (!empty($data['dokumen_pengajuan'])): ?>
                                         <!-- Link langsung buka PDF di tab baru -->
                                         <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan']; ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold">

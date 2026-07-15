@@ -105,13 +105,13 @@ include '../../../../components/header.php';
             $query = mysqli_query($koneksi, $query_sql);
             if (mysqli_num_rows($query) > 0):
             ?>
-                <table class="datatable-astar table table-hover table-striped mb-0 align-middle text-center">
+                <table class="datatable-astar table table-hover table-striped mb-0 align-middle ">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th width="5%">No.</th>
-                            <th class="text-start">Tgl Pengajuan</th>
-                            <th class="text-start">Pemohon (Tendik)</th>
-                            <th class="text-start">Kebutuhan Aset</th>
+                            <th>Tgl Pengajuan</th>
+                            <th>Pemohon (Tendik)</th>
+                            <th>Kebutuhan Aset</th>
                             <th>Jumlah</th>
                             <th>Status</th>
                             <th>Aksi</th>
@@ -134,9 +134,9 @@ include '../../../../components/header.php';
                         ?>
                             <tr>
                                 <td class="fw-bold"><?= $no++; ?></td>
-                                <td class="text-start"><?= date('d M Y, H:i', strtotime($data['tanggalPengadaan'])); ?></td>
+                                <td><?= date('d M Y, H:i', strtotime($data['tanggalPengadaan'])); ?></td>
                                 <td class="text-start fw-bold text-secondary"><?= $data['namaTendik']; ?></td>
-                                <td class="text-start">
+                                <td>
                                     <span class="badge bg-secondary mb-1"><?= $data['namaKategori']; ?></span><br>
                                     <span class="fw-bold text-dark"><?= $data['namaKebutuhan']; ?></span>
                                 </td>

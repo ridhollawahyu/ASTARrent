@@ -114,7 +114,7 @@ include '../../../components/header.php';
             $query = mysqli_query($koneksi, $query_sql);
             if (mysqli_num_rows($query) > 0):
             ?>
-                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
+                <table class="datatable-astar table table-hover table-striped mb-0  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th class="text-center" width="5%">No.</th>
@@ -124,7 +124,7 @@ include '../../../components/header.php';
                             <th>No. Telp</th>
                             <th>Email</th>
                             <th>Status</th>
-                            <th>Aksi</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -134,13 +134,13 @@ include '../../../components/header.php';
                         while ($data = mysqli_fetch_array($query)) {
                         ?>
                             <tr>
-                                <td class="fw-bold"><?= $no++; ?></td>
+                                <td class="text-center fw-bold"><?= $no++; ?></td>
                                 <td class="fw-bold"><?= $data['nimMahasiswa']; ?></td>
-                                <td class="text-start"><?= $data['namaMahasiswa']; ?></td>
+                                <td><?= $data['namaMahasiswa']; ?></td>
                                 <td><span class="badge bg-secondary"><?= $data['kodeProdi_mahasiswa']; ?></span></td>
                                 <td><?= $data['noTelp_mahasiswa']; ?></td>
                                 <td><?= $data['emailMahasiswa']; ?></td>
-                                <td>
+                                <td class="text-center">
                                     <?php if ($data['statusMahasiswa'] == 'Normal'): ?>
                                         <span class="badge bg-success rounded-pill px-3">Normal</span>
                                     <?php elseif ($data['statusMahasiswa'] == 'Dibekukan'): ?>
@@ -149,7 +149,7 @@ include '../../../components/header.php';
                                         <span class="badge bg-dark rounded-pill px-3">Nonaktif</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td class="text-center">
 
                                     <a href="edit.php?nim=<?= $data['nimMahasiswa']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
                                     <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?nim=<?= $data['nimMahasiswa']; ?>')">

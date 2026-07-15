@@ -356,12 +356,12 @@ $q_users = "INSERT IGNORE INTO users (idUser, namaUser, noTelp_user, jabatanUser
 ('GA-00001', 'Ridzal', '+62812212211', 'Kepala GA', 'kGA@astratech.ac.id', '$password_default', 'GA'),
 ('GA-00002', 'Rimba', '+62812211122', 'Staff GA', 'sGA@astratech.ac.id', '$password_default', 'GA'),
 ('FIN-00001', 'Samba', '+62812211212', 'Finance', 'FIN@astratech.ac.id', '$password_default', 'FIN'),
-('TDK-00001', 'Bapak Budi', '+62813313131', 'Tenaga Pendidik', 'budi@astratech.ac.id', '$password_default', 'RPL')";
+('TDK-00001', 'Bapak Budi', '+62813313131', 'Tenaga Pendidik', 'tendik@astratech.ac.id', '$password_default', 'RPL')";
 mysqli_query($conn, $q_users);
 
 // A. Insert Supplier
 $q_suppliers = "INSERT IGNORE INTO supplier (idSupplier, namaSupplier, noTelp_supplier, emailSupplier, passSupplier) VALUES
-('SPL-00001', 'Dola', '+62813313333', 'dola@astratech.ac.id', '$password_default')";
+('SPL-00001', 'Dola', '+62813313333', 'supplier@astratech.ac.id', '$password_default')";
 mysqli_query($conn, $q_suppliers);
 
 // B. Insert Mahasiswa TRPL

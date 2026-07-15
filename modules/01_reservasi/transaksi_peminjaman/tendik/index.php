@@ -42,16 +42,16 @@ include '../../../../components/header.php';
             ");
             if (mysqli_num_rows($queryTransaksi) > 0):
             ?>
-                <table class="datatable-astar table table-hover align-middle text-center mb-0">
+                <table class="datatable-astar table table-hover align-middle  mb-0">
                     <thead style="background-color: #f4f6f9; color: #1d4197; border-bottom: 2px solid #e0e6ed;">
                         <tr>
                             <th class="text-center" style="width: 5%;">No.</th>
-                            <th class="text-start" style="width: 18%;">Mahasiswa</th>
-                            <th class="text-start" style="width: 15%;">Barang Dipinjam</th>
-                            <th class="text-center" style="width: 18%;">Rencana Kembali</th>
-                            <th class="text-center" style="width: 10%;">Alasan</th>
-                            <th class="text-center" style="width: 12%;">Pengurus</th>
-                            <th class="text-center" style="width: 10%;">Status</th>
+                            <th style="width: 18%;">Mahasiswa</th>
+                            <th style="width: 15%;">Barang Dipinjam</th>
+                            <th style="width: 18%;">Rencana Kembali</th>
+                            <th style="width: 10%;">Alasan</th>
+                            <th style="width: 12%;">Pengurus</th>
+                            <th style="width: 10%;">Status</th>
                             <th class="text-center" style="width: 15%;">Aksi</th>
                         </tr>
                     </thead>
@@ -60,12 +60,12 @@ include '../../../../components/header.php';
                         $no = 1;
 
                         while ($data = mysqli_fetch_array($queryTransaksi)) {
-                            $nama_barang = ($data['idAset'] != NULL) ? "[Aset] " . $data['namaAset'] : "[Fasilitas] " . $data['namaFasilitas'];
+                            $nama_barang = ($data['idAset'] != NULL) ? $data['namaAset'] : $data['namaFasilitas'];
                             $nama_tendik = ($data['idPenyetuju'] != NULL) ? $data['namaUser'] : "Belum Dikelola";
                         ?>
                             <tr>
-                                <td class="fw-bold"><?= $no++; ?></td>
-                                <td class="text-start"><?= $data['namaMahasiswa']; ?></td>
+                                <td class="text-center fw-bold"><?= $no++; ?></td>
+                                <td><?= $data['namaMahasiswa']; ?></td>
                                 <td class="text-start fw-bold text-secondary"><?= $nama_barang; ?></td>
                                 <td><?= date('d M Y, H:i', strtotime($data['tanggalRencana_kembali'])); ?></td>
                                 <td>
@@ -74,7 +74,7 @@ include '../../../../components/header.php';
                                         <i class="bi bi-eye-fill me-1"></i> Detail
                                     </button>
                                 </td>
-                                <td class="text-center fw-bold text-secondary"><?= $nama_tendik; ?></td>
+                                <td class="fw-bold text-secondary"><?= $nama_tendik; ?></td>
                                 <td>
                                     <?php if ($data['statusPeminjaman'] == 'Menunggu'): ?>
                                         <span class="badge bg-warning text-dark">Menunggu</span>

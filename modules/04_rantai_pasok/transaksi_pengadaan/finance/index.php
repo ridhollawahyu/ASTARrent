@@ -36,11 +36,11 @@ include '../../../../components/header.php';
             $query = mysqli_query($koneksi, "SELECT tp.*, k.namaKategori FROM transaksi_pengadaan tp JOIN kategori k ON tp.idKategori = k.idKategori $where_sql ORDER BY tp.tanggalPengadaan DESC");
             if (mysqli_num_rows($query) > 0):
             ?>
-                <table class="datatable-astar table table-hover table-striped mb-0 align-middle text-center">
+                <table class="datatable-astar table table-hover table-striped mb-0 align-middle ">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th>No.</th>
-                            <th class="text-start">Kebutuhan Aset</th>
+                            <th>Kebutuhan Aset</th>
                             <th>Jumlah Kebutuhan</th>
                             <th>Status</th>
                             <th>Aksi</th>
@@ -52,7 +52,7 @@ include '../../../../components/header.php';
                         while ($data = mysqli_fetch_array($query)) { ?>
                             <tr>
                                 <td class="fw-bold"><?= $no++; ?></td>
-                                <td class="text-start"><span class="badge bg-secondary mb-1"><?= $data['namaKategori']; ?></span><br><span class="fw-bold text-dark"><?= $data['namaKebutuhan']; ?></span></td>
+                                <td><span class="badge bg-secondary mb-1"><?= $data['namaKategori']; ?></span><br><span class="fw-bold text-dark"><?= $data['namaKebutuhan']; ?></span></td>
                                 <td class="fw-bold fs-5 text-primary"><?= $data['jumlah']; ?></td>
                                 <td>
                                     <?= ($data['statusPengadaan'] == 'Harga Diinput Supplier') ? '<span class="badge bg-warning text-dark px-3 py-2">Butuh ACC</span>' : '<span class="badge bg-success px-3 py-2">Selesai</span>' ?>

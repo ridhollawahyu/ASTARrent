@@ -71,11 +71,11 @@ include '../../../components/header.php';
             $query = mysqli_query($koneksi, "SELECT * FROM supplier $where_sql ORDER BY idSupplier ASC");
             if (mysqli_num_rows($query) > 0):
             ?>
-                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle border">
+                <table class="datatable-astar table table-hover table-striped mb-0  align-middle border">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th width="5%">No.</th>
-                            <th class="text-start">Nama Lengkap</th>
+                            <th>Nama Lengkap</th>
                             <th>Telepon</th>
                             <th>Email</th>
                             <th>Jumlah Tugas</th>
@@ -90,7 +90,7 @@ include '../../../components/header.php';
                         ?>
                             <tr>
                                 <td><?= $no++; ?></td>
-                                <td class="text-start"><?= $data['namaSupplier']; ?></td>
+                                <td><?= $data['namaSupplier']; ?></td>
                                 <td><?= $data['noTelp_supplier']; ?></td>
                                 <td><?= $data['emailSupplier']; ?></td>
                                 <td>

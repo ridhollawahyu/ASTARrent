@@ -31,11 +31,11 @@ include '../../../../components/header.php';
 
         <div class="table-responsive mt-3">
             <?php if (mysqli_num_rows($query) > 0): ?>
-                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
+                <table class="datatable-astar table table-hover table-striped mb-0  align-middle">
                     <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
                             <th>No.</th>
-                            <th class="text-start">NIM - Nama Mahasiswa</th>
+                            <th>NIM - Nama Mahasiswa</th>
                             <th>Jam Minus</th>
                             <th>Denda (Uang)</th>
                             <th>Status Saat Ini</th>

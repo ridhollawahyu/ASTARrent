@@ -11,7 +11,7 @@ if (isset($_POST["login"])) {
     $password = $_POST["password"];
 
     // 1. CEK DI TABEL USERS DULU (Karyawan/Tendik/GA/Finance/SA)
-    $cek_user = mysqli_query($koneksi, "SELECT * FROM users WHERE idUser = '$id_login' OR emailUser = '$id_login'");
+    $cek_user = mysqli_query($koneksi, "SELECT * FROM users WHERE emailUser = '$id_login'");
 
     if (mysqli_num_rows($cek_user) === 1) {
         $row = mysqli_fetch_assoc($cek_user);
@@ -41,7 +41,7 @@ if (isset($_POST["login"])) {
     }
 
     // 2. JIKA BUKAN USER, CEK TABEL SUPPLIER (BARU!)
-    $cek_supplier = mysqli_query($koneksi, "SELECT * FROM supplier WHERE idSupplier = '$id_login' OR emailSupplier = '$id_login'");
+    $cek_supplier = mysqli_query($koneksi, "SELECT * FROM supplier WHERE emailSupplier = '$id_login'");
     if (mysqli_num_rows($cek_supplier) === 1) {
         $row = mysqli_fetch_assoc($cek_supplier);
         if (password_verify($password, $row["passSupplier"])) {

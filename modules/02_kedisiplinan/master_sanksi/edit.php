@@ -36,7 +36,8 @@ if (!$data) {
 if (isset($_POST['update'])) {
     $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
     $jamMinus = empty($_POST['jamMinus']) ? 0 : (int)$_POST['jamMinus'];
-    $denda = empty($_POST['denda']) ? 0 : (int)$_POST['denda'];
+    $denda_str = empty($_POST['denda']) ? '0' : $_POST['denda'];
+    $denda = (int)str_replace('.', '', $denda_str);
 
     // TANGKAP TRIGGER
     $klasifikasi_waktu = mysqli_real_escape_string($koneksi, $_POST['klasifikasi_waktu']);
@@ -118,7 +119,7 @@ include '../../../components/header.php';
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-danger fw-bold">Hukuman: Denda (Rp)</label>
-                            <input type="number" name="denda" class="form-control border-danger" value="<?= $data['sanksi_denda']; ?>">
+                            <input type="text" name="denda" class="form-control border-danger" value="<?= number_format($data['sanksi_denda'], 0, '', '.'); ?>" oninput="formatRupiahASTAR(this)">
                         </div>
                     </div>
 

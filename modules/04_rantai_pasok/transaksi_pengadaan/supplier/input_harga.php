@@ -71,7 +71,7 @@ if (isset($_POST['submit_penawaran'])) {
             $toko = mysqli_real_escape_string($koneksi, trim($nama_toko[$i]));
             $spek = mysqli_real_escape_string($koneksi, trim($spek_toko[$i]));
             $stok = (int)$stok_toko[$i];
-            $harga = (int)$harga_toko[$i];
+            $harga = (int)str_replace('.', '', $harga_toko[$i]);
             $estimasi = (int)$estimasi_tiba[$i];
 
             mysqli_query($koneksi, "INSERT INTO detail_pengadaan_vendor 
@@ -149,7 +149,7 @@ include '../../../../components/header.php';
                                 <label class="form-label fw-bold" style="font-size: 13px;">Harga Satuan</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light fw-bold">Rp</span>
-                                    <input type="number" name="harga_toko[]" class="form-control fw-bold" style="border: 2px solid #e0e6ed;" required min="1000" placeholder="...">
+                                    <input type="text" name="harga_toko[]" class="form-control fw-bold" style="border: 2px solid #e0e6ed;" required placeholder="..." oninput="formatRupiahASTAR(this)">
                                 </div>
                             </div>
                             <div class="col-md-1 d-flex align-items-end" style="height: 68px;">

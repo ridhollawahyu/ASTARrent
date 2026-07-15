@@ -23,9 +23,7 @@ if (isset($_POST['submit'])) {
     $jabatan = $_POST['jabatan'];
     $prefix = "";
 
-    if ($jabatan == "Super Admin") {
-        $prefix = "SA";
-    } elseif ($jabatan == "Tenaga Pendidik") {
+    if ($jabatan == "Tenaga Pendidik") {
         $prefix = "TDK";
     } elseif ($jabatan == "Staff GA" || $jabatan == "Kepala GA") {
         $prefix = "GA";
@@ -41,13 +39,18 @@ if (isset($_POST['submit'])) {
     $telp   = format_no_telp($_POST['kode_negara'], $_POST['no_telp']);
     $email  = mysqli_real_escape_string($koneksi, $_POST['email']);
     $pass   = password_hash($_POST['password'], PASSWORD_DEFAULT);
-
-    // TANGKAP DEPARTEMEN (Cerdas: Ambil dari Dropdown jika Tendik, ambil dari Auto jika Karyawan)
     $dept   = !empty($_POST['dept_prodi']) ? $_POST['dept_prodi'] : $_POST['dept_auto'];
 
     // 4. VALIDASI & INSERT
     if (cek_email_ganda($email)) {
         set_notifikasi('error', 'Gagal! Email tersebut sudah terdaftar.');
+        header('Location: create.php');
+        exit;
+    }
+    if (cek_telp_ganda($telp)) {
+        set_notifikasi('error', 'Gagal! Nomor telepon tersebut sudah terdaftar.');
+        header('Location: create.php');
+        exit;
     } else {
         $query = "INSERT INTO users (idUser, namaUser, noTelp_user, jabatanUser, emailUser, passUser, kodeDepartemen) 
                   VALUES ('$idUser', '$nama', '$telp', '$jabatan', '$email', '$pass', '$dept')";
@@ -91,8 +94,7 @@ include '../../../components/header.php';
                                 'Tenaga Pendidik' => 'Tenaga Pendidik',
                                 'Staff GA' => 'Staff GA',
                                 'Kepala GA' => 'Kepala GA',
-                                'Finance' => 'Finance',
-                                'Super Admin' => 'Super Admin'
+                                'Finance' => 'Finance'
                             ];
                             // Panggil Dropdown Global ASTARrent!
                             echo buat_dropdown_astar('jabatan', $opsi_jabatan);

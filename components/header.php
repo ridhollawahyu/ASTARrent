@@ -314,6 +314,11 @@
             }
         }
 
+        function formatRupiahASTAR(el) {
+            // Hanya izinkan angka, lalu tambahkan titik setiap 3 digit
+            el.value = el.value.replace(/[^0-9]/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
         function selectOption(id, nilai, label) {
             document.getElementById('text_' + id).innerText = label;
             document.getElementById('input_' + id).value = nilai;

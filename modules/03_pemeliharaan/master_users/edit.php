@@ -61,6 +61,12 @@ if (isset($_POST['update'])) {
     // Validasi Nomor Telepon
     $no_telp_final = format_no_telp($_POST['kode_negara'], $_POST['no_telp']);
 
+    if (cek_telp_ganda($no_telp_final, $id)) {
+        set_notifikasi('error', 'Gagal! Nomor telepon tersebut sudah digunakan oleh akun lain.');
+        header("Location: edit.php?id=$id");
+        exit;
+    }
+
     // Logika Password (Kosong = Tetap pakai yang lama)
     if (empty($_POST['password'])) {
         $password_final = $data['passUser'];

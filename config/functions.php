@@ -253,6 +253,40 @@ function cek_email_ganda($email_input)
 }
 
 /**
+ * FUNGSI: CEK NOMOR TELEPON GANDA (CROSS-TABLE VALIDATION)
+ * Mengecek apakah no telp sudah dipakai di tabel Mahasiswa, Users, atau Supplier.
+ * Return TRUE jika duplikat (tidak boleh dipakai), FALSE jika aman.
+ * Parameter $id_pengecualian digunakan saat proses Edit, agar nomor lamanya sendiri tidak terdeteksi ganda.
+ */
+function cek_telp_ganda($telp_input, $id_pengecualian = '')
+{
+    global $koneksi;
+    $telp_aman = mysqli_real_escape_string($koneksi, $telp_input);
+    $id_aman = mysqli_real_escape_string($koneksi, $id_pengecualian);
+
+    // Kondisi pengecualian (Mencegah nomor sendiri dideteksi duplikat saat proses Edit)
+    $kondisi_mhs = ($id_aman != '') ? "AND nimMahasiswa != '$id_aman'" : "";
+    $kondisi_usr = ($id_aman != '') ? "AND idUser != '$id_aman'" : "";
+    $kondisi_sup = ($id_aman != '') ? "AND idSupplier != '$id_aman'" : "";
+
+    // Murni PHP & SQL Native: UNION ALL untuk ngecek di 3 tabel sekaligus
+    $query = "
+        SELECT telp FROM (
+            SELECT noTelp_mahasiswa AS telp FROM mahasiswa WHERE noTelp_mahasiswa = '$telp_aman' $kondisi_mhs
+            UNION ALL
+            SELECT noTelp_user AS telp FROM users WHERE noTelp_user = '$telp_aman' $kondisi_usr
+            UNION ALL
+            SELECT noTelp_supplier AS telp FROM supplier WHERE noTelp_supplier = '$telp_aman' $kondisi_sup
+        ) AS gabungan
+    ";
+
+    $result = mysqli_query($koneksi, $query);
+
+    // Jika lebih dari 0, berarti nomor sudah ada di database
+    return mysqli_num_rows($result) > 0;
+}
+
+/**
  * FUNGSI 8: MENGAMBIL DATA KATEGORI DARI DATABASE UNTUK DROPDOWN
  * $tipe = 'Aset' atau 'Fasilitas'
  */
@@ -1020,7 +1054,7 @@ function script_dinamis_supplier_input($kebutuhan_jumlah)
                         <div class=\"input-group\"><input type=\"number\" name=\"estimasi_tiba[]\" class=\"form-control fw-bold text-center\" style=\"border: 2px solid #e0e6ed;\" required min=\"1\" placeholder=\"...\"><span class=\"input-group-text bg-light\">Hari</span></div>
                     </div>
                     <div class=\"col-md-3\">
-                        <div class=\"input-group\"><span class=\"input-group-text bg-light fw-bold\">Rp</span><input type=\"number\" name=\"harga_toko[]\" class=\"form-control fw-bold\" style=\"border: 2px solid #e0e6ed;\" required min=\"1000\" placeholder=\"...\"></div>
+                        <div class=\"input-group\"><span class=\"input-group-text bg-light fw-bold\">Rp</span><input type=\"text\" name=\"harga_toko[]\" class=\"form-control fw-bold\" style=\"border: 2px solid #e0e6ed;\" required placeholder=\"...\" oninput=\"formatRupiahASTAR(this)\"></div>
                     </div>
                     <div class=\"col-md-1 d-flex align-items-end\" style=\"height: 38px;\"><button type=\"button\" class=\"btn btn-outline-danger w-100 fw-bold\" onclick=\"hapusBaris(this)\"><i class=\"bi bi-x-lg\"></i></button></div>
                 </div>`;

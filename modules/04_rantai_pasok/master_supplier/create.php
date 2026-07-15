@@ -31,6 +31,11 @@ if (isset($_POST['submit'])) {
     // 4. VALIDASI & INSERT
     if (cek_email_ganda($email)) {
         set_notifikasi('error', 'Gagal! Email tersebut sudah terdaftar.');
+    }
+    if (cek_telp_ganda($telp)) {
+        set_notifikasi('error', 'Gagal! Nomor telepon tersebut sudah terdaftar.');
+        header('Location: create.php');
+        exit;
     } else {
         $query = "INSERT INTO supplier (idSupplier, namaSupplier, noTelp_supplier, emailSupplier, passSupplier) 
                   VALUES ('$idSupplier', '$nama', '$telp', '$email', '$pass')";

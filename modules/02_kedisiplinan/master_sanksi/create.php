@@ -22,7 +22,8 @@ if (isset($_POST['submit'])) {
 
     $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
     $jamMinus = empty($_POST['jamMinus']) ? 0 : (int)$_POST['jamMinus'];
-    $denda = empty($_POST['denda']) ? 0 : (int)$_POST['denda'];
+    $denda_str = empty($_POST['denda']) ? '0' : $_POST['denda'];
+    $denda = (int)str_replace('.', '', $denda_str);
 
     // TANGKAP INPUTAN TRIGGER BARU
     $klasifikasi_waktu = mysqli_real_escape_string($koneksi, $_POST['klasifikasi_waktu']);
@@ -100,7 +101,7 @@ if (isset($_POST['submit'])) {
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-danger fw-bold">Hukuman: Denda (Rp)</label>
-                            <input type="number" name="denda" class="form-control border-danger" placeholder="0">
+                            <input type="text" name="denda" class="form-control border-danger" placeholder="0" oninput="formatRupiahASTAR(this)">
                             <small class="text-secondary mt-1 d-block" style="font-size:11px;">*Kosongkan jika tidak ada denda uang.</small>
                         </div>
                     </div>

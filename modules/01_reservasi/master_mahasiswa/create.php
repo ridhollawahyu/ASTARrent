@@ -21,20 +21,26 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Super Admin') {
 if (isset($_POST['submit'])) {
 
     $nama = $_POST['nama'];
-    $prodi = $_POST['prodi']; // Hasil dari Dropdown Custom kita!
+    $prodi = $_POST['prodi'];
+    $no_telp_final = format_no_telp($_POST['kode_negara'], $_POST['no_telp']);
     $email = $_POST['email'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
     if (cek_email_ganda($email)) {
         // Jika fungsi return true, gagalkan proses dan kembalikan ke form
-        set_notifikasi('error', 'Gagal! Email tersebut sudah terdaftar di sistem ASTRAtech.');
+        set_notifikasi('error', 'Gagal! Email tersebut sudah terdaftar.');
         header('Location: create.php');
         exit; // Hentikan eksekusi kode di bawahnya!
     }
+    if (cek_telp_ganda($no_telp_final)) {
+        set_notifikasi('error', 'Gagal! Nomor telepon tersebut sudah terdaftar.');
+        header('Location: create.php');
+        exit;
+    }
+
 
     // Panggil fungsi generate NIM & Telepon
     $nim_otomatis = generate_nim_mahasiswa($prodi);
-    $no_telp_final = format_no_telp($_POST['kode_negara'], $_POST['no_telp']);
 
     $query_simpan = "INSERT INTO mahasiswa (nimMahasiswa, namaMahasiswa, kodeProdi_mahasiswa, noTelp_mahasiswa, emailMahasiswa, passMahasiswa) 
                      VALUES ('$nim_otomatis', '$nama', '$prodi', '$no_telp_final', '$email', '$password')";

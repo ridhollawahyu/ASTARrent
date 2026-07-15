@@ -39,11 +39,15 @@ if (isset($_POST['update'])) {
     $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
     $prodi = mysqli_real_escape_string($koneksi, $_POST['prodi']);
     $email = mysqli_real_escape_string($koneksi, $_POST['email']);
-
     $jamMinus = (int)$_POST['jamMinus'];
     $denda = (int)$_POST['denda'];
-
     $no_telp_final = format_no_telp($_POST['kode_negara'], $_POST['no_telp']);
+
+    if (cek_telp_ganda($no_telp_final, $nim)) {
+        set_notifikasi('error', 'Gagal! Nomor telepon tersebut sudah terdaftar.');
+        header("Location: edit.php?nim=$nim");
+        exit;
+    }
 
     if (empty($_POST['password'])) {
         $password_final = $data['passMahasiswa'];

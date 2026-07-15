@@ -353,7 +353,6 @@ $password_default = password_hash("12345", PASSWORD_DEFAULT);
 // A. Insert Users
 $q_users = "INSERT IGNORE INTO users (idUser, namaUser, noTelp_user, jabatanUser, emailUser, passUser, kodeDepartemen) VALUES
 ('SA-00000', 'IT Pusat ASTRAtech', '+62812212121', 'Super Admin', 'admin@astratech.ac.id', '$password_default', 'SA'),
-('SA-00001', 'Calistung', '+62812212222', 'Super Admin', 'cadmin@astratech.ac.id', '$password_default', 'SA'),
 ('GA-00001', 'Ridzal', '+62812212211', 'Kepala GA', 'kGA@astratech.ac.id', '$password_default', 'GA'),
 ('GA-00002', 'Rimba', '+62812211122', 'Staff GA', 'sGA@astratech.ac.id', '$password_default', 'GA'),
 ('FIN-00001', 'Samba', '+62812211212', 'Finance', 'FIN@astratech.ac.id', '$password_default', 'FIN'),

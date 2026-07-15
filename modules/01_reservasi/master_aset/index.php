@@ -162,7 +162,7 @@ include '../../../components/header.php';
                                 </td>
 
                                 <td class="text-center">
-                                    <?php if ($data['ketersediaanAset'] != 'Tidak Tersedia'): ?>
+                                    <?php if ($data['ketersediaanAset'] != 'Nonaktif'): ?>
                                         <!-- Tombol Edit -->
                                         <a href="edit.php?id=<?= $data['idAset']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
 

@@ -65,7 +65,7 @@ include '../../../components/header.php';
                     '' => '-- Status Default (Aktif) --',
                     'Tersedia' => 'Tersedia',
                     'Sudah Dipakai' => 'Sudah Dipakai',
-                    'Nonaktif' => 'Arsip (Soft Delete)',
+                    'Nonaktif' => 'Arsip',
                     'Semua_Termasuk_Arsip' => 'Tampilkan Semua Data'
                 ];
                 echo buat_dropdown_astar('status', $opsi_status, $status_terpilih, false);

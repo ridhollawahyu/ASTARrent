@@ -76,7 +76,7 @@ include '../../../../components/header.php';
                     'Dipinjam' => 'Sedang Dipinjam',
                     'Sedang Diperbaiki' => 'Sedang Diperbaiki (Reparasi)',
                     'Tidak Tersedia' => 'Tidak Tersedia (Rusak)',
-                    'Nonaktif' => 'Arsip (Soft Delete)',
+                    'Nonaktif' => 'Arsip',
                     'Semua_Termasuk_Arsip' => 'Tampilkan Semua Data'
                 ];
                 // Panggil fungsi Custom Dropdown kita (Tanpa wajib diisi/false)

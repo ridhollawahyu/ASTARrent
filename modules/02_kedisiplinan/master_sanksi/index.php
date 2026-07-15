@@ -63,7 +63,7 @@ include '../../../components/header.php';
                 <?php
                 $opsi_status = [
                     '' => '-- Status Default (Aktif) --',
-                    'Nonaktif' => 'Arsip (Soft Delete)',
+                    'Nonaktif' => 'Arsip',
                     'Semua_Termasuk_Arsip' => 'Tampilkan Semua Data'
                 ];
                 // Panggil fungsi Custom Dropdown kita (Tanpa wajib diisi/false)

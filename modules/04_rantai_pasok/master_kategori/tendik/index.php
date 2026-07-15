@@ -79,7 +79,7 @@ include '../../../../components/header.php';
                     '' => '-- Status Default (Aktif) --',
                     'Aset' => 'Aset',
                     'Fasilitas' => 'Fasilitas',
-                    'Nonaktif' => 'Arsip (Soft Delete)',
+                    'Nonaktif' => 'Arsip',
                     'Semua_Termasuk_Arsip' => 'Tampilkan Semua Data'
                 ];
                 // Panggil fungsi Custom Dropdown kita (Tanpa wajib diisi/false)

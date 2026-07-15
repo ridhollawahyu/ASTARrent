@@ -92,59 +92,64 @@ include '../../../../components/header.php';
 
         <!-- TABEL -->
         <div class="table-responsive">
-            <table class="datatable-astar table table-hover table-striped mb-0 align-middle text-center">
-                <thead style="background-color: #f4f6f9; color: #1d4197;">
-                    <tr>
-                        <th width="5%">No.</th>
-                        <th class="text-start">Tgl Pengajuan</th>
-                        <th class="text-start">Kebutuhan Aset</th>
-                        <th>Jumlah</th>
-                        <th>Proposal Tendik</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $query = mysqli_query($koneksi, "
+            <?php
+            $query = mysqli_query($koneksi, "
                         SELECT tp.*, k.namaKategori FROM transaksi_pengadaan tp
                         JOIN kategori k ON tp.idKategori = k.idKategori
                         $where_sql ORDER BY tp.tanggalPengadaan DESC
                     ");
-                    $no = 1;
-                    while ($data = mysqli_fetch_array($query)) {
-                    ?>
+            if (mysqli_num_rows($query) > 0):
+            ?>
+                <table class="datatable-astar table table-hover table-striped mb-0 align-middle text-center">
+                    <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <td class="fw-bold"><?= $no++; ?></td>
-                            <td class="text-start"><?= date('d M Y', strtotime($data['tanggalPengadaan'])); ?></td>
-                            <td class="text-start">
-                                <span class="badge bg-secondary mb-1"><?= $data['namaKategori']; ?></span><br>
-                                <span class="fw-bold text-dark"><?= $data['namaKebutuhan']; ?></span>
-                            </td>
-                            <td class="fw-bold fs-5 text-primary"><?= $data['jumlah']; ?></td>
-                            <td>
-                                <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan']; ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold">
-                                    <i class="bi bi-file-earmark-pdf-fill"></i> Baca PDF
-                                </a>
-                            </td>
-                            <td>
-                                <?php if ($data['statusPengadaan'] == 'Disetujui GA'): ?>
-                                    <a href="input_harga.php?id=<?= $data['idPengadaan']; ?>" class="btn btn-astar btn-sm fw-bold px-3 shadow-sm">
-                                        <i class="bi bi-pencil-square me-1"></i> Input Harga Vendor
+                            <th width="5%">No.</th>
+                            <th class="text-start">Tgl Pengajuan</th>
+                            <th class="text-start">Kebutuhan Aset</th>
+                            <th>Jumlah</th>
+                            <th>Proposal Tendik</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
+                        while ($data = mysqli_fetch_array($query)) {
+                        ?>
+                            <tr>
+                                <td class="fw-bold"><?= $no++; ?></td>
+                                <td class="text-start"><?= date('d M Y', strtotime($data['tanggalPengadaan'])); ?></td>
+                                <td class="text-start">
+                                    <span class="badge bg-secondary mb-1"><?= $data['namaKategori']; ?></span><br>
+                                    <span class="fw-bold text-dark"><?= $data['namaKebutuhan']; ?></span>
+                                </td>
+                                <td class="fw-bold fs-5 text-primary"><?= $data['jumlah']; ?></td>
+                                <td>
+                                    <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan']; ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold">
+                                        <i class="bi bi-file-earmark-pdf-fill"></i> Baca PDF
                                     </a>
-                                <?php else: ?>
-                                    <span class="badge bg-success px-3 py-2"><i class="bi bi-check-circle-fill"></i> Tugas Selesai</span>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                    <?php } ?>
-
-                    <?php if (mysqli_num_rows($query) == 0): ?>
-                        <tr>
-                            <td colspan="6" class="py-5 text-center text-muted fst-italic">Hore! Tidak ada tugas pencarian vendor.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                                </td>
+                                <td>
+                                    <?php if ($data['statusPengadaan'] == 'Disetujui GA'): ?>
+                                        <a href="input_harga.php?id=<?= $data['idPengadaan']; ?>" class="btn btn-astar btn-sm fw-bold px-3 shadow-sm">
+                                            <i class="bi bi-pencil-square me-1"></i> Input Harga Vendor
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="badge bg-success px-3 py-2"><i class="bi bi-check-circle-fill"></i> Tugas Selesai</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-success fw-bold">Aman!</h4>
+                    <p class="text-muted">Tidak ada tugas untuk Anda.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

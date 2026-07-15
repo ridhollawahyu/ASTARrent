@@ -61,87 +61,91 @@ include '../../../components/header.php';
         </div>
 
         <div class="table-responsive">
-            <table class="datatable-astar table table-hover align-middle text-center">
-                <thead style="background-color: #f4f6f9; color: #1d4197; border-bottom: 2px solid #e0e6ed;">
-                    <tr>
-                        <th width="5%" class="py-3">No.</th>
-                        <th>ID Tiket</th>
-                        <th class="text-start">Barang yang Rusak</th>
-                        <th>Klasifikasi</th>
-                        <th>Ketersediaan</th>
-                        <th>Aksi GA</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $no = 1;
-                    while ($data = mysqli_fetch_assoc($queryReparasi)):
-
-                        // =========================================================
-                        // PERBAIKAN LOGIKA VARIABEL (Sihir XOR)
-                        // Karena data Aset dan Fasilitas terpisah kolomnya, 
-                        // kita harus menyatukannya pakai PHP If-Else (Ternary)
-                        // =========================================================
-                        $tipe_barang = !empty($data['idAset']) ? 'Aset' : 'Fasilitas';
-                        $id_barang = ($tipe_barang == 'Aset') ? $data['idAset'] : $data['idFasilitas'];
-                        $nama_barang = ($tipe_barang == 'Aset') ? $data['namaAset'] : $data['namaFasilitas'];
-                        $ketersediaan = ($tipe_barang == 'Aset') ? $data['ketersediaanAset'] : $data['ketersediaanFasilitas'];
-
-                        $is_dipinjam = ($ketersediaan == 'Dipinjam');
-                        $is_diperbaiki = ($data['statusReparasi'] == 'Sedang Dikerjakan'); // Patokan status tiket!
-                    ?>
+            <?php if (mysqli_num_rows($queryReparasi) > 0): ?>
+                <table class="datatable-astar table table-hover align-middle text-center">
+                    <thead style="background-color: #f4f6f9; color: #1d4197; border-bottom: 2px solid #e0e6ed;">
                         <tr>
-                            <td class="fw-bold"><?= $no++ ?></td>
-                            <td><code class="text-primary fw-bold"><?= $data['idReparasi'] ?></code></td>
-                            <td class="text-start fw-bold text-secondary">
-                                <span class="badge bg-<?= ($tipe_barang == 'Aset') ? 'secondary' : 'dark' ?> me-1"><?= $tipe_barang ?></span>
-                                <?= $nama_barang ?>
-                                <br><small class="text-muted fw-normal">ID: <?= $id_barang ?></small>
-                            </td>
-                            <td>
-                                <!-- Ambil Klasifikasi dari Tabel Tiket, bukan Master -->
-                                <?php if ($data['klasifikasiKerusakan'] == 'Berfungsi'): ?>
-                                    <span class="text-warning fw-bold text-dark">Berfungsi (Minus)</span>
-                                <?php else: ?>
-                                    <span class="text-danger fw-bold">Tidak Berfungsi</span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <!-- Badge Ketersediaan -->
-                                <?php if ($is_dipinjam): ?>
-                                    <span class="badge bg-primary px-3 py-2">Sedang Dipinjam</span>
-                                <?php elseif ($is_diperbaiki): ?>
-                                    <span class="badge bg-warning text-dark px-3 py-2">Sedang Diperbaiki</span>
-                                <?php else: ?>
-                                    <span class="badge bg-success px-3 py-2">Tersedia (Di Gudang)</span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <!-- Tombol Aksi Menyesuaikan Status Tiket -->
-                                <?php if ($is_dipinjam): ?>
-                                    <button class="btn btn-secondary btn-sm fw-bold px-3 shadow-sm" disabled><i class="bi bi-lock-fill"></i> Di Tangan Mahasiswa</button>
-                                <?php elseif ($is_diperbaiki): ?>
-                                    <!-- Jika sedang dikerjakan, arahkan ke selesai_reparasi.php -->
-                                    <a href="selesai_reparasi.php?id_rep=<?= $data['idReparasi'] ?>&tipe=<?= $tipe_barang ?>&id_brg=<?= $id_barang ?>" class="btn btn-success btn-sm fw-bold px-3 shadow-sm">
-                                        <i class="bi bi-check2-circle me-1"></i> Selesaikan
-                                    </a>
-                                <?php else: ?>
-                                    <!-- PERBAIKAN: Jika masih Menunggu GA, arahkan ke mulai_reparasi.php dengan membawa parameter GET -->
-                                    <a href="proses_inspeksi.php?id=<?= $id_barang ?>&tipe=<?= $tipe_barang ?>" class="btn text-white btn-sm fw-bold px-3 shadow-sm" style="background-color: #1d4197;">
-                                        <i class="bi bi-wrench me-1"></i> Mulai Perbaiki
-                                    </a>
-                                <?php endif; ?>
-                            </td>
+                            <th width="5%" class="py-3">No.</th>
+                            <th>ID Tiket</th>
+                            <th class="text-start">Barang yang Rusak</th>
+                            <th>Klasifikasi</th>
+                            <th>Ketersediaan</th>
+                            <th>Aksi GA</th>
                         </tr>
-                    <?php endwhile; ?>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
+                        while ($data = mysqli_fetch_assoc($queryReparasi)):
 
-                    <?php if (mysqli_num_rows($queryReparasi) == 0): ?>
-                        <tr>
-                            <td colspan="6" class="py-5 text-center text-success fw-bold"><i class="bi bi-check-circle-fill fs-1 d-block mb-2"></i>Semua tiket reparasi telah diselesaikan!</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                            // =========================================================
+                            // PERBAIKAN LOGIKA VARIABEL (Sihir XOR)
+                            // Karena data Aset dan Fasilitas terpisah kolomnya, 
+                            // kita harus menyatukannya pakai PHP If-Else (Ternary)
+                            // =========================================================
+                            $tipe_barang = !empty($data['idAset']) ? 'Aset' : 'Fasilitas';
+                            $id_barang = ($tipe_barang == 'Aset') ? $data['idAset'] : $data['idFasilitas'];
+                            $nama_barang = ($tipe_barang == 'Aset') ? $data['namaAset'] : $data['namaFasilitas'];
+                            $ketersediaan = ($tipe_barang == 'Aset') ? $data['ketersediaanAset'] : $data['ketersediaanFasilitas'];
+
+                            $is_dipinjam = ($ketersediaan == 'Dipinjam');
+                            $is_diperbaiki = ($data['statusReparasi'] == 'Sedang Dikerjakan'); // Patokan status tiket!
+                        ?>
+                            <tr>
+                                <td class="fw-bold"><?= $no++ ?></td>
+                                <td><code class="text-primary fw-bold"><?= $data['idReparasi'] ?></code></td>
+                                <td class="text-start fw-bold text-secondary">
+                                    <span class="badge bg-<?= ($tipe_barang == 'Aset') ? 'secondary' : 'dark' ?> me-1"><?= $tipe_barang ?></span>
+                                    <?= $nama_barang ?>
+                                    <br><small class="text-muted fw-normal">ID: <?= $id_barang ?></small>
+                                </td>
+                                <td>
+                                    <!-- Ambil Klasifikasi dari Tabel Tiket, bukan Master -->
+                                    <?php if ($data['klasifikasiKerusakan'] == 'Berfungsi'): ?>
+                                        <span class="text-warning fw-bold text-dark">Berfungsi (Minus)</span>
+                                    <?php else: ?>
+                                        <span class="text-danger fw-bold">Tidak Berfungsi</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <!-- Badge Ketersediaan -->
+                                    <?php if ($is_dipinjam): ?>
+                                        <span class="badge bg-primary px-3 py-2">Sedang Dipinjam</span>
+                                    <?php elseif ($is_diperbaiki): ?>
+                                        <span class="badge bg-warning text-dark px-3 py-2">Sedang Diperbaiki</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-success px-3 py-2">Tersedia (Di Gudang)</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <!-- Tombol Aksi Menyesuaikan Status Tiket -->
+                                    <?php if ($is_dipinjam): ?>
+                                        <button class="btn btn-secondary btn-sm fw-bold px-3 shadow-sm" disabled><i class="bi bi-lock-fill"></i> Di Tangan Mahasiswa</button>
+                                    <?php elseif ($is_diperbaiki): ?>
+                                        <!-- Jika sedang dikerjakan, arahkan ke selesai_reparasi.php -->
+                                        <a href="selesai_reparasi.php?id_rep=<?= $data['idReparasi'] ?>&tipe=<?= $tipe_barang ?>&id_brg=<?= $id_barang ?>" class="btn btn-success btn-sm fw-bold px-3 shadow-sm">
+                                            <i class="bi bi-check2-circle me-1"></i> Selesaikan
+                                        </a>
+                                    <?php else: ?>
+                                        <!-- PERBAIKAN: Jika masih Menunggu GA, arahkan ke mulai_reparasi.php dengan membawa parameter GET -->
+                                        <a href="proses_inspeksi.php?id=<?= $id_barang ?>&tipe=<?= $tipe_barang ?>" class="btn text-white btn-sm fw-bold px-3 shadow-sm" style="background-color: #1d4197;">
+                                            <i class="bi bi-wrench me-1"></i> Mulai Perbaiki
+                                        </a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-success fw-bold">Aman!</h4>
+                    <p class="text-muted">Tidak ada Aset/Fasilitas yang rusak.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

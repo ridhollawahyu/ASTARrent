@@ -69,7 +69,7 @@ if (isset($_POST['selesai'])) {
         // Matikan Aset
         perbarui_status_barang('aset', $id_brg, 'Nonaktif', 'Tidak Berfungsi');
 
-        set_notifikasi('success', "Aset dikanibal! $jumlah_masuk Komponen baru berhasil ditambahkan ke gudang suku cadang.");
+        set_notifikasi('success', "Aset dibongkar! $jumlah_masuk Komponen baru berhasil ditambahkan ke gudang suku cadang.");
     } else {
         // ====================================================
         // JIKA DIPERBAIKI: KEMBALIKAN KE STATUS TERSDIA & NORMAL

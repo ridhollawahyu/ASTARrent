@@ -92,22 +92,8 @@ include '../../../components/header.php';
         </form>
 
         <div class="table-responsive">
-            <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
-                <thead style="background-color: #f4f6f9; color: #1d4197;">
-                    <tr>
-                        <th width="5%">No.</th>
-                        <th>ID Komponen</th>
-                        <th>Sumber Reparasi</th>
-                        <th>Nama Komponen</th>
-                        <th>Spesifikasi</th>
-                        <th>Kondisi</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $query_sql = "SELECT komponen.*, reparasi_fasilitas_aset.klasifikasiKerusakan, reparasi_fasilitas_aset.statusReparasi,
+            <?php
+            $query_sql = "SELECT komponen.*, reparasi_fasilitas_aset.klasifikasiKerusakan, reparasi_fasilitas_aset.statusReparasi,
                                          aset.namaAset, fasilitas.namaFasilitas
                                   FROM komponen
                                   JOIN reparasi_fasilitas_aset ON komponen.idReparasi = reparasi_fasilitas_aset.idReparasi
@@ -115,58 +101,78 @@ include '../../../components/header.php';
                                   LEFT JOIN fasilitas ON reparasi_fasilitas_aset.idFasilitas = fasilitas.idFasilitas
                                   " . $where_sql . "
                                   ORDER BY komponen.idKomponen ASC";
-                    $query = mysqli_query($koneksi, $query_sql);
-                    $no = 1;
-
-                    while ($data = mysqli_fetch_array($query)) {
-                        $nama_barang = $data['namaAset'] ?: $data['namaFasilitas'];
-                        if (!$nama_barang) {
-                            $nama_barang = 'Barang tidak ditemukan';
-                        }
-                    ?>
+            $query = mysqli_query($koneksi, $query_sql);
+            if (mysqli_num_rows($query) > 0):
+            ?>
+                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
+                    <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <td class="fw-bold"><?= $no++; ?></td>
-                            <td class="fw-bold text-astar"><?= $data['idKomponen']; ?></td>
-                            <td class="text-start">
-                                <span class="fw-bold"><?= $data['idReparasi']; ?></span><br>
-                                <small class="text-muted"><?= $nama_barang; ?></small>
-                            </td>
-                            <td><?= $data['namaKomponen']; ?></td>
-                            <td><?= $data['spesifikasiKomponen'] ?: '-'; ?></td>
-                            <td>
-                                <?php if ($data['kondisiKomponen'] == 'Sangat Baik'): ?>
-                                    <span class="badge bg-success rounded-pill px-3">Sangat Baik</span>
-                                <?php else: ?>
-                                    <span class="badge bg-primary rounded-pill px-3">Layak Pakai</span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <?php if ($data['statusKomponen'] == 'Tersedia'): ?>
-                                    <span class="badge bg-success rounded-pill px-3">Tersedia</span>
-                                <?php elseif ($data['statusKomponen'] == 'Sudah Dipakai'): ?>
-                                    <span class="badge bg-warning text-dark rounded-pill px-3">Sudah Dipakai</span>
-                                <?php else: ?>
-                                    <span class="badge bg-secondary rounded-pill px-3">Nonaktif</span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <?php if ($data['statusKomponen'] != 'Nonaktif'): ?>
-                                    <a href="edit.php?id=<?= $data['idKomponen']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
-                                    <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?id=<?= $data['idKomponen']; ?>')">
-                                        <i class="bi bi-trash-fill"></i>
-                                    </button>
-                                <?php endif; ?>
-                            </td>
+                            <th width="5%">No.</th>
+                            <th>ID Komponen</th>
+                            <th>Sumber Reparasi</th>
+                            <th>Nama Komponen</th>
+                            <th>Spesifikasi</th>
+                            <th>Kondisi</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
                         </tr>
-                    <?php } ?>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
 
-                    <?php if (!$query || mysqli_num_rows($query) == 0): ?>
-                        <tr>
-                            <td colspan="8" class="py-4 text-muted fst-italic">Tidak ada data komponen yang ditemukan.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                        while ($data = mysqli_fetch_array($query)) {
+                            $nama_barang = $data['namaAset'] ?: $data['namaFasilitas'];
+                            if (!$nama_barang) {
+                                $nama_barang = 'Barang tidak ditemukan';
+                            }
+                        ?>
+                            <tr>
+                                <td class="fw-bold"><?= $no++; ?></td>
+                                <td class="fw-bold text-astar"><?= $data['idKomponen']; ?></td>
+                                <td class="text-start">
+                                    <span class="fw-bold"><?= $data['idReparasi']; ?></span><br>
+                                    <small class="text-muted"><?= $nama_barang; ?></small>
+                                </td>
+                                <td><?= $data['namaKomponen']; ?></td>
+                                <td><?= $data['spesifikasiKomponen'] ?: '-'; ?></td>
+                                <td>
+                                    <?php if ($data['kondisiKomponen'] == 'Sangat Baik'): ?>
+                                        <span class="badge bg-success rounded-pill px-3">Sangat Baik</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-primary rounded-pill px-3">Layak Pakai</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if ($data['statusKomponen'] == 'Tersedia'): ?>
+                                        <span class="badge bg-success rounded-pill px-3">Tersedia</span>
+                                    <?php elseif ($data['statusKomponen'] == 'Sudah Dipakai'): ?>
+                                        <span class="badge bg-warning text-dark rounded-pill px-3">Sudah Dipakai</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary rounded-pill px-3">Nonaktif</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if ($data['statusKomponen'] != 'Nonaktif'): ?>
+                                        <a href="edit.php?id=<?= $data['idKomponen']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
+                                        <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?id=<?= $data['idKomponen']; ?>')">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php } ?>
+
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-success fw-bold">Aman!</h4>
+                    <p class="text-muted">Tidak ada data Komponen.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

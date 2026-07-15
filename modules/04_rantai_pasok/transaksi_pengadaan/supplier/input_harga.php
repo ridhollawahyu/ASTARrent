@@ -86,8 +86,6 @@ if (isset($_POST['submit_penawaran'])) {
                                 statusPengadaan = 'Harga Diinput Supplier'
                             WHERE idPengadaan = '$id_pengadaan'");
 
-    mysqli_query($koneksi, "UPDATE supplier SET jumlahTugas_aktif = GREATEST(0, jumlahTugas_aktif - 1) WHERE idSupplier = '$id_supplier'");
-
     // GENERATE PDF
     buat_pdf_penawaran($id_pengadaan);
 

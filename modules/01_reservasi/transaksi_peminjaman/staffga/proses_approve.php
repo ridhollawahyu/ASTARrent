@@ -65,13 +65,6 @@ if (isset($_GET['id']) && isset($_GET['aksi']) && $_GET['aksi'] == 'setuju') {
                                 idPenyetuju = '$idStaffGA' 
                             WHERE idPeminjaman = '$id'");
 
-    // Update status barang
-    if (!empty($data['idAset'])) {
-        perbarui_status_barang('aset', $data['idAset'], 'Dipinjam');
-    } else if (!empty($data['idFasilitas'])) {
-        perbarui_status_barang('fasilitas', $data['idFasilitas'], 'Dipinjam');
-    }
-
     // Auto reject barang bentrok
     tolak_peminjaman_bentrok($data['idAset'], $data['idFasilitas'], $id);
 

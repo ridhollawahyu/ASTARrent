@@ -77,56 +77,62 @@ include '../../../components/header.php';
         </form>
 
         <div class="table-responsive">
-            <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle border">
-                <thead style="background-color: #f4f6f9; color: #1d4197;">
-                    <tr>
-                        <th width="5%">No.</th>
-                        <th>ID User</th>
-                        <th class="text-start">Nama Lengkap</th>
-                        <th>Jabatan</th>
-                        <th>Departemen</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $query = mysqli_query($koneksi, "SELECT * FROM users $where_sql ORDER BY idUser ASC");
-                    $no = 1;
-                    while ($data = mysqli_fetch_assoc($query)) {
-                    ?>
+            <?php
+            $query = mysqli_query($koneksi, "SELECT * FROM users $where_sql ORDER BY idUser ASC");
+            if (mysqli_num_rows($query) > 0):
+            ?>
+                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle border">
+                    <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <td><?= $no++; ?></td>
-                            <td class="fw-bold"><?= $data['idUser']; ?></td>
-                            <td class="text-start"><?= $data['namaUser']; ?></td>
-                            <td><span class="badge bg-primary text-white px-3"><?= $data['jabatanUser']; ?></span></td>
-                            <td><span class="badge bg-secondary px-3"><?= $data['kodeDepartemen']; ?></span></td>
-                            <td>
-                                <?php if ($data['statusUser'] == 'Aktif'): ?>
-                                    <span class="badge bg-success rounded-pill px-3">Aktif</span>
-                                <?php else: ?>
-                                    <span class="badge bg-danger rounded-pill px-3">Nonaktif</span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <a href="edit.php?id=<?= $data['idUser']; ?>" class="btn btn-warning btn-sm shadow-sm" title="Edit Data"><i class="bi bi-pencil-square"></i></a>
-
-                                <?php if ($data['statusUser'] == 'Aktif'): ?>
-                                    <button type="button" class="btn btn-danger btn-sm shadow-sm" onclick="konfirmasiHapus('delete.php?id=<?= $data['idUser']; ?>')" title="Arsipkan">
-                                        <i class="bi bi-trash-fill"></i>
-                                    </button>
-                                <?php endif; ?>
-                            </td>
+                            <th width="5%">No.</th>
+                            <th>ID User</th>
+                            <th class="text-start">Nama Lengkap</th>
+                            <th>Jabatan</th>
+                            <th>Departemen</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
                         </tr>
-                    <?php } ?>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
+                        while ($data = mysqli_fetch_assoc($query)) {
+                        ?>
+                            <tr>
+                                <td><?= $no++; ?></td>
+                                <td class="fw-bold"><?= $data['idUser']; ?></td>
+                                <td class="text-start"><?= $data['namaUser']; ?></td>
+                                <td><span class="badge bg-primary text-white px-3"><?= $data['jabatanUser']; ?></span></td>
+                                <td><span class="badge bg-secondary px-3"><?= $data['kodeDepartemen']; ?></span></td>
+                                <td>
+                                    <?php if ($data['statusUser'] == 'Aktif'): ?>
+                                        <span class="badge bg-success rounded-pill px-3">Aktif</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-danger rounded-pill px-3">Nonaktif</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <a href="edit.php?id=<?= $data['idUser']; ?>" class="btn btn-warning btn-sm shadow-sm" title="Edit Data"><i class="bi bi-pencil-square"></i></a>
 
-                    <?php if (mysqli_num_rows($query) == 0): ?>
-                        <tr>
-                            <td colspan="7" class="py-4 text-muted fst-italic">Data tidak ditemukan.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                                    <?php if ($data['statusUser'] == 'Aktif'): ?>
+                                        <button type="button" class="btn btn-danger btn-sm shadow-sm" onclick="konfirmasiHapus('delete.php?id=<?= $data['idUser']; ?>')" title="Arsipkan">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php } ?>
+
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-success fw-bold">Aman!</h4>
+                    <p class="text-muted">Tidak ada data Pengguna.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

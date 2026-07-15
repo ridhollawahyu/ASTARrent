@@ -81,10 +81,7 @@ if (isset($_POST['proses_validasi'])) {
                                     idSupplier = '$id_supplier' 
                                 WHERE idPengadaan = '$id_pengadaan'");
 
-        // 2. TAMBAH TUGAS SUPPLIER
-        mysqli_query($koneksi, "UPDATE supplier SET jumlahTugas_aktif = jumlahTugas_aktif + 1 WHERE idSupplier = '$id_supplier'");
-
-        // 3. GENERATE ULANG PDF AGAR TTD GA MUNCUL! (Panggil Autoloader dulu)
+        // 2. GENERATE ULANG PDF AGAR TTD GA MUNCUL! (Panggil Autoloader dulu)
         require '../../../../vendor/autoload.php';
         buat_pdf_pengajuan($id_pengadaan);
 

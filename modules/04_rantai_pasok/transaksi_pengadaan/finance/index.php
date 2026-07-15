@@ -10,11 +10,11 @@ include '../../../../config/functions.php';
 
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Finance') {
     set_notifikasi('error', 'Akses Ditolak! Halaman ini khusus Finance.');
-    header('Location: ../00_auth/login.php');
+    header('Location: ../../../00_auth/login.php');
     exit;
 } elseif ((isset($_SESSION['login']) || $_SESSION['role'] === 'Finance') && $_SESSION['status'] === 'Nonaktif') {
     set_notifikasi('error', 'Akses Ditolak! Akun kamu sudah dinonaktifkan.');
-    header('Location: ../00_auth/login.php');
+    header('Location: ../../../00_auth/login.php');
     exit;
 }
 
@@ -32,39 +32,50 @@ include '../../../../components/header.php';
     </div>
     <div class="card-body p-4">
         <div class="table-responsive">
-            <table class="datatable-astar table table-hover table-striped mb-0 align-middle text-center">
-                <thead style="background-color: #f4f6f9; color: #1d4197;">
-                    <tr>
-                        <th>No.</th>
-                        <th class="text-start">Kebutuhan Aset</th>
-                        <th>Jumlah Kebutuhan</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $query = mysqli_query($koneksi, "SELECT tp.*, k.namaKategori FROM transaksi_pengadaan tp JOIN kategori k ON tp.idKategori = k.idKategori $where_sql ORDER BY tp.tanggalPengadaan DESC");
-                    $no = 1;
-                    while ($data = mysqli_fetch_array($query)) { ?>
+            <?php
+            $query = mysqli_query($koneksi, "SELECT tp.*, k.namaKategori FROM transaksi_pengadaan tp JOIN kategori k ON tp.idKategori = k.idKategori $where_sql ORDER BY tp.tanggalPengadaan DESC");
+            if (mysqli_num_rows($query) > 0):
+            ?>
+                <table class="datatable-astar table table-hover table-striped mb-0 align-middle text-center">
+                    <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <td class="fw-bold"><?= $no++; ?></td>
-                            <td class="text-start"><span class="badge bg-secondary mb-1"><?= $data['namaKategori']; ?></span><br><span class="fw-bold text-dark"><?= $data['namaKebutuhan']; ?></span></td>
-                            <td class="fw-bold fs-5 text-primary"><?= $data['jumlah']; ?></td>
-                            <td>
-                                <?= ($data['statusPengadaan'] == 'Harga Diinput Supplier') ? '<span class="badge bg-warning text-dark px-3 py-2">Butuh ACC</span>' : '<span class="badge bg-success px-3 py-2">Selesai</span>' ?>
-                            </td>
-                            <td>
-                                <?php if ($data['statusPengadaan'] == 'Harga Diinput Supplier'): ?>
-                                    <a href="approve.php?id=<?= $data['idPengadaan']; ?>" class="btn btn-astar btn-sm fw-bold px-3">Cairkan Dana</a>
-                                <?php else: ?>
-                                    <a href="../../../../uploads/dokumen_penawaran/<?= $data['dokumen_penawaran']; ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger btn-sm">PDF Akhir</a>
-                                <?php endif; ?>
-                            </td>
+                            <th>No.</th>
+                            <th class="text-start">Kebutuhan Aset</th>
+                            <th>Jumlah Kebutuhan</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
                         </tr>
-                    <?php } ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
+                        while ($data = mysqli_fetch_array($query)) { ?>
+                            <tr>
+                                <td class="fw-bold"><?= $no++; ?></td>
+                                <td class="text-start"><span class="badge bg-secondary mb-1"><?= $data['namaKategori']; ?></span><br><span class="fw-bold text-dark"><?= $data['namaKebutuhan']; ?></span></td>
+                                <td class="fw-bold fs-5 text-primary"><?= $data['jumlah']; ?></td>
+                                <td>
+                                    <?= ($data['statusPengadaan'] == 'Harga Diinput Supplier') ? '<span class="badge bg-warning text-dark px-3 py-2">Butuh ACC</span>' : '<span class="badge bg-success px-3 py-2">Selesai</span>' ?>
+                                </td>
+                                <td>
+                                    <?php if ($data['statusPengadaan'] == 'Harga Diinput Supplier'): ?>
+                                        <a href="approve.php?id=<?= $data['idPengadaan']; ?>" class="btn btn-astar btn-sm fw-bold px-3">Cairkan Dana</a>
+                                    <?php else: ?>
+                                        <a href="../../../../uploads/dokumen_penawaran/<?= $data['dokumen_penawaran']; ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger btn-sm">PDF Akhir</a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-success fw-bold">Aman!</h4>
+                    <p class="text-muted">Tidak ada tunggakan Jam Minus di Prodi Anda.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

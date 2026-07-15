@@ -94,21 +94,7 @@ include '../../../../components/header.php';
 
         <!-- TABEL DATA -->
         <div class="table-responsive">
-            <table class="table table-hover table-striped mb-0 align-middle text-center">
-                <thead style="background-color: #f4f6f9; color: #1d4197;">
-                    <tr>
-                        <th width="5%">No.</th>
-                        <th class="text-start">Tgl Pengajuan</th>
-                        <th class="text-start">Pemohon (Tendik)</th>
-                        <th class="text-start">Kebutuhan Aset</th>
-                        <th>Jumlah</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $query_sql = "
+            <?php $query_sql = "
                         SELECT tp.*, k.namaKategori, u.namaUser as namaTendik 
                         FROM transaksi_pengadaan tp
                         JOIN kategori k ON tp.idKategori = k.idKategori
@@ -116,50 +102,77 @@ include '../../../../components/header.php';
                         $where_sql 
                         ORDER BY tp.tanggalPengadaan DESC
                     ";
-                    $query = mysqli_query($koneksi, $query_sql);
-                    $no = 1;
-
-                    while ($data = mysqli_fetch_array($query)) {
-                    ?>
+            $query = mysqli_query($koneksi, $query_sql);
+            if (mysqli_num_rows($query) > 0):
+            ?>
+                <table class="datatable-astar table table-hover table-striped mb-0 align-middle text-center">
+                    <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <td class="fw-bold"><?= $no++; ?></td>
-                            <td class="text-start"><?= date('d M Y, H:i', strtotime($data['tanggalPengadaan'])); ?></td>
-                            <td class="text-start fw-bold text-secondary"><?= $data['namaTendik']; ?></td>
-                            <td class="text-start">
-                                <span class="badge bg-secondary mb-1"><?= $data['namaKategori']; ?></span><br>
-                                <span class="fw-bold text-dark"><?= $data['namaKebutuhan']; ?></span>
-                            </td>
-                            <td class="fw-bold fs-5 text-primary"><?= $data['jumlah']; ?></td>
-                            <td>
-                                <?php if ($data['statusPengadaan'] == 'Draft'): ?>
-                                    <span class="badge bg-warning text-dark px-3 py-2">Menunggu GA</span>
-                                <?php elseif ($data['statusPengadaan'] == 'Ditolak'): ?>
-                                    <span class="badge bg-danger px-3 py-2">Ditolak</span>
-                                <?php else: ?>
-                                    <span class="badge bg-success px-3 py-2"><i class="bi bi-check-circle-fill"></i> Disetujui GA</span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <?php if ($data['statusPengadaan'] == 'Draft'): ?>
-                                    <a href="approve.php?id=<?= $data['idPengadaan']; ?>" class="btn btn-astar btn-sm fw-bold px-3 shadow-sm">
-                                        <i class="bi bi-clipboard-check me-1"></i> Proses Validasi
-                                    </a>
-                                <?php else: ?>
-                                    <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan']; ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold px-3">
-                                        <i class="bi bi-file-earmark-pdf-fill me-1"></i> Baca PDF
-                                    </a>
-                                <?php endif; ?>
-                            </td>
+                            <th width="5%">No.</th>
+                            <th class="text-start">Tgl Pengajuan</th>
+                            <th class="text-start">Pemohon (Tendik)</th>
+                            <th class="text-start">Kebutuhan Aset</th>
+                            <th>Jumlah</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
                         </tr>
-                    <?php } ?>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $query_sql = "
+                        SELECT tp.*, k.namaKategori, u.namaUser as namaTendik 
+                        FROM transaksi_pengadaan tp
+                        JOIN kategori k ON tp.idKategori = k.idKategori
+                        JOIN users u ON tp.idTendik = u.idUser
+                        $where_sql 
+                        ORDER BY tp.tanggalPengadaan DESC
+                    ";
+                        $query = mysqli_query($koneksi, $query_sql);
+                        $no = 1;
 
-                    <?php if (mysqli_num_rows($query) == 0): ?>
-                        <tr>
-                            <td colspan="7" class="py-5 text-center text-muted fst-italic">Belum ada pengajuan yang sesuai filter.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                        while ($data = mysqli_fetch_array($query)) {
+                        ?>
+                            <tr>
+                                <td class="fw-bold"><?= $no++; ?></td>
+                                <td class="text-start"><?= date('d M Y, H:i', strtotime($data['tanggalPengadaan'])); ?></td>
+                                <td class="text-start fw-bold text-secondary"><?= $data['namaTendik']; ?></td>
+                                <td class="text-start">
+                                    <span class="badge bg-secondary mb-1"><?= $data['namaKategori']; ?></span><br>
+                                    <span class="fw-bold text-dark"><?= $data['namaKebutuhan']; ?></span>
+                                </td>
+                                <td class="fw-bold fs-5 text-primary"><?= $data['jumlah']; ?></td>
+                                <td>
+                                    <?php if ($data['statusPengadaan'] == 'Draft'): ?>
+                                        <span class="badge bg-warning text-dark px-3 py-2">Menunggu GA</span>
+                                    <?php elseif ($data['statusPengadaan'] == 'Ditolak'): ?>
+                                        <span class="badge bg-danger px-3 py-2">Ditolak</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-success px-3 py-2"><i class="bi bi-check-circle-fill"></i> Disetujui GA</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if ($data['statusPengadaan'] == 'Draft'): ?>
+                                        <a href="approve.php?id=<?= $data['idPengadaan']; ?>" class="btn btn-astar btn-sm fw-bold px-3 shadow-sm">
+                                            <i class="bi bi-clipboard-check me-1"></i> Proses Validasi
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan']; ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold px-3">
+                                            <i class="bi bi-file-earmark-pdf-fill me-1"></i> Baca PDF
+                                        </a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-success fw-bold">Aman!</h4>
+                    <p class="text-muted">Tidak ada data pangajuan tersisa.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

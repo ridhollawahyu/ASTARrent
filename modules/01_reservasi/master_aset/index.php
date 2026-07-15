@@ -106,82 +106,84 @@ include '../../../components/header.php';
         <!-- TABEL DATA ASET -->
         <!-- ========================================== -->
         <div class="table-responsive">
-            <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
-                <thead style="background-color: #f4f6f9; color: #1d4197;">
-                    <tr>
-                        <th class="text-center" width="5%">No.</th>
-                        <th>Kategori</th>
-                        <th class="text-start">Nama Aset</th>
-                        <th>Kondisi Fisik</th>
-                        <th>Ketersediaan</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    // QUERY UTAMA (JOIN Aset dan Kategori + Filter + Ascending)
-                    $query_sql = "SELECT aset.*, kategori.namaKategori 
-                                  FROM aset 
-                                  JOIN kategori ON aset.idKategori = kategori.idKategori "
-                        . $where_sql .
-                        " ORDER BY aset.idAset ASC";
-                    $query = mysqli_query($koneksi, $query_sql);
-
-                    $no = 1;
-
-                    while ($data = mysqli_fetch_array($query)) {
-                    ?>
+            <?php
+            // QUERY UTAMA (JOIN Aset dan Kategori + Filter + Ascending)
+            $query_sql = "SELECT aset.*, kategori.namaKategori 
+                            FROM aset 
+                            JOIN kategori ON aset.idKategori = kategori.idKategori "
+                . $where_sql .
+                " ORDER BY aset.idAset ASC";
+            $query = mysqli_query($koneksi, $query_sql);
+            if (mysqli_num_rows($query) > 0):
+            ?>
+                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
+                    <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <td class="fw-bold"><?= $no++; ?></td>
-                            <td><span class="badge bg-secondary"><?= $data['namaKategori']; ?></span></td>
-                            <td class="text-start"><?= $data['namaAset']; ?></td>
-
-                            <!-- PEWARNAAN KONDISI FISIK -->
-                            <td>
-                                <?php if ($data['kondisiAset'] == 'Normal') echo '<span class="text-success fw-bold">Normal</span>';
-                                else if ($data['kondisiAset'] == 'Tidak Berfungsi') echo '<span class="text-danger fw-bold">Tidak Berfungsi</span>';
-                                else echo '<span class="text-warning text-dark fw-bold">' . $data['kondisiAset'] . '</span>';
-                                ?>
-                            </td>
-
-                            <!-- PEWARNAAN KETERSEDIAAN (Sesuai Logika Terbaru Anda) -->
-                            <td>
-                                <?php if ($data['ketersediaanAset'] == 'Tersedia'): ?>
-                                    <span class="badge bg-success rounded-pill px-3">Tersedia</span>
-                                <?php elseif ($data['ketersediaanAset'] == 'Dipinjam'): ?>
-                                    <span class="badge bg-primary rounded-pill px-3">Dipinjam</span>
-                                <?php elseif ($data['ketersediaanAset'] == 'Sedang Diperbaiki'): ?>
-                                    <span class="badge bg-warning text-dark rounded-pill px-3">Sedang Diperbaiki</span>
-                                <?php elseif ($data['ketersediaanAset'] == 'Tidak Tersedia'): ?>
-                                    <span class="badge bg-secondary rounded-pill px-3">Tidak Tersedia</span>
-                                <?php else: ?>
-                                    <span class="badge bg-dark rounded-pill px-3">Nonaktif</span>
-                                <?php endif; ?>
-                            </td>
-
-                            <td>
-                                <?php if ($data['ketersediaanAset'] != 'Tidak Tersedia'): ?>
-                                    <!-- Tombol Edit -->
-                                    <a href="edit.php?id=<?= $data['idAset']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
-
-                                    <!-- Tombol Soft Delete (Memanggil fungsi dari footer) -->
-                                    <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?id=<?= $data['idAset']; ?>')">
-                                        <i class="bi bi-trash-fill"></i>
-                                    </button>
-                                <?php endif; ?>
-                            </td>
+                            <th class="text-center" width="5%">No.</th>
+                            <th>Kategori</th>
+                            <th class="text-start">Nama Aset</th>
+                            <th>Kondisi Fisik</th>
+                            <th>Ketersediaan</th>
+                            <th>Aksi</th>
                         </tr>
-                    <?php } ?>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
 
-                    <!-- Jika data kosong -->
-                    <?php if (mysqli_num_rows($query) == 0): ?>
-                        <tr>
-                            <td colspan="6" class="py-4 text-muted fst-italic">Tidak ada data aset yang ditemukan.</td>
-                        </tr>
-                    <?php endif; ?>
+                        while ($data = mysqli_fetch_array($query)) {
+                        ?>
+                            <tr>
+                                <td class="fw-bold"><?= $no++; ?></td>
+                                <td><span class="badge bg-secondary"><?= $data['namaKategori']; ?></span></td>
+                                <td class="text-start"><?= $data['namaAset']; ?></td>
 
-                </tbody>
-            </table>
+                                <!-- PEWARNAAN KONDISI FISIK -->
+                                <td>
+                                    <?php if ($data['kondisiAset'] == 'Normal') echo '<span class="text-success fw-bold">Normal</span>';
+                                    else if ($data['kondisiAset'] == 'Tidak Berfungsi') echo '<span class="text-danger fw-bold">Tidak Berfungsi</span>';
+                                    else echo '<span class="text-warning text-dark fw-bold">' . $data['kondisiAset'] . '</span>';
+                                    ?>
+                                </td>
+
+                                <!-- PEWARNAAN KETERSEDIAAN (Sesuai Logika Terbaru Anda) -->
+                                <td>
+                                    <?php if ($data['ketersediaanAset'] == 'Tersedia'): ?>
+                                        <span class="badge bg-success rounded-pill px-3">Tersedia</span>
+                                    <?php elseif ($data['ketersediaanAset'] == 'Dipinjam'): ?>
+                                        <span class="badge bg-primary rounded-pill px-3">Dipinjam</span>
+                                    <?php elseif ($data['ketersediaanAset'] == 'Sedang Diperbaiki'): ?>
+                                        <span class="badge bg-warning text-dark rounded-pill px-3">Sedang Diperbaiki</span>
+                                    <?php elseif ($data['ketersediaanAset'] == 'Tidak Tersedia'): ?>
+                                        <span class="badge bg-secondary rounded-pill px-3">Tidak Tersedia</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-dark rounded-pill px-3">Nonaktif</span>
+                                    <?php endif; ?>
+                                </td>
+
+                                <td>
+                                    <?php if ($data['ketersediaanAset'] != 'Tidak Tersedia'): ?>
+                                        <!-- Tombol Edit -->
+                                        <a href="edit.php?id=<?= $data['idAset']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
+
+                                        <!-- Tombol Soft Delete (Memanggil fungsi dari footer) -->
+                                        <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?id=<?= $data['idAset']; ?>')">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-success fw-bold">Aman!</h4>
+                    <p class="text-muted">Tidak ada data Aset.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

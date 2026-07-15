@@ -298,13 +298,13 @@ if (isset($_SESSION['notif_pesan'])):
 endif;
 ?>
 
-<!-- Inisialisasi DataTables Global secara Otomatis -->
+<!-- Inisialisasi DataTables Global secara Otomatis (Dengan Custom Dropdown) -->
 <script>
   $(document).ready(function() {
     if ($.fn.DataTable) {
       $('.datatable-astar').DataTable({
         "language": {
-          "lengthMenu": "Tampilkan _MENU_",
+          "lengthMenu": "Tampilkan _MENU_ baris",
           "search": "Cari:",
           "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
           "infoEmpty": "Menampilkan 0 sampai 0 dari 0 data",
@@ -323,47 +323,175 @@ endif;
         "lengthMenu": [
           [5, 10, 25, 50, -1],
           [5, 10, 25, 50, "Semua"]
-        ]
+        ],
+
+        // =========================================================================
+        // SIHIR: MENYULAP DROPDOWN DATATABLES MENJADI TEMA ASTARRENT
+        // =========================================================================
+        "initComplete": function(settings, json) {
+          let api = this.api();
+          let wrapper = $(api.table().container());
+          let dtSelect = wrapper.find('.dataTables_length select');
+
+          if (dtSelect.length > 0) {
+            // 1. Sembunyikan select bawaan browser (yang jelek di Mac/Safari)
+            dtSelect.hide();
+
+            let idUnik = 'dt_drop_' + Math.floor(Math.random() * 9000 + 1000);
+            let currentVal = dtSelect.val();
+            let currentText = dtSelect.find('option:selected').text();
+
+            // 2. Bangun HTML Custom Dropdown.
+            // PERBAIKAN: Menambahkan event.preventDefault() dan stopPropagation() agar <label> DataTables tidak mengganggu klik kita!
+            let html = `
+                <div class="custom-dropdown-container mx-2" id="container_${idUnik}" style="display: inline-block; width: 85px; vertical-align: middle;">
+                    <div class="custom-dropdown-selected" onclick="event.preventDefault(); event.stopPropagation(); toggleDropdown('${idUnik}')" style="padding: 4px 10px; height: 32px; display: flex; align-items: center; justify-content: space-between;">
+                        <span id="text_${idUnik}" style="font-weight:bold;">${currentText}</span>
+                        <i class="bi bi-chevron-down" style="font-size: 12px;"></i>
+                    </div>
+                    <div class="custom-dropdown-options shadow text-start" id="options_${idUnik}" style="width: 100px;">
+                `;
+
+            // 3. Looping opsi angka dari DataTables bawaan
+            dtSelect.find('option').each(function() {
+              let val = $(this).val();
+              let txt = $(this).text();
+              let activeClass = (val == currentVal) ? 'active' : '';
+              // PERBAIKAN: Tambahkan preventDefault di pilihan dropdown-nya juga
+              html += `<div class="custom-dropdown-item ${activeClass}" onclick="event.preventDefault(); event.stopPropagation(); selectDTLength('${idUnik}', '${val}', '${txt}', this)">${txt}</div>`;
+            });
+
+            html += `</div></div>`;
+
+            // 4. Suntikkan HTML kita ke sebelah select asli
+            dtSelect.after(html);
+
+            // 5. Simpan referensi select asli agar bisa dipicu saat diklik
+            $('#container_' + idUnik).data('nativeSelect', dtSelect);
+          }
+        }
       });
     }
   });
+
+  // FUNGSI KHUSUS UNTUK MENANGANI KLIK PADA DROPDOWN DATATABLES
+  function selectDTLength(id, nilai, label, el) {
+    // Ubah teks yang tampil
+    document.getElementById('text_' + id).innerText = label;
+
+    // Tutup opsi
+    document.getElementById('options_' + id).style.display = 'none';
+
+    // Pindahkan class active (Warna biru tebal)
+    let opsi = document.getElementById('options_' + id).children;
+    for (let i = 0; i < opsi.length; i++) {
+      opsi[i].classList.remove('active');
+    }
+    el.classList.add('active');
+
+    // MAGIC: Trigger perubahan pada select bawaan DataTables agar tabelnya ikut berubah!
+    let nativeSelect = $('#container_' + id).data('nativeSelect');
+    nativeSelect.val(nilai).trigger('change');
+  }
 </script>
 
 <script>
   // ===================================================================================
-  // JS GLOBAL: FUNGSI EXPORT TABEL KE CSV/EXCEL (Khusus Modul Laporan)
+  // JS GLOBAL: FUNGSI CETAK PDF (ISOLATED WINDOW & PURE HTML EXTRACTION)
   // ===================================================================================
-  function exportToCSV(namaFilePrefix = "Laporan") {
-    let table = document.getElementById("tableLaporan");
-    if (!table) return; // Jika bukan halaman laporan, hentikan
+  function cetakPDF() {
+    let tableEl = document.getElementById('tableLaporan');
+    if (!tableEl) {
+      window.print();
+      return;
+    }
 
-    let rows = table.querySelectorAll("tr");
-    let csvContent = "";
+    // 1. Cek DataTables dan Buka Semua Baris
+    let isDT = (typeof $ !== 'undefined' && $.fn.DataTable && $.fn.DataTable.isDataTable('#tableLaporan'));
+    let dtTable, originalLen;
 
-    rows.forEach(function(row) {
-      let cols = row.querySelectorAll("td, th");
-      let rowData = [];
-      cols.forEach(function(col) {
-        // Bersihkan enter dan koma agar CSV tidak rusak
-        let text = col.innerText.replace(/(\r\n|\n|\r)/gm, " ").replace(/"/g, '""');
-        rowData.push('"' + text + '"');
-      });
-      csvContent += rowData.join(",") + "\r\n";
-    });
+    if (isDT) {
+      dtTable = $('#tableLaporan').DataTable();
+      originalLen = dtTable.page.len();
+      dtTable.page.len(-1).draw(); // Tampilkan seluruh data
+    }
 
-    let blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], {
-      type: "text/csv;charset=utf-8;"
-    });
-    let link = document.createElement("a");
-    let url = URL.createObjectURL(blob);
-    let fileName = namaFilePrefix + "_Astarrent_" + new Date().toISOString().slice(0, 10) + ".csv";
+    // 2. Jeda agar DataTables selesai render
+    setTimeout(function() {
 
-    link.setAttribute("href", url);
-    link.setAttribute("download", fileName);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      // 3. EKSTRAKSI MURNI (Membuang "racun" CSS dari DataTables)
+      let theadHTML = tableEl.querySelector('thead') ? tableEl.querySelector('thead').innerHTML : '';
+      let tbodyHTML = tableEl.querySelector('tbody') ? tableEl.querySelector('tbody').innerHTML : '';
+      let tfootHTML = tableEl.querySelector('tfoot') ? tableEl.querySelector('tfoot').innerHTML : '';
+
+      // Hapus panah Sorting DataTables (▲/▼) menggunakan Regex
+      theadHTML = theadHTML.replace(/<span class="dt-column-order">.*?<\/span>/gi, '');
+      theadHTML = theadHTML.replace(/▲|▼|↑|↓/gi, '');
+
+      // Rakit kembali menjadi tabel yang suci
+      let cleanTable = '<table>' +
+        '<thead>' + theadHTML + '</thead>' +
+        '<tbody>' + tbodyHTML + '</tbody>' +
+        (tfootHTML ? '<tfoot>' + tfootHTML + '</tfoot>' : '') +
+        '</table>';
+
+      let printHeader = document.querySelector('.print-header') ? document.querySelector('.print-header').innerHTML : '<h3>LAPORAN ASTARRENT</h3>';
+
+      // 4. Buka Tab Virtual Print
+      let printWindow = window.open('', '_blank', 'width=1000,height=800');
+
+      printWindow.document.write('<!DOCTYPE html><html lang="id"><head><title>Print Laporan ASTARrent</title>');
+      printWindow.document.write('<style>');
+
+      // ATURAN KERTAS & MENGHILANGKAN URL BROWSER
+      printWindow.document.write('@page { size: A4 portrait; margin: 15mm; }');
+      printWindow.document.write('body { font-family: "Helvetica", Arial, sans-serif; font-size: 11px; color: #000; margin: 0; padding: 0; }');
+
+      // ATURAN HEADER LAPORAN
+      printWindow.document.write('.print-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }');
+      printWindow.document.write('h3 { margin: 0 0 5px 0; font-size: 18px; text-transform: uppercase; font-weight: bold; color: #000;}');
+      printWindow.document.write('.print-date { font-size: 10px; color: #555; margin-top: 5px;}');
+
+      // ATURAN TABEL ANTI TERPOTONG & REPEAT HEADER
+      printWindow.document.write('table { width: 100%; border-collapse: collapse; page-break-inside: auto; margin-top: 10px; }');
+      printWindow.document.write('tr { page-break-inside: avoid !important; page-break-after: auto !important; }');
+      printWindow.document.write('thead { display: table-header-group !important; }');
+      printWindow.document.write('tfoot { display: table-footer-group !important; }');
+      printWindow.document.write('th, td { border: 1px solid #000; padding: 6px; text-align: center; vertical-align: middle; word-wrap: break-word; }');
+      printWindow.document.write('th { background-color: #f0f0f0 !important; font-weight: bold; -webkit-print-color-adjust: exact; print-color-adjust: exact; }');
+
+      // ATURAN TYPOGRAPHY & BADGE
+      printWindow.document.write('.text-start { text-align: left !important; }');
+      printWindow.document.write('.text-end { text-align: right !important; }');
+      printWindow.document.write('.text-danger { color: #dc3545 !important; }');
+      printWindow.document.write('.text-success { color: #198754 !important; }');
+      printWindow.document.write('.text-primary { color: #0d6efd !important; }');
+      printWindow.document.write('.text-secondary, .text-muted { color: #555 !important; }');
+      printWindow.document.write('.fw-bold, b { font-weight: bold !important; }');
+      printWindow.document.write('code { font-family: monospace; font-size: 12px; }');
+      printWindow.document.write('.badge { border: 1px solid #333; padding: 2px 5px; border-radius: 4px; font-weight: bold; display: inline-block; font-size: 9px; margin: 2px;}');
+      printWindow.document.write('small { font-size: 9px; color: #555; display: block; margin-top: 2px; }');
+
+      printWindow.document.write('</style></head><body>');
+
+      // 5. Cetak ke Layar Virtual
+      printWindow.document.write('<div class="print-header">' + printHeader + '</div>');
+      printWindow.document.write(cleanTable);
+
+      printWindow.document.write('</body></html>');
+      printWindow.document.close();
+
+      // 6. Tunggu rendering OS lalu Print
+      setTimeout(function() {
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+
+        // Kembalikan DataTables ke halaman 1
+        if (isDT) dtTable.page.len(originalLen).draw();
+      }, 800); // Naikkan jeda 800ms agar browser Mac punya waktu memproses CSS
+
+    }, 500);
   }
 </script>
 

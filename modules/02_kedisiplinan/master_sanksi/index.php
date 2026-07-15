@@ -83,55 +83,57 @@ include '../../../components/header.php';
         <!-- TABEL DATA SANKSI -->
         <!-- ========================================== -->
         <div class="table-responsive">
-            <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
-                <thead style="background-color: #f4f6f9; color: #1d4197;">
-                    <tr>
-                        <th class="text-center pe-5" width="10%">No.</th>
-                        <th class="text-start">Nama Sanksi</th>
-                        <th>Jam Minus (Jam/Hour)</th>
-                        <th>Denda (Rp)</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    // QUERY UTAMA (JOIN Sanksi dan Kategori + Filter + Ascending)
-                    $query_sql = "SELECT * FROM sanksi " . $where_sql . " ORDER BY idSanksi ASC";
-                    $query = mysqli_query($koneksi, $query_sql);
-
-                    $no = 1;
-
-                    while ($data = mysqli_fetch_array($query)) {
-                    ?>
+            <?php
+            // QUERY UTAMA (JOIN Sanksi dan Kategori + Filter + Ascending)
+            $query_sql = "SELECT * FROM sanksi " . $where_sql . " ORDER BY idSanksi ASC";
+            $query = mysqli_query($koneksi, $query_sql);
+            if (mysqli_num_rows($query) > 0):
+            ?>
+                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
+                    <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <td class="fw-bold pe-5"><?= $no++; ?></td>
-                            <td class="text-start"><?= $data['namaSanksi']; ?></td>
-                            <td class="text-center"><?= $data['sanksi_jamMinus']; ?></td>
-                            <td class="text-center"><?= $data['sanksi_denda']; ?></td>
-
-                            <td>
-                                <?php if ($data['statusSanksi'] == 'Aktif'): ?>
-                                    <!-- Tombol Edit -->
-                                    <a href="edit.php?id=<?= $data['idSanksi']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
-
-                                    <!-- Tombol Soft Delete (Memanggil fungsi dari footer) -->
-                                    <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?id=<?= $data['idSanksi']; ?>')">
-                                        <i class="bi bi-trash-fill"></i>
-                                    </button>
-                                <?php endif; ?>
-                            </td>
+                            <th class="text-center pe-5" width="10%">No.</th>
+                            <th class="text-start">Nama Sanksi</th>
+                            <th>Jam Minus (Jam/Hour)</th>
+                            <th>Denda (Rp)</th>
+                            <th>Aksi</th>
                         </tr>
-                    <?php } ?>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
 
-                    <!-- Jika data kosong -->
-                    <?php if (mysqli_num_rows($query) == 0): ?>
-                        <tr>
-                            <td colspan="6" class="py-4 text-muted fst-italic">Tidak ada data sanksi yang ditemukan.</td>
-                        </tr>
-                    <?php endif; ?>
+                        while ($data = mysqli_fetch_array($query)) {
+                        ?>
+                            <tr>
+                                <td class="fw-bold pe-5"><?= $no++; ?></td>
+                                <td class="text-start"><?= $data['namaSanksi']; ?></td>
+                                <td class="text-center"><?= $data['sanksi_jamMinus']; ?></td>
+                                <td class="text-center"><?= $data['sanksi_denda']; ?></td>
 
-                </tbody>
-            </table>
+                                <td>
+                                    <?php if ($data['statusSanksi'] == 'Aktif'): ?>
+                                        <!-- Tombol Edit -->
+                                        <a href="edit.php?id=<?= $data['idSanksi']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
+
+                                        <!-- Tombol Soft Delete (Memanggil fungsi dari footer) -->
+                                        <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?id=<?= $data['idSanksi']; ?>')">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-success fw-bold">Aman!</h4>
+                    <p class="text-muted">Tidak ada data Sanksi.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

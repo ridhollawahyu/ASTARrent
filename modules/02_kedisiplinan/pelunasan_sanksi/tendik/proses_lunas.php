@@ -14,10 +14,6 @@ if (isset($_POST['submit_lunas']) && $_SESSION['role'] === 'Tenaga Pendidik') {
     if (mysqli_num_rows($q_cek) > 0) {
         // HANYA MENGUBAH JAM MINUS
         mysqli_query($koneksi, "UPDATE mahasiswa SET jamMinus_mahasiswa = 0 WHERE nimMahasiswa = '$nim'");
-
-        // PANGGIL FUNGSI SISTEM PAKAR UNTUK MENGUBAH STATUS SECARA OTOMATIS!
-        perbarui_status_mahasiswa($nim);
-
         set_notifikasi('success', 'Jam Minus berhasil dihapus! Status akun Mahasiswa diperbarui.');
     } else {
         set_notifikasi('error', 'Akses Ditolak! Mahasiswa bukan dari Prodi Anda.');

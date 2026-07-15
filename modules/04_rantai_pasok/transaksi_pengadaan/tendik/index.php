@@ -94,75 +94,77 @@ include '../../../../components/header.php';
                 <a href="index.php" class="btn btn-light fw-bold px-3 border" style="border-radius: 8px; color: #1d4197;">Reset</a>
             </div>
         </form>
-
-        <!-- ========================================== -->
-        <!-- TABEL DATA PENGADAAN -->
-        <!-- ========================================== -->
         <div class="table-responsive">
-            <table class="datatable-astar table table-hover table-striped mb-0 align-middle text-center">
-                <thead style="background-color: #f4f6f9; color: #1d4197;">
-                    <tr>
-                        <th width="5%">No.</th>
-                        <th class="text-start">Tgl Pengajuan</th>
-                        <th class="text-start">Kebutuhan Aset</th>
-                        <th>Jumlah</th>
-                        <th>Status</th>
-                        <th>Dokumen PDF</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $query_sql = "
+            <?php
+            $query_sql = "
                     SELECT tp.*, k.namaKategori 
                     FROM transaksi_pengadaan tp
                     JOIN kategori k ON tp.idKategori = k.idKategori
                     $where_sql 
                     ORDER BY tp.tanggalPengadaan DESC
-                ";
-                    $query = mysqli_query($koneksi, $query_sql);
-                    $no = 1;
-
-                    while ($data = mysqli_fetch_array($query)) {
-                    ?>
+            ";
+            $query = mysqli_query($koneksi, $query_sql);
+            if (mysqli_num_rows($query) > 0):
+            ?>
+                <table class="datatable-astar table table-hover table-striped mb-0 align-middle text-center">
+                    <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <td class="fw-bold"><?= $no++; ?></td>
-                            <td class="text-start"><?= date('d M Y, H:i', strtotime($data['tanggalPengadaan'])); ?></td>
-                            <td class="text-start">
-                                <span class="badge bg-secondary mb-1"><?= $data['namaKategori']; ?></span><br>
-                                <span class="fw-bold text-dark"><?= $data['namaKebutuhan']; ?></span>
-                            </td>
-                            <td class="fw-bold fs-5 text-primary"><?= $data['jumlah']; ?></td>
-                            <td>
-                                <?php if ($data['statusPengadaan'] == 'Draft'): ?>
-                                    <span class="badge bg-warning text-dark px-3 py-2">Menunggu GA</span>
-                                <?php elseif ($data['statusPengadaan'] == 'Disetujui Finance'): ?>
-                                    <span class="badge bg-success px-3 py-2"><i class="bi bi-check-circle-fill"></i> Selesai Dibeli</span>
-                                <?php elseif ($data['statusPengadaan'] == 'Ditolak'): ?>
-                                    <span class="badge bg-danger px-3 py-2">Ditolak</span>
-                                <?php else: ?>
-                                    <span class="badge bg-info text-dark px-3 py-2 shadow-sm"><i class="bi bi-arrow-repeat spin"></i> Diproses Manajemen</span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <?php if (!empty($data['dokumen_pengajuan'])): ?>
-                                    <!-- Link langsung buka PDF di tab baru -->
-                                    <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan']; ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold">
-                                        <i class="bi bi-file-earmark-pdf-fill"></i> Proposal
-                                    </a>
-                                <?php else: ?>
-                                    <span class="text-muted"><i class="bi bi-dash"></i></span>
-                                <?php endif; ?>
-                            </td>
+                            <th width="5%">No.</th>
+                            <th class="text-start">Tgl Pengajuan</th>
+                            <th class="text-start">Kebutuhan Aset</th>
+                            <th>Jumlah</th>
+                            <th>Status</th>
+                            <th>Dokumen PDF</th>
                         </tr>
-                    <?php } ?>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
 
-                    <?php if (mysqli_num_rows($query) == 0): ?>
-                        <tr>
-                            <td colspan="6" class="py-4 text-muted fst-italic">Belum ada pengajuan pengadaan aset.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                        while ($data = mysqli_fetch_array($query)) {
+                        ?>
+                            <tr>
+                                <td class="fw-bold"><?= $no++; ?></td>
+                                <td class="text-start"><?= date('d M Y, H:i', strtotime($data['tanggalPengadaan'])); ?></td>
+                                <td class="text-start">
+                                    <span class="badge bg-secondary mb-1"><?= $data['namaKategori']; ?></span><br>
+                                    <span class="fw-bold text-dark"><?= $data['namaKebutuhan']; ?></span>
+                                </td>
+                                <td class="fw-bold fs-5 text-primary"><?= $data['jumlah']; ?></td>
+                                <td>
+                                    <?php if ($data['statusPengadaan'] == 'Draft'): ?>
+                                        <span class="badge bg-warning text-dark px-3 py-2">Menunggu GA</span>
+                                    <?php elseif ($data['statusPengadaan'] == 'Disetujui Finance'): ?>
+                                        <span class="badge bg-success px-3 py-2"><i class="bi bi-check-circle-fill"></i> Selesai Dibeli</span>
+                                    <?php elseif ($data['statusPengadaan'] == 'Ditolak'): ?>
+                                        <span class="badge bg-danger px-3 py-2">Ditolak</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-info text-dark px-3 py-2 shadow-sm"><i class="bi bi-arrow-repeat spin"></i> Diproses Manajemen</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if (!empty($data['dokumen_pengajuan'])): ?>
+                                        <!-- Link langsung buka PDF di tab baru -->
+                                        <a href="../../../../uploads/dokumen_pengajuan/<?= $data['dokumen_pengajuan']; ?>?v=<?= time(); ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold">
+                                            <i class="bi bi-file-earmark-pdf-fill"></i> Proposal
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="text-muted"><i class="bi bi-dash"></i></span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php } ?>
+
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-success fw-bold">Aman!</h4>
+                    <p class="text-muted">Tidak ada data pengajuan di Prodi Anda.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

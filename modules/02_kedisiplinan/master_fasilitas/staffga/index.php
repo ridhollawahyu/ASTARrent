@@ -107,81 +107,91 @@ include '../../../../components/header.php';
         <!-- TABEL DATA Fasilitas -->
         <!-- ========================================== -->
         <div class="table-responsive">
-            <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
-                <thead style="background-color: #f4f6f9; color: #1d4197;">
-                    <tr>
-                        <th class="text-center" width="5%">No.</th>
-                        <th>Kategori</th>
-                        <th>Nama Fasilitas</th>
-                        <th>Lokasi Fasilitas</th>
-                        <th>Kondisi Fisik</th>
-                        <th>Ketersediaan</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    // QUERY UTAMA (JOIN Fasilitas dan Kategori + Filter + Ascending)
-                    $query_sql = "SELECT fasilitas.*, kategori.namaKategori 
+            <?php
+            // QUERY UTAMA (JOIN Fasilitas dan Kategori + Filter + Ascending)
+            $query_sql = "SELECT fasilitas.*, kategori.namaKategori 
+                            FROM fasilitas 
+                            JOIN kategori ON fasilitas.idKategori = kategori.idKategori "
+                . $where_sql .
+                " ORDER BY fasilitas.idFasilitas ASC";
+            $query = mysqli_query($koneksi, $query_sql);
+            if (mysqli_num_rows($query) > 0):
+            ?>
+                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
+                    <thead style="background-color: #f4f6f9; color: #1d4197;">
+                        <tr>
+                            <th class="text-center" width="5%">No.</th>
+                            <th>Kategori</th>
+                            <th>Nama Fasilitas</th>
+                            <th>Lokasi Fasilitas</th>
+                            <th>Kondisi Fisik</th>
+                            <th>Ketersediaan</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        // QUERY UTAMA (JOIN Fasilitas dan Kategori + Filter + Ascending)
+                        $query_sql = "SELECT fasilitas.*, kategori.namaKategori 
                                   FROM fasilitas 
                                   JOIN kategori ON fasilitas.idKategori = kategori.idKategori "
-                        . $where_sql .
-                        " ORDER BY fasilitas.idFasilitas ASC";
-                    $query = mysqli_query($koneksi, $query_sql);
+                            . $where_sql .
+                            " ORDER BY fasilitas.idFasilitas ASC";
+                        $query = mysqli_query($koneksi, $query_sql);
 
-                    $no = 1;
+                        $no = 1;
 
-                    while ($data = mysqli_fetch_array($query)) {
-                    ?>
-                        <tr>
-                            <td class="fw-bold"><?= $no++; ?></td>
-                            <td><span class="badge bg-secondary"><?= $data['namaKategori']; ?></span></td>
-                            <td class="text-center"><?= $data['namaFasilitas']; ?></td>
-                            <td class="text-center"><?= $data['lokasiFasilitas']; ?></td>
+                        while ($data = mysqli_fetch_array($query)) {
+                        ?>
+                            <tr>
+                                <td class="fw-bold"><?= $no++; ?></td>
+                                <td><span class="badge bg-secondary"><?= $data['namaKategori']; ?></span></td>
+                                <td class="text-center"><?= $data['namaFasilitas']; ?></td>
+                                <td class="text-center"><?= $data['lokasiFasilitas']; ?></td>
 
-                            <!-- PEWARNAAN KONDISI FISIK -->
-                            <td>
-                                <?php if ($data['kondisiFasilitas'] == 'Normal') echo '<span class="text-success fw-bold">Normal</span>';
-                                else if ($data['kondisiFasilitas'] == 'Tidak Berfungsi') echo '<span class="text-danger fw-bold">Tidak Berfungsi</span>';
-                                else echo '<span class="text-warning text-dark fw-bold">' . $data['kondisiFasilitas'] . '</span>';
-                                ?>
-                            </td>
+                                <!-- PEWARNAAN KONDISI FISIK -->
+                                <td>
+                                    <?php if ($data['kondisiFasilitas'] == 'Normal') echo '<span class="text-success fw-bold">Normal</span>';
+                                    else if ($data['kondisiFasilitas'] == 'Tidak Berfungsi') echo '<span class="text-danger fw-bold">Tidak Berfungsi</span>';
+                                    else echo '<span class="text-warning text-dark fw-bold">' . $data['kondisiFasilitas'] . '</span>';
+                                    ?>
+                                </td>
 
-                            <!-- PEWARNAAN KETERSEDIAAN (Sesuai Logika Terbaru Anda) -->
-                            <td>
-                                <?php if ($data['ketersediaanFasilitas'] == 'Tersedia'): ?>
-                                    <span class="badge bg-success rounded-pill px-3">Tersedia</span>
-                                <?php elseif ($data['ketersediaanFasilitas'] == 'Dipinjam'): ?>
-                                    <span class="badge bg-primary rounded-pill px-3">Dipinjam</span>
-                                <?php elseif ($data['ketersediaanFasilitas'] == 'Sedang Diperbaiki'): ?>
-                                    <span class="badge bg-warning text-dark rounded-pill px-3">Sedang Diperbaiki</span>
-                                <?php else: ?>
-                                    <span class="badge bg-secondary rounded-pill px-3">Tidak Tersedia</span>
-                                <?php endif; ?>
-                            </td>
+                                <!-- PEWARNAAN KETERSEDIAAN (Sesuai Logika Terbaru Anda) -->
+                                <td>
+                                    <?php if ($data['ketersediaanFasilitas'] == 'Tersedia'): ?>
+                                        <span class="badge bg-success rounded-pill px-3">Tersedia</span>
+                                    <?php elseif ($data['ketersediaanFasilitas'] == 'Dipinjam'): ?>
+                                        <span class="badge bg-primary rounded-pill px-3">Dipinjam</span>
+                                    <?php elseif ($data['ketersediaanFasilitas'] == 'Sedang Diperbaiki'): ?>
+                                        <span class="badge bg-warning text-dark rounded-pill px-3">Sedang Diperbaiki</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary rounded-pill px-3">Tidak Tersedia</span>
+                                    <?php endif; ?>
+                                </td>
 
-                            <td>
-                                <?php if ($data['ketersediaanFasilitas'] != 'Tidak Tersedia'): ?>
-                                    <!-- Tombol Edit -->
-                                    <a href="edit.php?id=<?= $data['idFasilitas']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
+                                <td>
+                                    <?php if ($data['ketersediaanFasilitas'] != 'Tidak Tersedia'): ?>
+                                        <!-- Tombol Edit -->
+                                        <a href="edit.php?id=<?= $data['idFasilitas']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
 
-                                    <!-- Tombol Soft Delete (Memanggil fungsi dari footer) -->
-                                    <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?id=<?= $data['idFasilitas']; ?>')">
-                                        <i class="bi bi-trash-fill"></i>
-                                    </button>
-                                <?php endif; ?>
-                        </tr>
-                    <?php } ?>
-
-                    <!-- Jika data kosong -->
-                    <?php if (mysqli_num_rows($query) == 0): ?>
-                        <tr>
-                            <td colspan="7" class="py-4 text-muted fst-italic">Tidak ada data Fasilitas yang ditemukan.</td>
-                        </tr>
-                    <?php endif; ?>
-
-                </tbody>
-            </table>
+                                        <!-- Tombol Soft Delete (Memanggil fungsi dari footer) -->
+                                        <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?id=<?= $data['idFasilitas']; ?>')">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    <?php endif; ?>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-success fw-bold">Aman!</h4>
+                    <p class="text-muted">Tidak ada data Fasilitas Non-Akademik.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

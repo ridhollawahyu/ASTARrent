@@ -36,10 +36,10 @@
         }
 
         /* DataTables Poppins Font Style integration */
-        .dataTables_wrapper, 
-        .dataTables_wrapper .dataTables_filter input, 
-        .dataTables_wrapper .dataTables_length select, 
-        .dataTables_wrapper .dataTables_info, 
+        .dataTables_wrapper,
+        .dataTables_wrapper .dataTables_filter input,
+        .dataTables_wrapper .dataTables_length select,
+        .dataTables_wrapper .dataTables_info,
         .dataTables_wrapper .dataTables_paginate {
             font-family: 'Poppins', sans-serif !important;
         }
@@ -259,6 +259,37 @@
             background-color: var(--danger);
             color: #ffffff;
             font-weight: bold;
+        }
+
+        /* ------------------------------------------- */
+        /* KUSTOMISASI DROPDOWN DATATABLES ASTARRENT   */
+        /* ------------------------------------------- */
+        div.dataTables_wrapper div.dataTables_length select {
+            border: 2px solid #e0e6ed !important;
+            border-radius: 8px !important;
+            padding: 4px 25px 4px 10px !important;
+            color: #1d4197 !important;
+            font-weight: 600 !important;
+            background-color: #f9fbfd !important;
+            cursor: pointer !important;
+            outline: none !important;
+            box-shadow: none !important;
+            appearance: none;
+            /* Menghilangkan panah default bawaan browser */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            /* Membuat panah panah custom biru yang sama dengan tema */
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231d4197' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 8px center !important;
+            background-size: 1em !important;
+            transition: all 0.3s ease;
+        }
+
+        div.dataTables_wrapper div.dataTables_length select:hover,
+        div.dataTables_wrapper div.dataTables_length select:focus {
+            border-color: #1d4197 !important;
+            background-color: #ffffff !important;
         }
     </style>
     <script>

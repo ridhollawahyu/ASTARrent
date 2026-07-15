@@ -62,7 +62,6 @@ if (isset($_POST['update'])) {
                      WHERE nimMahasiswa = '$nim'";
 
     if (mysqli_query($koneksi, $query_update)) {
-        perbarui_status_mahasiswa($nim);
         set_notifikasi('success', 'Data mahasiswa berhasil diperbarui!');
         header('Location: index.php');
         exit;

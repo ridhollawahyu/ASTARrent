@@ -24,7 +24,7 @@ $dept_tendik = $_SESSION['departemen'];
 $query_sql = "
     SELECT tp.*, m.namaMahasiswa, m.nimMahasiswa AS nim, 
            a.namaAset, f.namaFasilitas,
-           TIMESTAMPDIFF(HOUR, tp.tanggalRencana_kembali, NOW()) AS jam_terlambat
+           udf_hitung_jam_telat(tp.tanggalRencana_kembali, NOW()) AS jam_terlambat
     FROM transaksi_peminjaman tp
     JOIN mahasiswa m ON tp.nimMahasiswa = m.nimMahasiswa
     LEFT JOIN aset a ON tp.idAset = a.idAset
@@ -52,58 +52,61 @@ include '../../../../components/header.php';
         </div>
 
         <div class="table-responsive">
-            <table class="datatable-astar table table-hover align-middle text-center">
-                <thead style="background-color: #f4f6f9; color: #1d4197;">
-                    <tr>
-                        <th width="5%">No.</th>
-                        <th class="text-start">Mahasiswa</th>
-                        <th class="text-start">Barang yang Dipinjam</th>
-                        <th>Batas Kembali</th>
-                        <th>Status Waktu</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $no = 1;
-                    while ($data = mysqli_fetch_assoc($queryTransaksi)):
-                        $is_terlambat = (int)$data['jam_terlambat'] > 0;
-                        $teks_waktu = format_waktu_terlambat((int)$data['jam_terlambat']);
-                        $nama_barang = !empty($data['idAset']) ? '<span class="text-secondary fw-bold me-1">[Aset]</span>' . $data['namaAset'] : '<span class="text-secondary me-1 fw-bold">[Fasilitas]</span>' . $data['namaFasilitas'];
-                    ?>
+            <?php if (mysqli_num_rows($queryTransaksi) > 0): ?>
+                <table class="datatable-astar table table-hover align-middle text-center">
+                    <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <td class="fw-bold"><?= $no++ ?></td>
-                            <td class="text-start">
-                                <div class="fw-bold text-dark"><?= $data['namaMahasiswa'] ?></div>
-                                <div class="text-muted" style="font-size:0.8rem;"><?= $data['nim'] ?></div>
-                            </td>
-                            <td class="text-start fw-semibold text-secondary"><?= $nama_barang ?></td>
-                            <td class="fw-bold <?= $is_terlambat ? 'text-danger' : 'text-success' ?>">
-                                <?= date('d M Y, H:i', strtotime($data['tanggalRencana_kembali'])) ?>
-                            </td>
-                            <td>
-                                <?php if ($is_terlambat): ?>
-                                    <span class="badge bg-danger rounded-pill px-3 py-2" style="white-space: normal; line-height: 1.5;"><i class="bi bi-alarm-fill me-1"></i> Telat <?= $teks_waktu ?></span>
-                                <?php else: ?>
-                                    <span class="badge bg-success rounded-pill px-3 py-2"><i class="bi bi-check2-circle me-1"></i> Tepat Waktu</span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <!-- MENGARAH KE HALAMAN PROSES APPROVE -->
-                                <a href="proses_approve.php?id=<?= $data['idPeminjaman'] ?>" class="btn text-white btn-sm fw-bold px-3" style="background-color: #1d4197; border-radius: 8px;">
-                                    <i class="bi bi-clipboard-check me-1"></i> Proses
-                                </a>
-                            </td>
+                            <th width="5%">No.</th>
+                            <th class="text-start">Mahasiswa</th>
+                            <th class="text-start">Barang yang Dipinjam</th>
+                            <th>Batas Kembali</th>
+                            <th>Status Waktu</th>
+                            <th>Aksi</th>
                         </tr>
-                    <?php endwhile; ?>
-
-                    <?php if (mysqli_num_rows($queryTransaksi) == 0): ?>
-                        <tr>
-                            <td colspan="6" class="py-5 text-center text-muted fst-italic">Belum ada antrean pengembalian.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
+                        while ($data = mysqli_fetch_assoc($queryTransaksi)):
+                            $is_terlambat = (int)$data['jam_terlambat'] > 0;
+                            $teks_waktu = format_waktu_terlambat((int)$data['jam_terlambat']);
+                            $nama_barang = !empty($data['idAset']) ? '<span class="text-secondary fw-bold me-1">[Aset]</span>' . $data['namaAset'] : '<span class="text-secondary me-1 fw-bold">[Fasilitas]</span>' . $data['namaFasilitas'];
+                        ?>
+                            <tr>
+                                <td class="fw-bold"><?= $no++ ?></td>
+                                <td class="text-start">
+                                    <div class="fw-bold text-dark"><?= $data['namaMahasiswa'] ?></div>
+                                    <div class="text-muted" style="font-size:0.8rem;"><?= $data['nim'] ?></div>
+                                </td>
+                                <td class="text-start fw-semibold text-secondary"><?= $nama_barang ?></td>
+                                <td class="fw-bold <?= $is_terlambat ? 'text-danger' : 'text-success' ?>">
+                                    <?= date('d M Y, H:i', strtotime($data['tanggalRencana_kembali'])) ?>
+                                </td>
+                                <td>
+                                    <?php if ($is_terlambat): ?>
+                                        <span class="badge bg-danger rounded-pill px-3 py-2" style="white-space: normal; line-height: 1.5;"><i class="bi bi-alarm-fill me-1"></i> Telat <?= $teks_waktu ?></span>
+                                    <?php else: ?>
+                                        <span class="badge bg-success rounded-pill px-3 py-2"><i class="bi bi-check2-circle me-1"></i> Tepat Waktu</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <!-- MENGARAH KE HALAMAN PROSES APPROVE -->
+                                    <a href="proses_approve.php?id=<?= $data['idPeminjaman'] ?>" class="btn text-white btn-sm fw-bold px-3" style="background-color: #1d4197; border-radius: 8px;">
+                                        <i class="bi bi-clipboard-check me-1"></i> Proses
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-success fw-bold">Aman!</h4>
+                    <p class="text-muted">Tidak ada data Peminjaman yang belum dikembalikan.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

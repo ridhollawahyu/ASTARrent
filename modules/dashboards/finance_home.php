@@ -115,7 +115,7 @@ include '../../components/header.php';
             <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #1d4197 !important;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
-                        <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Anggaran Terpakai</p>
+                        <p class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Dana Keluar</p>
                         <h4 class="fw-bold mb-0 text-dark" style="font-size: 1.15rem;">Rp <?= number_format($total_dana, 0, ',', '.') ?></h4>
                     </div>
                     <div class="rounded-circle p-3 bg-primary-subtle text-astar" style="font-size: 1.5rem; line-height: 1;">

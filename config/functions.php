@@ -14,45 +14,7 @@ header("Expires: 0");
 
 date_default_timezone_set('Asia/Jakarta');
 
-// 1. FUNGSI READ (Menampilkan Data)
-// Contoh pakai: $data_mhs = ambil_data("SELECT * FROM mahasiswa");
-function ambil_data($query)
-{
-    global $conn;
-    $result = mysqli_query($conn, $query);
-    $rows = [];
-    while ($row = mysqli_fetch_assoc($result)) {
-        $rows[] = $row;
-    }
-    return $rows;
-}
-
-// 2. FUNGSI CREATE (Tambah Data Mahasiswa)
-function tambah_mahasiswa($data)
-{
-    global $conn;
-    $nim = htmlspecialchars($data["nim"]);
-    $nama = htmlspecialchars($data["nama"]);
-    $prodi = htmlspecialchars($data["prodi"]);
-    $email = htmlspecialchars($data["email"]);
-    // Enkripsi Password (Validasi Wajib)
-    $password = password_hash($data["password"], PASSWORD_DEFAULT);
-
-    $query = "INSERT INTO mahasiswa (nimMahasiswa, namaMahasiswa, kodeProdi_mahasiswa, emailMahasiswa, passMahasiswa) 
-              VALUES ('$nim', '$nama', '$prodi', '$email', '$password')";
-
-    mysqli_query($conn, $query);
-    return mysqli_affected_rows($conn); // Mengembalikan nilai 1 jika sukses, -1 jika gagal
-}
-
-// 3. FUNGSI VALIDASI LOGIN SSO
-function validasi_login($username, $password, $role)
-{
-    global $conn;
-    // Logika SSO akan dibuat di proses_login.php
-}
-
-// FUNGSI 4: BIKIN ID OTOMATIS (VARCHAR 20)
+// FUNGSI 1: BIKIN ID OTOMATIS (VARCHAR 20)
 // Cara pakai: $id_baru = generate_id("AST", "aset", "idAset");
 function generate_id($prefix, $nama_tabel, $nama_pk)
 {
@@ -78,25 +40,8 @@ function generate_id($prefix, $nama_tabel, $nama_pk)
     return $id_baru;
 }
 
-// FUNGSI 5: UBAH DATA (UPDATE)
-function ubah_data($nama_tabel, $data_array, $nama_pk, $id_nilai)
-{
-    global $koneksi;
-    $set_query = [];
-    foreach ($data_array as $kolom => $nilai) {
-        $nilai_aman = mysqli_real_escape_string($koneksi, $nilai);
-        $set_query[] = "$kolom = '$nilai_aman'";
-    }
-    $set_string = implode(", ", $set_query);
-    $id_aman = mysqli_real_escape_string($koneksi, $id_nilai);
-
-    $query = "UPDATE $nama_tabel SET $set_string WHERE $nama_pk = '$id_aman'";
-    mysqli_query($koneksi, $query);
-    return mysqli_affected_rows($koneksi);
-}
-
 /**
- * FUNGSI 6: GENERATE NIM MAHASISWA OTOMATIS
+ * FUNGSI 2: GENERATE NIM MAHASISWA OTOMATIS
  * Logika: Mapping Prodi -> Ambil Tahun -> Cari MAX NIM -> Tambah 1
  */
 function generate_nim_mahasiswa($nama_prodi)
@@ -142,7 +87,7 @@ function generate_nim_mahasiswa($nama_prodi)
 }
 
 /**
- * FUNGSI 7: FORMAT & VALIDASI NOMOR TELEPON
+ * FUNGSI 3: FORMAT & VALIDASI NOMOR TELEPON
  * Mencegah nomor dobel nol (misal +620812...)
  */
 function format_no_telp($kode_negara, $nomor)
@@ -164,7 +109,7 @@ function format_no_telp($kode_negara, $nomor)
 }
 
 /**
- * FUNGSI 8: GENERATE KOMPONEN INPUT TELEPON (HTML + JS)
+ * FUNGSI 4: GENERATE KOMPONEN INPUT TELEPON (HTML + JS)
  * Bisa dipakai di form Create maupun Edit (tinggal kirim parameternya)
  */
 function buat_input_telp($val_telp = '', $val_kode = '+62')
@@ -211,7 +156,7 @@ function buat_input_telp($val_telp = '', $val_kode = '+62')
 
 
 /**
- * FUNGSI 9: SET NOTIFIKASI POP-UP GLOBAL
+ * FUNGSI 5: SET NOTIFIKASI POP-UP GLOBAL
  * Dipakai setelah proses Insert/Update/Delete selesai
  * Tipe: 'success' atau 'error'
  */
@@ -223,36 +168,7 @@ function set_notifikasi($tipe, $pesan)
 }
 
 /**
- * FUNGSI 8: UPDATE STATUS MAHASISWA OTOMATIS (SMART LOGIC)
- * Mengecek: Jika Denda > 0 ATAU Jam Minus > 0, maka Dibekukan. Jika nol semua, Normal.
- * Panggil fungsi ini setiap kali ada perubahan data denda/jam minus!
- */
-function perbarui_status_mahasiswa($nim)
-{
-    global $koneksi;
-
-    // 1. Ambil data denda dan jam minus terbaru dari database
-    $query = mysqli_query($koneksi, "SELECT jamMinus_mahasiswa, dendaMahasiswa FROM mahasiswa WHERE nimMahasiswa = '$nim'");
-    $data = mysqli_fetch_assoc($query);
-
-    if ($data) {
-        $jam = (int)$data['jamMinus_mahasiswa'];
-        $denda = (int)$data['dendaMahasiswa'];
-
-        // 2. Logika Cerdas penentuan status
-        if ($jam > 0 || $denda > 0) {
-            $status_baru = 'Dibekukan';
-        } else {
-            $status_baru = 'Normal';
-        }
-
-        // 3. Update otomatis ke database
-        mysqli_query($koneksi, "UPDATE mahasiswa SET statusMahasiswa = '$status_baru' WHERE nimMahasiswa = '$nim'");
-    }
-}
-
-/**
- * FUNGSI 10: DROPDOWN INTERAKTIF TEMA ASTARRENT (CUSTOM UI - ANTI MAC/SAFARI DEFAULT)
+ * FUNGSI 6: DROPDOWN INTERAKTIF TEMA ASTARRENT (CUSTOM UI - ANTI MAC/SAFARI DEFAULT)
  * Menghasilkan dropdown yang 100% bisa diwarnai sesuai tema!
  */
 function buat_dropdown_astar($nama_input, $array_pilihan, $nilai_lama = '', $wajib = true)
@@ -320,7 +236,7 @@ function buat_dropdown_danger($nama_input, $array_pilihan, $nilai_lama = '', $wa
 }
 
 /**
- * FUNGSI 11: CEK EMAIL GANDA (CROSS-TABLE VALIDATION)
+ * FUNGSI 7: CEK EMAIL GANDA (CROSS-TABLE VALIDATION)
  * Mengecek apakah email sudah dipakai di tabel Mahasiswa, Users, atau Supplier.
  * Return TRUE jika duplikat (tidak boleh dipakai), FALSE jika aman.
  */
@@ -329,30 +245,15 @@ function cek_email_ganda($email_input)
     global $koneksi;
     $email_aman = mysqli_real_escape_string($koneksi, $email_input);
 
-    // Sihir SQL UNION: Menggabungkan 3 kolom email dari 3 tabel berbeda menjadi 1 daftar
-    $query = "
-        SELECT email FROM (
-            SELECT emailMahasiswa AS email FROM mahasiswa
-            UNION ALL
-            SELECT emailUser AS email FROM users
-            UNION ALL
-            SELECT emailSupplier AS email FROM supplier
-        ) AS semua_email 
-        WHERE email = '$email_aman'
-    ";
+    // PHP tidak perlu mikir lagi, tinggal tanya ke UDF di Database!
+    $query = mysqli_query($koneksi, "SELECT udf_cek_email_ganda('$email_aman') AS is_duplicate");
+    $data = mysqli_fetch_assoc($query);
 
-    $result = mysqli_query($koneksi, $query);
-
-    // Jika hasilnya lebih dari 0, berarti email ketemu di salah satu tabel!
-    if (mysqli_num_rows($result) > 0) {
-        return true; // DITOLAK (Duplikat)
-    }
-
-    return false; // AMAN
+    return $data['is_duplicate'] == 1;
 }
 
 /**
- * FUNGSI 12: MENGAMBIL DATA KATEGORI DARI DATABASE UNTUK DROPDOWN
+ * FUNGSI 8: MENGAMBIL DATA KATEGORI DARI DATABASE UNTUK DROPDOWN
  * $tipe = 'Aset' atau 'Fasilitas'
  */
 function ambil_pilihan_kategori($tipe)
@@ -370,7 +271,7 @@ function ambil_pilihan_kategori($tipe)
 }
 
 /**
- * FUNGSI 13: UPDATE STATUS KETERSEDIAAN & KONDISI BARANG (STATE MACHINE)
+ * FUNGSI 9: UPDATE STATUS KETERSEDIAAN & KONDISI BARANG (STATE MACHINE)
  * Digunakan saat: Peminjaman di-Approve, Reparasi Diproses, Reparasi Selesai, atau Barang Rusak Total.
  * $tipe_barang = 'aset' atau 'fasilitas'
  */
@@ -400,7 +301,7 @@ function perbarui_status_barang($tipe_barang, $id_barang, $ketersediaan_baru, $k
 }
 
 /**
- * FUNGSI 14: AMBIL BARANG TERSEDIA (Untuk Form Peminjaman)
+ * FUNGSI 10: AMBIL BARANG TERSEDIA (Untuk Form Peminjaman)
  * $tipe = 'aset' atau 'fasilitas'
  */
 function ambil_barang_tersedia($tipe)
@@ -423,7 +324,7 @@ function ambil_barang_tersedia($tipe)
 }
 
 /**
- * FUNGSI 15: AUTO-TOLAK PEMINJAMAN KEDALUWARSA
+ * FUNGSI 11: AUTO-TOLAK PEMINJAMAN KEDALUWARSA
  * Berjalan otomatis untuk membatalkan request yang 'Menunggu' 
  * tapi waktu 'Rencana Kembali'-nya sudah terlewat.
  */
@@ -446,7 +347,7 @@ function validasi_kadaluwarsa_peminjaman()
 }
 
 /**
- * FUNGSI 16: GENERATE INPUT TANGGAL & JAM (DATETIME-LOCAL)
+ * FUNGSI 12: GENERATE INPUT TANGGAL & JAM (DATETIME-LOCAL)
  * Dilengkapi Smart Calendar: Min (Sekarang + 1 Jam), Max (Akhir Semester)
  */
 function buat_input_datetime($nama_input, $nilai_lama = '', $wajib = true)
@@ -518,7 +419,7 @@ function buat_input_datetime($nama_input, $nilai_lama = '', $wajib = true)
 }
 
 /**
- * FUNGSI 17: VALIDASI OTORITAS TENDIK (ROW-LEVEL SECURITY)
+ * FUNGSI 13: VALIDASI OTORITAS TENDIK (ROW-LEVEL SECURITY)
  * Memastikan Tendik hanya bisa memproses transaksi dari mahasiswa prodi yang sama.
  * Return TRUE jika prodi sama (Aman), FALSE jika prodi beda (Hacker/Bypass).
  */
@@ -544,194 +445,53 @@ function validasi_otoritas_tendik($id_peminjaman, $kode_departemen_tendik)
 }
 
 /**
- * FUNGSI 18: AUTO-REJECT BARANG BENTROK (DOUBLE BOOKING)
+ * FUNGSI 14: AUTO-REJECT BARANG BENTROK (DOUBLE BOOKING)
  * Jika 1 mahasiswa di-Approve, otomatis tolak mahasiswa lain yang request barang yang sama.
  */
 function tolak_peminjaman_bentrok($id_aset, $id_fasilitas, $id_peminjaman_yg_menang)
 {
     global $koneksi;
+    $val_aset = !empty($id_aset) ? "'$id_aset'" : "NULL";
+    $val_fasi = !empty($id_fasilitas) ? "'$id_fasilitas'" : "NULL";
 
-    // 1. Tentukan barang apa yang lagi direbutin (Pakai logika XOR kita)
-    if (!empty($id_aset)) {
-        $kondisi_barang = "idAset = '$id_aset'";
-    } else {
-        $kondisi_barang = "idFasilitas = '$id_fasilitas'";
-    }
-
-    // 2. Query Sapu Jagat (Auto-Reject)
-    // Arti query ini: "Ubah status jadi DITOLAK untuk barang yang sama, 
-    // yang statusnya masih MENUNGGU, KECUALI ID transaksi si pemenang!"
-    $query = "UPDATE transaksi_peminjaman 
-              SET statusPeminjaman = 'Ditolak' 
-              WHERE $kondisi_barang 
-              AND statusPeminjaman = 'Menunggu' 
-              AND idPeminjaman != '$id_peminjaman_yg_menang'";
-
-    mysqli_query($koneksi, $query);
+    // Langsung tembak ke Stored Procedure!
+    mysqli_query($koneksi, "CALL sp_tolak_peminjaman_bentrok('$id_peminjaman_yg_menang', $val_aset, $val_fasi)");
 }
 
 /**
- * FUNGSI 19: TERAPKAN SANKSI KE MAHASISWA
+ * FUNGSI 15: TERAPKAN SANKSI KE MAHASISWA
  * Mesin ini akan menyedot nilai denda/jam dari Master Sanksi, 
  * lalu menambahkannya ke akun mahasiswa, dan otomatis membekukannya!
  */
 function terapkan_sanksi_mahasiswa($nim, $id_sanksi)
 {
     global $koneksi;
+    if (empty($id_sanksi) || $id_sanksi == 'NULL') return;
 
-    // Kalau Tendik tidak milih sanksi (barangnya aman), matikan mesin ini.
-    if (empty($id_sanksi)) {
-        return;
-    }
-
-    // 1. Tanya ke Master Sanksi: "Sanksi ini denda dan jam minusnya berapa?"
-    $q_sanksi = mysqli_query($koneksi, "SELECT sanksi_jamMinus, sanksi_denda FROM sanksi WHERE idSanksi = '$id_sanksi'");
-    $sanksi = mysqli_fetch_assoc($q_sanksi);
-
-    if ($sanksi) {
-        $tambah_jam = (int)$sanksi['sanksi_jamMinus'];
-        $tambah_denda = (int)$sanksi['sanksi_denda'];
-
-        // 2. Tambahkan (Akumulasikan) ke profil mahasiswa tersebut
-        // Sintaks "jamMinus_mahasiswa + $tambah_jam" itu artinya: Nilai lama ditambah nilai baru
-        mysqli_query($koneksi, "UPDATE mahasiswa 
-                                SET jamMinus_mahasiswa = jamMinus_mahasiswa + $tambah_jam, 
-                                    dendaMahasiswa = dendaMahasiswa + $tambah_denda 
-                                WHERE nimMahasiswa = '$nim'");
-
-        // Karena dendanya nambah, fungsi ini bakal otomatis ngubah status mahasiswa jadi 'Dibekukan'
-        perbarui_status_mahasiswa($nim);
-    }
+    // SP ini otomatis nambah denda, lalu Trigger otomatis membekukan akun!
+    mysqli_query($koneksi, "CALL sp_terapkan_sanksi_mahasiswa('$nim', '$id_sanksi')");
 }
 
 /**
- * FUNGSI 20: ROBOT PEMBUAT / PEMBARUI TIKET REPARASI OTOMATIS
+ * FUNGSI 16: ROBOT PEMBUAT / PEMBARUI TIKET REPARASI OTOMATIS
  * Mencegah Tiket Ganda: 1 Barang hanya boleh punya 1 Tiket 'Menunggu GA'.
  */
 function buat_tiket_reparasi_otomatis($id_pelapor, $id_aset, $id_fasilitas, $tingkat_rusak, $catatan_kerusakan = '')
 {
     global $koneksi;
+    if ($tingkat_rusak == 'Normal') return;
 
-    // Kalau barangnya Normal, robot mati (gak usah lapor)
-    if ($tingkat_rusak == 'Normal') {
-        return;
-    }
+    $id_rep_baru = generate_id('REP', 'reparasi_fasilitas_aset', 'idReparasi');
+    $val_aset = !empty($id_aset) ? "'$id_aset'" : "NULL";
+    $val_fasi = !empty($id_fasilitas) ? "'$id_fasilitas'" : "NULL";
 
-    $waktu_lapor = date('Y-m-d H:i:s');
-
-    // Logika XOR untuk mencari barang di database
-    $kolom_cari = !empty($id_aset) ? "idAset = '$id_aset'" : "idFasilitas = '$id_fasilitas'";
-
-    // =========================================================================
-    // 🔍 LANGKAH 1: CEK APAKAH BARANG INI SUDAH PUNYA TIKET 'MENUNGGU GA' ?
-    // =========================================================================
-    $cek_tiket = mysqli_query($koneksi, "
-        SELECT idReparasi, klasifikasiKerusakan, catatanReparasi 
-        FROM reparasi_fasilitas_aset 
-        WHERE $kolom_cari AND statusReparasi = 'Menunggu GA'
-        LIMIT 1
-    ");
-
-    if (mysqli_num_rows($cek_tiket) > 0) {
-        // =========================================================================
-        // 🔄 LANGKAH 2A: TIKET SUDAH ADA (LAKUKAN UPDATE, JANGAN INSERT!)
-        // =========================================================================
-        $data_tiket = mysqli_fetch_assoc($cek_tiket);
-        $id_reparasi_lama = $data_tiket['idReparasi'];
-
-        // Gabungkan catatan lama dengan catatan baru biar GA tahu sejarahnya
-        $catatan_baru = $data_tiket['catatanReparasi'] . "\n[Laporan Baru $waktu_lapor]: " . $catatan_kerusakan;
-
-        // Update klasifikasinya (Misal tadinya 'Berfungsi', sekarang jebol jadi 'Tidak Berfungsi')
-        $query_update = "UPDATE reparasi_fasilitas_aset 
-                         SET klasifikasiKerusakan = '$tingkat_rusak', 
-                             tanggalLapor = '$waktu_lapor', 
-                             idPelapor = '$id_pelapor', 
-                             catatanReparasi = '$catatan_baru' 
-                         WHERE idReparasi = '$id_reparasi_lama'";
-
-        mysqli_query($koneksi, $query_update);
-    } else {
-        // =========================================================================
-        // 🆕 LANGKAH 2B: TIKET BELUM ADA (LAKUKAN INSERT TIKET BARU)
-        // =========================================================================
-        $id_reparasi_baru = generate_id('REP', 'reparasi_fasilitas_aset', 'idReparasi');
-
-        $val_aset = !empty($id_aset) ? "'$id_aset'" : "NULL";
-        $val_fasilitas = !empty($id_fasilitas) ? "'$id_fasilitas'" : "NULL";
-
-        $query_insert = "INSERT INTO reparasi_fasilitas_aset 
-                  (idReparasi, idPelapor, idAset, idFasilitas, tanggalLapor, klasifikasiKerusakan, statusReparasi, catatanReparasi) 
-                  VALUES 
-                  ('$id_reparasi_baru', '$id_pelapor', $val_aset, $val_fasilitas, '$waktu_lapor', '$tingkat_rusak', 'Menunggu GA', '$catatan_kerusakan')";
-
-        mysqli_query($koneksi, $query_insert);
-    }
+    // Lempar parameter ke SP
+    mysqli_query($koneksi, "CALL sp_buat_tiket_reparasi('$id_rep_baru', '$id_pelapor', $val_aset, $val_fasi, '$tingkat_rusak', '$catatan_kerusakan')");
 }
 
-/**
- * FUNGSI 21: PENGHITUNG KETERLAMBATAN OTOMATIS
- * Membandingkan waktu sekarang dengan Rencana Kembali
- */
-function hitung_keterlambatan($tgl_rencana_kembali)
-{
-    date_default_timezone_set('Asia/Jakarta');
-    $waktu_sekarang = time(); // Waktu detik ini
-    $waktu_rencana = strtotime($tgl_rencana_kembali);
-
-    // Jika belum lewat batas waktu
-    if ($waktu_sekarang <= $waktu_rencana) {
-        return ['kategori' => 'Tepat Waktu', 'teks' => 'Aman / Tepat Waktu', 'warna' => 'success'];
-    }
-
-    // Jika telat, hitung selisih jamnya
-    $selisih_detik = $waktu_sekarang - $waktu_rencana;
-    $selisih_jam = floor($selisih_detik / 3600);
-
-    if ($selisih_jam < 24) {
-        return ['kategori' => 'Telat < 24 Jam', 'teks' => "Terlambat $selisih_jam Jam", 'warna' => 'warning'];
-    } elseif ($selisih_jam <= 72) {
-        $hari = floor($selisih_jam / 24);
-        return ['kategori' => 'Telat 1-3 Hari', 'teks' => "Terlambat $hari Hari", 'warna' => 'danger'];
-    } else {
-        $hari = floor($selisih_jam / 24);
-        return ['kategori' => 'Telat > 3 Hari', 'teks' => "Terlambat Parah ($hari Hari!)", 'warna' => 'dark'];
-    }
-}
 
 /**
- * FUNGSI 22: PENCARI SANKSI KOMBO OTOMATIS
- * Menggabungkan Waktu dan Kondisi Fisik untuk mencari ID Sanksi di Database
- */
-function cari_id_sanksi_otomatis($kategori_waktu, $kondisi_fisik)
-{
-    global $koneksi;
-
-    // Jika semuanya aman, tidak ada sanksi (NULL)
-    if ($kategori_waktu == 'Tepat Waktu' && $kondisi_fisik == 'Normal') {
-        return "NULL";
-    }
-
-    // RAKIT KATA KUNCI PENCARIAN (Menyesuaikan dengan nama di tabel Sanksi kita)
-    if ($kategori_waktu == 'Tepat Waktu') {
-        $keyword = "Tepat Waktu + $kondisi_fisik";
-    } elseif ($kondisi_fisik == 'Normal') {
-        $keyword = "$kategori_waktu (Barang Aman/Normal)";
-    } else {
-        $keyword = "$kategori_waktu + $kondisi_fisik";
-    }
-
-    // Cari di database sanksi mana yang namanya mirip dengan keyword
-    $query = mysqli_query($koneksi, "SELECT idSanksi FROM sanksi WHERE namaSanksi LIKE '%$keyword%' LIMIT 1");
-    if ($row = mysqli_fetch_assoc($query)) {
-        return "'" . $row['idSanksi'] . "'";
-    }
-
-    return "NULL"; // Jaga-jaga kalau sanksi tidak ketemu
-}
-
-/**
- * FUNGSI 23: MATRIKS OTOMATISASI SANKSI (DATABASE-DRIVEN)
+ * FUNGSI 17: MATRIKS OTOMATISASI SANKSI (DATABASE-DRIVEN)
  */
 function dapatkan_sanksi_otomatis($jam_terlambat, $kondisi_fisik)
 {
@@ -777,7 +537,7 @@ function dapatkan_sanksi_otomatis($jam_terlambat, $kondisi_fisik)
 }
 
 /**
- * FUNGSI 24: AMBIL PILIHAN REPARASI RUSAK TOTAL UNTUK MASTER KOMPONEN
+ * FUNGSI 18: AMBIL PILIHAN REPARASI RUSAK TOTAL UNTUK MASTER KOMPONEN
  * Dipakai saat Staff GA mencatat komponen hasil bongkar aset atau fasilitas rusak total.
  */
 function ambil_pilihan_reparasi_rusak_total()
@@ -806,7 +566,7 @@ function ambil_pilihan_reparasi_rusak_total()
 }
 
 /**
- * FUNGSI 25: VALIDASI REPARASI RUSAK TOTAL
+ * FUNGSI 19: VALIDASI REPARASI RUSAK TOTAL
  */
 function reparasi_rusak_total_valid($id_reparasi)
 {
@@ -822,7 +582,7 @@ function reparasi_rusak_total_valid($id_reparasi)
 }
 
 /**
- * FUNGSI 26: VALIDASI KONDISI KOMPONEN
+ * FUNGSI 20: VALIDASI KONDISI KOMPONEN
  */
 function kondisi_komponen_valid($kondisi)
 {
@@ -831,7 +591,7 @@ function kondisi_komponen_valid($kondisi)
 }
 
 /**
- * FUNGSI 27: VALIDASI STATUS KOMPONEN
+ * FUNGSI 21: VALIDASI STATUS KOMPONEN
  */
 function status_komponen_valid($status)
 {
@@ -840,7 +600,7 @@ function status_komponen_valid($status)
 }
 
 /**
- * FUNGSI 28: CEK DUPLIKASI KOMPONEN PADA SUMBER REPARASI YANG SAMA
+ * FUNGSI 22: CEK DUPLIKASI KOMPONEN PADA SUMBER REPARASI YANG SAMA
  */
 function komponen_duplikat($id_reparasi, $nama_komponen, $id_kecuali = null)
 {
@@ -866,7 +626,7 @@ function komponen_duplikat($id_reparasi, $nama_komponen, $id_kecuali = null)
 }
 
 /**
- * FUNGSI 29: SCRIPT DINAMIS JABATAN & DEPARTEMEN (CLEAN CODE)
+ * FUNGSI 23: SCRIPT DINAMIS JABATAN & DEPARTEMEN (CLEAN CODE)
  * Menyembunyikan kerumitan JavaScript dari file create/edit.
  * Logika: Jika Tendik -> Muncul Dropdown Prodi. Jika bukan -> Text Auto-Fill Terkunci.
  */
@@ -923,7 +683,7 @@ function script_dinamis_jabatan_dept()
 }
 
 /**
- * FUNGSI 31: AMBIL PILIHAN SUPPLIER (Karyawan Internal)
+ * FUNGSI 24: AMBIL PILIHAN SUPPLIER (Karyawan Internal)
  * Ditampilkan di Dropdown Kepala GA. Diurutkan dari yang tugasnya paling sedikit.
  */
 function ambil_pilihan_supplier()
@@ -944,7 +704,7 @@ function ambil_pilihan_supplier()
 }
 
 /**
- * FUNGSI 32: GENERATE ULANG PDF PENGAJUAN (TENDIK + GA + FINANCE)
+ * FUNGSI 25: GENERATE ULANG PDF PENGAJUAN (TENDIK + GA + FINANCE)
  * Dinamis: Menyuntikkan Stempel ACC atau REJECTED
  */
 function buat_pdf_pengajuan($id_pengadaan)
@@ -1072,7 +832,7 @@ function buat_pdf_pengajuan($id_pengadaan)
 }
 
 /**
- * FUNGSI 33: GENERATE ULANG PDF PENAWARAN (TIDAK LAGI PAKAI JSON)
+ * FUNGSI 26: GENERATE ULANG PDF PENAWARAN (TIDAK LAGI PAKAI JSON)
  */
 function buat_pdf_penawaran($id_pengadaan)
 {
@@ -1193,7 +953,7 @@ function buat_pdf_penawaran($id_pengadaan)
 }
 
 /**
- * FUNGSI 35: SCRIPT DINAMIS KEPALA GA (VALIDASI)
+ * FUNGSI 27: SCRIPT DINAMIS KEPALA GA (VALIDASI)
  */
 function script_dinamis_kepalaga_approve($has_supplier)
 {
@@ -1227,7 +987,7 @@ function script_dinamis_kepalaga_approve($has_supplier)
 }
 
 /**
- * FUNGSI 36: SCRIPT DINAMIS SUPPLIER (INPUT HARGA, STOK, & ESTIMASI)
+ * FUNGSI 28: SCRIPT DINAMIS SUPPLIER (INPUT HARGA, STOK, & ESTIMASI)
  */
 function script_dinamis_supplier_input($kebutuhan_jumlah)
 {
@@ -1276,10 +1036,7 @@ function script_dinamis_supplier_input($kebutuhan_jumlah)
 }
 
 /**
- * FUNGSI 37: SCRIPT DINAMIS FINANCE (ACC PENCAIRAN + PPN 12%)
- */
-/**
- * FUNGSI 37: SCRIPT DINAMIS FINANCE (ACC PENCAIRAN + PPN 12%)
+ * FUNGSI 29: SCRIPT DINAMIS FINANCE (ACC PENCAIRAN + PPN 12%)
  */
 function script_dinamis_finance_approve($kebutuhan_jumlah)
 {
@@ -1341,7 +1098,7 @@ function script_dinamis_finance_approve($kebutuhan_jumlah)
 }
 
 /**
- * FUNGSI 38: SCRIPT DINAMIS REPARASI (STAFF GA)
+ * FUNGSI 30: SCRIPT DINAMIS REPARASI (STAFF GA)
  */
 function script_dinamis_reparasi()
 {
@@ -1385,14 +1142,14 @@ function script_dinamis_reparasi()
         function hapusBaris(btn) {
             let row = btn.closest('.komponen-row');
             if (document.querySelectorAll('.komponen-row').length > 1) row.remove();
-            else alert('Minimal harus ada 1 komponen yang diselamatkan jika memilih Kanibal!');
+            else alert('Minimal harus ada 1 komponen yang diselamatkan jika memilih Pembongkaran!');
         }
         window.onload = toggleTindakan;
     </script>";
 }
 
 /**
- * FUNGSI 39: ROBOT KEDATANGAN ASET (TIME-BASED TRIGGER)
+ * FUNGSI 31: ROBOT KEDATANGAN ASET (TIME-BASED TRIGGER)
  * Mengecek apakah ada vendor yang barangnya diprediksi sudah tiba hari ini!
  */
 function cek_kedatangan_aset_otomatis()
@@ -1432,7 +1189,7 @@ function cek_kedatangan_aset_otomatis()
 }
 
 /**
- * FUNGSI 40: FORMAT WAKTU KETERLAMBATAN
+ * FUNGSI 32: FORMAT WAKTU KETERLAMBATAN
  * Mengubah total jam menjadi format: X Tahun, X Bulan, X Minggu, X Hari, X Jam
  */
 function format_waktu_terlambat($total_jam)
@@ -1463,7 +1220,7 @@ function format_waktu_terlambat($total_jam)
 }
 
 /**
- * FUNGSI 41: SCRIPT DINAMIS TIPE PEMINJAMAN (MAHASISWA)
+ * FUNGSI 33: SCRIPT DINAMIS TIPE PEMINJAMAN (MAHASISWA)
  */
 function script_dinamis_tipe_pinjam()
 {

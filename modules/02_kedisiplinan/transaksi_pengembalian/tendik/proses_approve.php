@@ -114,7 +114,7 @@ $query_detail = mysqli_query($koneksi, "
     SELECT tp.*, m.namaMahasiswa, m.nimMahasiswa, 
            a.namaAset, a.kondisiAset, 
            f.namaFasilitas, f.kondisiFasilitas,
-    TIMESTAMPDIFF(HOUR, tp.tanggalRencana_kembali, NOW()) AS jam_terlambat
+    udf_hitung_jam_telat(tp.tanggalRencana_kembali, NOW()) AS jam_terlambat
     FROM transaksi_peminjaman tp JOIN mahasiswa m ON tp.nimMahasiswa = m.nimMahasiswa
     LEFT JOIN aset a ON tp.idAset = a.idAset LEFT JOIN fasilitas f ON tp.idFasilitas = f.idFasilitas
     WHERE tp.idPeminjaman = '$id_pjm_get' AND tp.statusPeminjaman = 'Disetujui'

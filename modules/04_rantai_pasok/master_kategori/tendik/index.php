@@ -99,67 +99,68 @@ include '../../../../components/header.php';
         <!-- TABEL DATA ASET -->
         <!-- ========================================== -->
         <div class="table-responsive">
-            <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
-                <thead style="background-color: #f4f6f9; color: #1d4197;">
-                    <tr>
-                        <th class="text-center pe-5" width="10%">No.</th>
-                        <th class="text-start">Nama Kategori</th>
-                        <th>Tipe</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    // QUERY UTAMA (JOIN Kategori dan Kategori + Filter + Ascending)
-                    $query_sql = "SELECT * FROM kategori "
-                        . $where_sql .
-                        " ORDER BY idKategori ASC";
-                    $query = mysqli_query($koneksi, $query_sql);
-
-                    $no = 1;
-
-                    while ($data = mysqli_fetch_array($query)) {
-                    ?>
+            <?php
+            $query_sql = "SELECT * FROM kategori "
+                . $where_sql .
+                " ORDER BY idKategori ASC";
+            $query = mysqli_query($koneksi, $query_sql);
+            if (mysqli_num_rows($query) > 0):
+            ?>
+                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
+                    <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <td class="fw-bold pe-5"><?= $no++; ?></td>
-                            <td class="text-start"><?= $data['namaKategori']; ?></td>
-
-                            <!-- PEWARNAAN KONDISI FISIK -->
-                            <td class="text-secondary"><?= $data['tipeKategori']; ?></td>
-
-                            <!-- PEWARNAAN KETERSEDIAAN (Sesuai Logika Terbaru Anda) -->
-                            <td>
-                                <?php if ($data['statusKategori'] == 'Aktif'): ?>
-                                    <span class="badge bg-success rounded-pill px-3">Aktif</span>
-                                <?php else: ?>
-                                    <span class="badge bg-secondary rounded-pill px-3">Nonaktif</span>
-                                <?php endif; ?>
-                            </td>
-
-                            <td>
-                                <?php if ($data['statusKategori'] != 'Nonaktif'): ?>
-                                    <!-- Tombol Edit -->
-                                    <a href="edit.php?id=<?= $data['idKategori']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
-
-                                    <!-- Tombol Soft Delete (Memanggil fungsi dari footer) -->
-                                    <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?id=<?= $data['idKategori']; ?>')">
-                                        <i class="bi bi-trash-fill"></i>
-                                    </button>
-                                <?php endif; ?>
-                            </td>
+                            <th class="text-center pe-5" width="10%">No.</th>
+                            <th class="text-start">Nama Kategori</th>
+                            <th>Tipe</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
                         </tr>
-                    <?php } ?>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
 
-                    <!-- Jika data kosong -->
-                    <?php if (mysqli_num_rows($query) == 0): ?>
-                        <tr>
-                            <td colspan="5" class="py-4 text-muted fst-italic">Tidak ada data kategori yang ditemukan.</td>
-                        </tr>
-                    <?php endif; ?>
+                        while ($data = mysqli_fetch_array($query)) {
+                        ?>
+                            <tr>
+                                <td class="fw-bold pe-5"><?= $no++; ?></td>
+                                <td class="text-start"><?= $data['namaKategori']; ?></td>
 
-                </tbody>
-            </table>
+                                <!-- PEWARNAAN KONDISI FISIK -->
+                                <td class="text-secondary"><?= $data['tipeKategori']; ?></td>
+
+                                <!-- PEWARNAAN KETERSEDIAAN (Sesuai Logika Terbaru Anda) -->
+                                <td>
+                                    <?php if ($data['statusKategori'] == 'Aktif'): ?>
+                                        <span class="badge bg-success rounded-pill px-3">Aktif</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary rounded-pill px-3">Nonaktif</span>
+                                    <?php endif; ?>
+                                </td>
+
+                                <td>
+                                    <?php if ($data['statusKategori'] != 'Nonaktif'): ?>
+                                        <!-- Tombol Edit -->
+                                        <a href="edit.php?id=<?= $data['idKategori']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
+
+                                        <!-- Tombol Soft Delete (Memanggil fungsi dari footer) -->
+                                        <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="konfirmasiHapus('delete.php?id=<?= $data['idKategori']; ?>')">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-success fw-bold">Aman!</h4>
+                    <p class="text-muted">Tidak ada data Kategori.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

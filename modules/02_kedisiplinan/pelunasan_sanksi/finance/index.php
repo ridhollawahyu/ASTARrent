@@ -47,40 +47,44 @@ include '../../../../components/header.php';
         </form>
 
         <div class="table-responsive">
-            <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
-                <thead style="background-color: #f4f6f9; color: #1d4197;">
-                    <tr>
-                        <th>No.</th>
-                        <th class="text-start">NIM - Nama Mahasiswa</th>
-                        <th>Prodi</th>
-                        <th>Tagihan Denda (Rp)</th>
-                        <th>Jam Minus</th>
-                        <th>Aksi Finance</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php $no = 1;
-                    while ($data = mysqli_fetch_array($query)): ?>
+            <?php if (mysqli_num_rows($query) > 0): ?>
+                <table class="datatable-astar table table-hover table-striped mb-0 text-center align-middle">
+                    <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <td class="fw-bold"><?= $no++ ?></td>
-                            <td class="text-start fw-bold text-dark"><?= $data['nimMahasiswa'] ?> <br><small class="text-muted"><?= $data['namaMahasiswa'] ?></small></td>
-                            <td><span class="badge bg-secondary"><?= $data['kodeProdi_mahasiswa'] ?></span></td>
-                            <td class="text-danger fw-bold fs-5">Rp <?= number_format($data['dendaMahasiswa'], 0, ',', '.') ?></td>
-                            <td class="text-muted"><?= $data['jamMinus_mahasiswa'] ?> Jam</td>
-                            <td>
-                                <button type="button" class="btn btn-success btn-sm fw-bold shadow-sm" onclick="bukaModalLunas('<?= $data['nimMahasiswa'] ?>', '<?= $data['namaMahasiswa'] ?>', 'proses_lunas.php')">
-                                    <i class="bi bi-check-circle-fill me-1"></i> Lunasi Denda
-                                </button>
-                            </td>
+                            <th>No.</th>
+                            <th class="text-start">NIM - Nama Mahasiswa</th>
+                            <th>Prodi</th>
+                            <th>Tagihan Denda (Rp)</th>
+                            <th>Jam Minus</th>
+                            <th>Aksi Finance</th>
                         </tr>
-                    <?php endwhile; ?>
-                    <?php if (mysqli_num_rows($query) == 0): ?>
-                        <tr>
-                            <td colspan="6" class="py-4 text-success fw-bold"><i class="bi bi-check-circle-fill fs-2 d-block mb-2"></i>Tidak ada tagihan denda uang yang tertunggak.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php $no = 1;
+                        while ($data = mysqli_fetch_array($query)): ?>
+                            <tr>
+                                <td class="fw-bold"><?= $no++ ?></td>
+                                <td class="text-start fw-bold text-dark"><?= $data['nimMahasiswa'] ?> <br><small class="text-muted"><?= $data['namaMahasiswa'] ?></small></td>
+                                <td><span class="badge bg-secondary"><?= $data['kodeProdi_mahasiswa'] ?></span></td>
+                                <td class="text-danger fw-bold fs-5">Rp <?= number_format($data['dendaMahasiswa'], 0, ',', '.') ?></td>
+                                <td class="text-muted"><?= $data['jamMinus_mahasiswa'] ?> Jam</td>
+                                <td>
+                                    <button type="button" class="btn btn-success btn-sm fw-bold shadow-sm" onclick="bukaModalLunas('<?= $data['nimMahasiswa'] ?>', '<?= $data['namaMahasiswa'] ?>', 'proses_lunas.php')">
+                                        <i class="bi bi-check-circle-fill me-1"></i> Lunasi Denda
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-success fw-bold">Aman!</h4>
+                    <p class="text-muted">Tidak ada tunggakan Denda dari Mahasiswa.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

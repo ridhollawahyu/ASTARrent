@@ -219,6 +219,134 @@ foreach ($tables as $index => $sql) {
     }
 }
 
+// ==========================================
+// 4. PEMBUATAN 9 LOGIKA DATABASE (TRIGGERS, UDF, SP)
+// ==========================================
+$db_logic = [
+    // --- 1. TRIGGERS ---
+    "DROP TRIGGER IF EXISTS trg_update_status_mahasiswa",
+    "CREATE TRIGGER trg_update_status_mahasiswa BEFORE UPDATE ON mahasiswa FOR EACH ROW
+    BEGIN
+        IF NEW.jamMinus_mahasiswa > 0 OR NEW.dendaMahasiswa > 0 THEN
+            SET NEW.statusMahasiswa = 'Dibekukan';
+        ELSE
+            SET NEW.statusMahasiswa = 'Normal';
+        END IF;
+    END",
+
+    "DROP TRIGGER IF EXISTS trg_otomasi_ketersediaan_barang",
+    "CREATE TRIGGER trg_otomasi_ketersediaan_barang AFTER UPDATE ON transaksi_peminjaman FOR EACH ROW
+    BEGIN
+        IF NEW.statusPeminjaman = 'Disetujui' AND OLD.statusPeminjaman = 'Menunggu' THEN
+            IF NEW.idAset IS NOT NULL THEN
+                UPDATE aset SET ketersediaanAset = 'Dipinjam' WHERE idAset = NEW.idAset;
+            ELSEIF NEW.idFasilitas IS NOT NULL THEN
+                UPDATE fasilitas SET ketersediaanFasilitas = 'Dipinjam' WHERE idFasilitas = NEW.idFasilitas;
+            END IF;
+        END IF;
+    END",
+
+    "DROP TRIGGER IF EXISTS trg_hitung_beban_supplier",
+    "CREATE TRIGGER trg_hitung_beban_supplier AFTER UPDATE ON transaksi_pengadaan FOR EACH ROW
+    BEGIN
+        IF NEW.statusPengadaan = 'Disetujui GA' AND OLD.statusPengadaan = 'Draft' THEN
+            UPDATE supplier SET jumlahTugas_aktif = jumlahTugas_aktif + 1 WHERE idSupplier = NEW.idSupplier;
+        ELSEIF NEW.statusPengadaan = 'Harga Diinput Supplier' AND OLD.statusPengadaan = 'Disetujui GA' THEN
+            UPDATE supplier SET jumlahTugas_aktif = GREATEST(0, jumlahTugas_aktif - 1) WHERE idSupplier = NEW.idSupplier;
+        END IF;
+    END",
+
+    // --- 2. UDF (USER DEFINED FUNCTIONS) ---
+    "DROP FUNCTION IF EXISTS udf_cek_email_ganda",
+    "CREATE FUNCTION udf_cek_email_ganda(p_email VARCHAR(100)) RETURNS INT DETERMINISTIC
+    BEGIN
+        DECLARE v_count INT DEFAULT 0;
+        SELECT COUNT(*) INTO v_count FROM (
+            SELECT emailMahasiswa AS email FROM mahasiswa
+            UNION ALL
+            SELECT emailUser AS email FROM users
+            UNION ALL
+            SELECT emailSupplier AS email FROM supplier
+        ) AS gabungan WHERE email = p_email;
+        RETURN IF(v_count > 0, 1, 0);
+    END",
+
+    "DROP FUNCTION IF EXISTS udf_hitung_jam_telat",
+    "CREATE FUNCTION udf_hitung_jam_telat(p_waktu_rencana DATETIME, p_waktu_aktual DATETIME) RETURNS INT DETERMINISTIC
+    BEGIN
+        DECLARE v_jam_telat INT DEFAULT 0;
+        IF p_waktu_aktual > p_waktu_rencana THEN
+            SET v_jam_telat = TIMESTAMPDIFF(HOUR, p_waktu_rencana, p_waktu_aktual);
+        END IF;
+        RETURN v_jam_telat;
+    END",
+
+    "DROP FUNCTION IF EXISTS udf_generate_id_aset",
+    "CREATE FUNCTION udf_generate_id_aset() RETURNS VARCHAR(20) READS SQL DATA
+    BEGIN
+        DECLARE v_max_id VARCHAR(20);
+        DECLARE v_angka INT;
+        SELECT MAX(idAset) INTO v_max_id FROM aset WHERE idAset LIKE 'AST-%';
+        IF v_max_id IS NOT NULL THEN
+            SET v_angka = CAST(SUBSTRING(v_max_id, 5) AS UNSIGNED) + 1;
+        ELSE
+            SET v_angka = 1;
+        END IF;
+        RETURN CONCAT('AST-', LPAD(v_angka, 5, '0'));
+    END",
+
+    // --- 3. STORED PROCEDURES (SP) ---
+    "DROP PROCEDURE IF EXISTS sp_tolak_peminjaman_bentrok",
+    "CREATE PROCEDURE sp_tolak_peminjaman_bentrok(IN p_id_peminjaman VARCHAR(20), IN p_id_aset VARCHAR(20), IN p_id_fasilitas VARCHAR(20))
+    BEGIN
+        IF p_id_aset IS NOT NULL THEN
+            UPDATE transaksi_peminjaman SET statusPeminjaman = 'Ditolak', alasanPenolakan_peminjaman = 'Barang telah dipinjam orang lain (Double Booking)' 
+            WHERE idAset = p_id_aset AND statusPeminjaman = 'Menunggu' AND idPeminjaman != p_id_peminjaman;
+        ELSEIF p_id_fasilitas IS NOT NULL THEN
+            UPDATE transaksi_peminjaman SET statusPeminjaman = 'Ditolak', alasanPenolakan_peminjaman = 'Fasilitas telah di-booking orang lain (Double Booking)' 
+            WHERE idFasilitas = p_id_fasilitas AND statusPeminjaman = 'Menunggu' AND idPeminjaman != p_id_peminjaman;
+        END IF;
+    END",
+
+    "DROP PROCEDURE IF EXISTS sp_terapkan_sanksi_mahasiswa",
+    "CREATE PROCEDURE sp_terapkan_sanksi_mahasiswa(IN p_nim VARCHAR(20), IN p_id_sanksi VARCHAR(20))
+    BEGIN
+        DECLARE v_jam INT DEFAULT 0;
+        DECLARE v_denda INT DEFAULT 0;
+        IF p_id_sanksi IS NOT NULL AND p_id_sanksi != 'NULL' THEN
+            SELECT sanksi_jamMinus, sanksi_denda INTO v_jam, v_denda FROM sanksi WHERE idSanksi = p_id_sanksi;
+            UPDATE mahasiswa SET jamMinus_mahasiswa = jamMinus_mahasiswa + v_jam, dendaMahasiswa = dendaMahasiswa + v_denda 
+            WHERE nimMahasiswa = p_nim;
+        END IF;
+    END",
+
+    "DROP PROCEDURE IF EXISTS sp_buat_tiket_reparasi",
+    "CREATE PROCEDURE sp_buat_tiket_reparasi(IN p_id_reparasi_baru VARCHAR(20), IN p_pelapor VARCHAR(20), IN p_id_aset VARCHAR(20), IN p_id_fasilitas VARCHAR(20), IN p_kerusakan VARCHAR(50), IN p_catatan TEXT)
+    BEGIN
+        DECLARE v_id_tiket_lama VARCHAR(20);
+        IF p_kerusakan != 'Normal' THEN
+            SELECT idReparasi INTO v_id_tiket_lama FROM reparasi_fasilitas_aset WHERE (idAset = p_id_aset OR idFasilitas = p_id_fasilitas) AND statusReparasi = 'Menunggu GA' LIMIT 1;
+            IF v_id_tiket_lama IS NOT NULL THEN
+                UPDATE reparasi_fasilitas_aset SET klasifikasiKerusakan = p_kerusakan, catatanReparasi = CONCAT(catatanReparasi, '\n[Update]: ', p_catatan) WHERE idReparasi = v_id_tiket_lama;
+            ELSE
+                INSERT INTO reparasi_fasilitas_aset (idReparasi, idPelapor, idAset, idFasilitas, tanggalLapor, klasifikasiKerusakan, statusReparasi, catatanReparasi) 
+                VALUES (p_id_reparasi_baru, p_pelapor, p_id_aset, p_id_fasilitas, NOW(), p_kerusakan, 'Menunggu GA', p_catatan);
+            END IF;
+        END IF;
+    END"
+];
+
+$berhasil_logic = 0;
+foreach ($db_logic as $sql) {
+    if (mysqli_query($conn, $sql)) {
+        if (strpos($sql, 'DROP') === false) {
+            $berhasil_logic++;
+        }
+    } else {
+        echo "<p style='color:red;'>Gagal membuat Logic Database: " . mysqli_error($conn) . "</p>";
+    }
+}
+
 // 4. DATA SEEDING (Menggunakan VARCHAR 20)
 $password_default = password_hash("12345", PASSWORD_DEFAULT);
 
@@ -276,18 +404,18 @@ $q_sanksi = "INSERT IGNORE INTO sanksi (idSanksi, namaSanksi, sanksi_jamMinus, s
 mysqli_query($conn, $q_sanksi);
 
 // Cek Hasil
-if ($berhasil == count($tables)) {
+if ($berhasil == count($tables) && $berhasil_logic == 9) {
     echo "<div style='background-color: #d4edda; border-left: 5px solid #28a745; padding: 15px; margin: 20px 0;'>";
-    echo "<h3>🎉 DATABASE SIAP 100%!</h3>";
-    echo "<p>Seluruh 12 tabel dengan <b>VARCHAR(20)</b> telah berhasil dibuat sesuai dengan XML PDM Anda.</p>";
-    echo "<p><b>Data Dummy yang disuntikkan:</b></p>";
-    echo "<ul>
-            <li>User: Banyak</li>
-            <li>NIM: 0920260001 (Mahasiswa)</li>
-            <li>Aset: AST-00001 (Proyektor)</li>
-            <li>Sanksi: Banyak</li>
-          </ul>";
-    echo "<p>Silakan gas koding Modul Peminjamannya! <b>Semoga Review 1 hari ini lancar jaya!</b> 🚀</p>";
+    echo "<h3>🎉 INSTALASI DATABASE (ENTERPRISE) SELESAI 100%!</h3>";
+    echo "<p>Berhasil membuat: <br>✅ <b>13 Tabel Database</b><br>✅ <b>3 Triggers</b><br>✅ <b>3 User Defined Functions (UDF)</b><br>✅ <b>3 Stored Procedures (SP)</b></p>";
+    echo "<p>Data Dummy User, Mahasiswa, Aset, dan Sanksi telah disuntikkan!</p>";
+    echo "<a href='index.php' style='display: inline-block; padding: 10px 20px; background-color: #1d4197; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;'>Buka Halaman Login</a>";
+    echo "</div>";
+} else {
+    echo "<div style='background-color: #f8d7da; border-left: 5px solid #dc3545; padding: 15px; margin: 20px 0;'>";
+    echo "<h3>⚠️ Peringatan</h3>";
+    echo "<p>Tabel ter-install: $berhasil / " . count($tables) . "</p>";
+    echo "<p>Logic DB ter-install: $berhasil_logic / 9</p>";
     echo "</div>";
 }
 

@@ -102,7 +102,7 @@ include '../../../components/header.php';
 
                     <div class="mb-4 p-3 rounded" style="background-color: #fff8e1; border: 1px solid #ffc107;">
                         <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
-                        <span class="text-dark fw-bold" style="font-size: 0.9rem;">Tindakan Perbaikan / Kanibal akan ditentukan setelah barang selesai diinspeksi di bengkel (pada menu Selesaikan).</span>
+                        <span class="text-dark fw-bold" style="font-size: 0.9rem;">Tindakan Perbaikan / Pembongkaran akan ditentukan setelah barang selesai diinspeksi di bengkel (pada menu Selesaikan).</span>
                     </div>
 
                     <div class="mb-4">

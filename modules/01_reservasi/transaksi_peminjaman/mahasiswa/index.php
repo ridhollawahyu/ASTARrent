@@ -41,19 +41,8 @@ include '../../../../components/header.php';
         </div>
 
         <div class="table-responsive">
-            <table class="datatable-astar table table-hover align-middle text-center">
-                <thead style="background-color: #f4f6f9; color: #1d4197;">
-                    <tr>
-                        <th class="text-center" width="5%">No.</th>
-                        <th>Tanggal Pengajuan</th>
-                        <th class="text-start">Barang yang Dipinjam</th>
-                        <th>Rencana Kembali</th>
-                        <th>Status & Detail</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $query_sql = "
+            <?php
+            $query_sql = "
                         SELECT tp.*, a.namaAset, f.namaFasilitas 
                         FROM transaksi_peminjaman tp
                         LEFT JOIN aset a ON tp.idAset = a.idAset
@@ -61,55 +50,69 @@ include '../../../../components/header.php';
                         WHERE tp.nimMahasiswa = '$nim_login'
                         ORDER BY tp.tanggalPengajuan DESC
                     ";
-                    $query = mysqli_query($koneksi, $query_sql);
-
-                    $no = 1;
-
-                    while ($data = mysqli_fetch_array($query)) {
-                        if ($data['idAset'] != NULL) {
-                            $nama_barang = "<span class='badge bg-secondary me-1'>Aset</span> " . $data['namaAset'];
-                        } else {
-                            $nama_barang = "<span class='badge bg-dark me-1'>Fasilitas</span> " . $data['namaFasilitas'];
-                        }
-                    ?>
+            $query = mysqli_query($koneksi, $query_sql);
+            if (mysqli_num_rows($query) > 0):
+            ?>
+                <table class="datatable-astar table table-hover align-middle text-center">
+                    <thead style="background-color: #f4f6f9; color: #1d4197;">
                         <tr>
-                            <td class="fw-bold"><?= $no++; ?></td>
-                            <td><?= date('d M Y, H:i', strtotime($data['tanggalPengajuan'])); ?></td>
-                            <td class="text-start fw-bold text-secondary"><?= $nama_barang; ?></td>
-                            <td class="text-danger fw-bold"><?= date('d M Y, H:i', strtotime($data['tanggalRencana_kembali'])); ?></td>
-
-                            <!-- STATUS & ALASAN PENOLAKAN -->
-                            <td>
-                                <?php if ($data['statusPeminjaman'] == 'Menunggu'): ?>
-                                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">Menunggu</span>
-
-                                <?php elseif ($data['statusPeminjaman'] == 'Disetujui'): ?>
-                                    <span class="badge bg-primary px-3 py-2 rounded-pill">Disetujui (Sedang Dipinjam)</span>
-
-                                <?php elseif ($data['statusPeminjaman'] == 'Ditolak'): ?>
-                                    <span class="badge bg-danger px-3 py-2 rounded-pill mb-1">Ditolak</span><br>
-
-                                    <!-- Tombol Info Alasan Penolakan -->
-                                    <button type="button" class="btn btn-sm btn-outline-danger mt-1" style="font-size: 11px; padding: 2px 8px; border-radius: 5px;"
-                                        onclick="lihatDetailTeks('<?= htmlspecialchars(addslashes($data['alasanPenolakan_peminjaman'] ?? 'Tidak ada alasan.')) ?>')">
-                                        <i class="bi bi-info-circle me-1"></i> Cek Alasan
-                                    </button>
-
-                                <?php else: ?>
-                                    <span class="badge bg-success px-3 py-2 rounded-pill">Selesai Dikembalikan</span>
-                                <?php endif; ?>
-                            </td>
+                            <th class="text-center" width="5%">No.</th>
+                            <th>Tanggal Pengajuan</th>
+                            <th class="text-start">Barang yang Dipinjam</th>
+                            <th>Rencana Kembali</th>
+                            <th>Status & Detail</th>
                         </tr>
-                    <?php } ?>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
 
-                    <?php if (mysqli_num_rows($query) == 0): ?>
-                        <tr>
-                            <td colspan="5" class="py-4 text-muted fst-italic">Anda belum pernah melakukan transaksi peminjaman.</td>
-                        </tr>
-                    <?php endif; ?>
+                        while ($data = mysqli_fetch_array($query)) {
+                            if ($data['idAset'] != NULL) {
+                                $nama_barang = "<span class='badge bg-secondary me-1'>Aset</span> " . $data['namaAset'];
+                            } else {
+                                $nama_barang = "<span class='badge bg-dark me-1'>Fasilitas</span> " . $data['namaFasilitas'];
+                            }
+                        ?>
+                            <tr>
+                                <td class="fw-bold"><?= $no++; ?></td>
+                                <td><?= date('d M Y, H:i', strtotime($data['tanggalPengajuan'])); ?></td>
+                                <td class="text-start fw-bold text-secondary"><?= $nama_barang; ?></td>
+                                <td class="text-danger fw-bold"><?= date('d M Y, H:i', strtotime($data['tanggalRencana_kembali'])); ?></td>
 
-                </tbody>
-            </table>
+                                <!-- STATUS & ALASAN PENOLAKAN -->
+                                <td>
+                                    <?php if ($data['statusPeminjaman'] == 'Menunggu'): ?>
+                                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">Menunggu</span>
+
+                                    <?php elseif ($data['statusPeminjaman'] == 'Disetujui'): ?>
+                                        <span class="badge bg-primary px-3 py-2 rounded-pill">Disetujui (Sedang Dipinjam)</span>
+
+                                    <?php elseif ($data['statusPeminjaman'] == 'Ditolak'): ?>
+                                        <span class="badge bg-danger px-3 py-2 rounded-pill mb-1">Ditolak</span><br>
+
+                                        <!-- Tombol Info Alasan Penolakan -->
+                                        <button type="button" class="btn btn-sm btn-outline-danger mt-1" style="font-size: 11px; padding: 2px 8px; border-radius: 5px;"
+                                            onclick="lihatDetailTeks('<?= htmlspecialchars(addslashes($data['alasanPenolakan_peminjaman'] ?? 'Tidak ada alasan.')) ?>')">
+                                            <i class="bi bi-info-circle me-1"></i> Cek Alasan
+                                        </button>
+
+                                    <?php else: ?>
+                                        <span class="badge bg-success px-3 py-2 rounded-pill">Selesai Dikembalikan</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <!-- PESAN KOSONG DITAMPILKAN DILUAR TABEL JIKA DATA 0 -->
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success d-block mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-success fw-bold">Aman!</h4>
+                    <p class="text-muted">Tidak ada data Peminjaman yang sudah Anda lakukan.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

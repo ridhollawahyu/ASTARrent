@@ -26,11 +26,15 @@ if (isset($_POST['submit'])) {
     $email = $_POST['email'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
+    if (empty($prodi)) {
+        set_notifikasi('error', 'Gagal! Harus memilih Prodi.');
+        header('Location: create.php');
+        exit;
+    }
     if (cek_email_ganda($email)) {
-        // Jika fungsi return true, gagalkan proses dan kembalikan ke form
         set_notifikasi('error', 'Gagal! Email tersebut sudah terdaftar.');
         header('Location: create.php');
-        exit; // Hentikan eksekusi kode di bawahnya!
+        exit;
     }
     if (cek_telp_ganda($no_telp_final)) {
         set_notifikasi('error', 'Gagal! Nomor telepon tersebut sudah terdaftar.');

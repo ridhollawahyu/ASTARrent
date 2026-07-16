@@ -25,6 +25,12 @@ if (isset($_POST['submit'])) {
     $kategori = mysqli_real_escape_string($koneksi, $_POST['kategori']);
     $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
 
+    if (empty($kategori)) {
+        set_notifikasi('error', "Gagal! Wajib pilih Kategori");
+        header('Location: create.php');
+        exit;
+    }
+
     // 3. INSERT KE DATABASE (Kondisi & Ketersediaan diisi Default oleh MySQL)
     $query_simpan = "INSERT INTO aset (idAset, idKategori, namaAset) 
                      VALUES ('$id_otomatis', '$kategori', '$nama')";

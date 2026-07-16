@@ -35,9 +35,11 @@ if (isset($_POST['submit_pengembalian'])) {
     $q_cek = mysqli_query($koneksi, "SELECT nimMahasiswa, idAset, idFasilitas FROM transaksi_peminjaman WHERE idPeminjaman = '$id_peminjaman'");
     $data_pjm = mysqli_fetch_assoc($q_cek);
 
-    // ====================================================================
-    // LOGIKA PENGAMPUNAN (BYPASS SISTEM PAKAR)
-    // ====================================================================
+    if (empty($kondisi_fisik)) {
+        set_notifikasi('error', "Gagal! Wajib pilih kondisi fisik");
+        header('Location: proses_approve.php');
+        exit;
+    }
     $kondisi_untuk_robot = $kondisi_fisik;
     if ($kondisi_awal === 'Berfungsi' && $kondisi_fisik === 'Berfungsi') {
         $kondisi_untuk_robot = 'Normal';

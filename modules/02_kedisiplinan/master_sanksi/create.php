@@ -29,6 +29,17 @@ if (isset($_POST['submit'])) {
     $klasifikasi_waktu = mysqli_real_escape_string($koneksi, $_POST['klasifikasi_waktu']);
     $klasifikasi_kondisi = mysqli_real_escape_string($koneksi, $_POST['klasifikasi_kondisi']);
 
+    if (empty($klasifikasi_kondisi)) {
+        set_notifikasi('error', "Gagal! Wajib pilih klasifikasi kondisi");
+        header('Location: create.php');
+        exit;
+    }
+    if (empty($klasifikasi_waktu)) {
+        set_notifikasi('error', "Gagal! Wajib pilih klasifikasi kondisi");
+        header('Location: create.php');
+        exit;
+    }
+
     $query_simpan = "INSERT INTO sanksi (idSanksi, namaSanksi, sanksi_jamMinus, sanksi_denda, klasifikasi_waktu, klasifikasi_kondisi) 
                      VALUES ('$id_otomatis', '$nama', $jamMinus, $denda, '$klasifikasi_waktu', '$klasifikasi_kondisi')";
 
@@ -38,6 +49,7 @@ if (isset($_POST['submit'])) {
         exit;
     } else {
         set_notifikasi('error', 'Gagal menyimpan data ke database!');
+        exit;
     }
 }
 ?>

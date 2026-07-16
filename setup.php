@@ -360,6 +360,11 @@ $q_users = "INSERT IGNORE INTO users (idUser, namaUser, noTelp_user, jabatanUser
 ('TDK-00001', 'Bapak Budi', '+62813313131', 'Tenaga Pendidik', 'tendik@astratech.ac.id', '$password_default', 'RPL')";
 mysqli_query($conn, $q_users);
 
+// Akun Nonaktif
+$q_users = "INSERT IGNORE INTO users (idUser, namaUser, noTelp_user, jabatanUser, emailUser, passUser, kodeDepartemen, statusUser) VALUES
+('NON-00000', 'akun inaktif', '+6281220099', 'Super Admin', 'nonaktif@astra.id', '$password_default', 'SA', 'Nonaktif')";
+mysqli_query($conn, $q_users);
+
 // A. Insert Supplier
 $q_suppliers = "INSERT IGNORE INTO supplier (idSupplier, namaSupplier, noTelp_supplier, emailSupplier, passSupplier) VALUES
 ('SPL-00001', 'Dola', '+62813313333', 'supplier@astratech.ac.id', '$password_default')";

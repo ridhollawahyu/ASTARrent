@@ -83,7 +83,8 @@ if (isset($_POST["login"])) {
     }
 
     // 3. JIKA DUA-DUANYA GAGAL (ID tidak ada atau Pass salah)
-    echo "<script>alert('ID atau Password Salah!'); window.location='login.php';</script>";
+    set_notifikasi('error', "Gagal! Email/NIM atau Password Salah!");
+    header("Location: login.php");
 } else {
     header("Location: login.php");
 }

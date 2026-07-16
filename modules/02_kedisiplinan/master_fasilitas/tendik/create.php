@@ -28,6 +28,12 @@ if (isset($_POST['submit'])) {
     $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
     $lokasi = mysqli_real_escape_string($koneksi, $_POST['lokasi']);
 
+    if (empty($kategori)) {
+        set_notifikasi('error', "Gagal! Wajib pilih Kategori");
+        header('Location: create.php');
+        exit;
+    }
+
     // Insert menggunakan idPengelola dan otomatis tipeFasilitas = 'Akademik'
     $query_simpan = "INSERT INTO fasilitas (idFasilitas, idPengelola, idKategori, namaFasilitas, lokasiFasilitas, tipeFasilitas) 
                      VALUES ('$id_otomatis', '$id_pengelola', '$kategori', '$nama', '$lokasi', 'Akademik')";

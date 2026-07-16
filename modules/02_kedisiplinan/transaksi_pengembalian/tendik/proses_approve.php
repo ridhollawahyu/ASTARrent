@@ -31,12 +31,15 @@ if (isset($_POST['submit_pengembalian'])) {
     $id_tendik     = $_SESSION['id'];
     $waktu_sekarang = date('Y-m-d H:i:s');
 
+    if (empty($kondisi_fisik)) {
+        set_notifikasi('error', "Gagal! Wajib pilih kondisi fisik");
+        header('Location: proses_approve.php');
+        exit;
+    }
+
     $q_cek = mysqli_query($koneksi, "SELECT nimMahasiswa, idAset, idFasilitas FROM transaksi_peminjaman WHERE idPeminjaman = '$id_peminjaman'");
     $data_pjm = mysqli_fetch_assoc($q_cek);
 
-    // ====================================================================
-    // LOGIKA PENGAMPUNAN (BYPASS SISTEM PAKAR)
-    // ====================================================================
     $kondisi_untuk_robot = $kondisi_fisik;
 
     // Jika barang dari awal memang "Berfungsi", dan dikembalikan "Berfungsi", 

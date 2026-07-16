@@ -32,9 +32,8 @@ if (isset($_POST['submit'])) {
     $idAset = !empty($_POST['aset']) ? "'" . mysqli_real_escape_string($koneksi, $_POST['aset']) . "'" : "NULL";
     $idFasilitas = !empty($_POST['fasilitas']) ? "'" . mysqli_real_escape_string($koneksi, $_POST['fasilitas']) . "'" : "NULL";
 
-    // VALIDASI LOGIKA XOR (Wajib isi salah satu)
-    if (($idAset == "NULL" && $idFasilitas == "NULL") || ($idAset != "NULL" && $idFasilitas != "NULL")) {
-        set_notifikasi('error', 'Pilih SATU saja: Aset atau Fasilitas!');
+    if ($idAset === 'NULL' && $idFasilitas === 'NULL') {
+        set_notifikasi('error', "Gagal! Wajib pilih apa yang ingin dipinjam");
         header('Location: create.php');
         exit;
     }

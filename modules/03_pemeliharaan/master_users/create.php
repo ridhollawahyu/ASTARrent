@@ -42,6 +42,11 @@ if (isset($_POST['submit'])) {
     $dept   = !empty($_POST['dept_prodi']) ? $_POST['dept_prodi'] : $_POST['dept_auto'];
 
     // 4. VALIDASI & INSERT
+    if (empty($dept)) {
+        set_notifikasi('error', 'Gagal! Jabatan dan Departemen harus diisi.');
+        header('Location: create.php');
+        exit;
+    }
     if (cek_email_ganda($email)) {
         set_notifikasi('error', 'Gagal! Email tersebut sudah terdaftar.');
         header('Location: create.php');

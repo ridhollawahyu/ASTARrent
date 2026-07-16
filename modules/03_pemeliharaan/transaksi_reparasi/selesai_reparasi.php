@@ -56,6 +56,12 @@ if (isset($_POST['selesai'])) {
                 $spek_k = mysqli_real_escape_string($koneksi, $spek_komp[$i]);
                 $kond_k = mysqli_real_escape_string($koneksi, $kond_komp[$i]);
 
+                if (empty($kond_komp)) {
+                    set_notifikasi('error', "Gagal! Wajib pilih kondisi fisik komponen");
+                    header('Location: proses_approve.php');
+                    exit;
+                }
+
                 $q_komp = "INSERT INTO komponen (idKomponen, idReparasi, namaKomponen, tanggalMasuk, spesifikasiKomponen, kondisiKomponen, statusKomponen) 
                            VALUES ('$id_komp_baru', '$id_rep', '$nama_k', '$waktu', '$spek_k', '$kond_k', 'Tersedia')";
                 mysqli_query($koneksi, $q_komp);

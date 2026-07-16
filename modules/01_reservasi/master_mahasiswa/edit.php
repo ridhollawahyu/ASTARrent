@@ -152,11 +152,11 @@ include '../../../components/header.php';
                     <div class="row mb-4 align-items-center bg-light p-3 rounded">
                         <div class="col-md-4">
                             <label class="form-label text-danger fw-bold">Jam Minus</label>
-                            <input type="text" name="jamMinus" class="form-control border-danger" value="<?= $data['jamMinus_mahasiswa']; ?>" required>
+                            <input type="text" name="jamMinus" class="form-control border-danger" value="<?= $data['jamMinus_mahasiswa']; ?>" readonly>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label text-danger fw-bold">Denda (Rp)</label>
-                            <input type="text" name="denda" class="form-control border-danger" value="<?= $data['dendaMahasiswa']; ?>" required>
+                            <input type="text" name="denda" class="form-control border-danger" value="<?= $data['dendaMahasiswa']; ?>" readonly>
                         </div>
                         <div class="col-md-4 text-center border-start border-danger">
                             <label class="form-label text-secondary fw-bold">Status Saat Ini</label><br>

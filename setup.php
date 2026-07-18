@@ -88,7 +88,7 @@ foreach ($db_logic as $sql) {
 // ==========================================
 // 3. MASSIVE DATA SEEDING (20 DATA PER TABEL)
 // ==========================================
-$pass = password_hash("12345", PASSWORD_DEFAULT);
+$pass = password_hash("123456", PASSWORD_DEFAULT);
 $waktu = date('Y-m-d H:i:s');
 $waktu_lalu = date('Y-m-d H:i:s', strtotime('-2 days'));
 $waktu_depan = date('Y-m-d H:i:s', strtotime('+2 days'));

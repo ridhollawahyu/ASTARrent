@@ -81,6 +81,11 @@ if (isset($_POST['selesai'])) {
         // JIKA DIPERBAIKI: KEMBALIKAN KE STATUS TERSDIA & NORMAL
         // ====================================================
         $kondisi_akhir = $_POST['kondisi_akhir'];
+        if (empty($kondisi_akhir)) {
+            set_notifikasi('error', 'Gagal! Kondisi Penyelesaian harus diisi.');
+            header('Location: selesai_reparasi.php');
+            exit;
+        }
         mysqli_query($koneksi, "UPDATE reparasi_fasilitas_aset SET statusReparasi = 'Selesai', tanggalSelesai = '$waktu', catatanReparasi = CONCAT(IFNULL(catatanReparasi, ''), '\n[Diperbaiki]: $catatan') WHERE idReparasi = '$id_rep'");
 
         // Barang hidup lagi!
@@ -143,7 +148,7 @@ include '../../../components/header.php';
                             <?php
                             $opsi_kondisi_akhir = ['Normal' => 'Normal Sempurna', 'Berfungsi' => 'Berfungsi (Masih ada minus)'];
                             // Panggil dropdown tema dari functions.php
-                            echo buat_dropdown_astar('kondisi_akhir', $opsi_kondisi_akhir, 'Normal');
+                            echo buat_dropdown_astar('kondisi_akhir', $opsi_kondisi_akhir, false);
                             ?>
                         </div>
                     </div>

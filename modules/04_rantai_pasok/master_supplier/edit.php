@@ -132,7 +132,7 @@ include '../../../components/header.php';
                     <div class="row mb-4 align-items-center bg-light p-3 rounded">
                         <div class="col-md-6 border-end">
                             <label class="form-label text-astar fw-bold">Status Akun</label>
-                            <?php if ($data['statusKategori'] == 'Aktif'): ?>
+                            <?php if ($data['statusSupplier'] == 'Aktif'): ?>
                                 <input type="text" class="form-control bg-light text-success fw-bold" value="<?= $data['statusSupplier']; ?>" readonly>
                             <?php else: ?>
                                 <input type="text" class="form-control bg-light text-text-danger fw-bold" value="<?= $data['statusSupplier']; ?>" readonly>

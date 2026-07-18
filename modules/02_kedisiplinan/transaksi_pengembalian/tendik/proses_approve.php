@@ -24,7 +24,7 @@ if (isset($_POST['submit_pengembalian'])) {
 
     $id_peminjaman = mysqli_real_escape_string($koneksi, $_POST['id_peminjaman']);
     $kondisi_fisik = mysqli_real_escape_string($koneksi, $_POST['kondisi_fisik']);
-    $kondisi_awal  = mysqli_real_escape_string($koneksi, $_POST['kondisi_awal']); // Tangkap Kondisi Awal
+    $kondisi_awal  = mysqli_real_escape_string($koneksi, $_POST['kondisi_awal']);
     $catatan       = mysqli_real_escape_string($koneksi, trim($_POST['catatan']));
     $sanksi_manual = mysqli_real_escape_string($koneksi, $_POST['sanksi_manual']);
     $jam_terlambat = (int)$_POST['jam_terlambat'];
@@ -180,14 +180,14 @@ include '../../../../components/header.php';
                                 'Berfungsi' => 'Sama Seperti Sebelumnya (Aman)',
                                 'Tidak Berfungsi' => 'Makin Rusak (Tidak Berfungsi)'
                             ];
-                            echo buat_dropdown_astar('kondisi_fisik', $opsi_kondisi, 'Berfungsi');
+                            echo buat_dropdown_astar('kondisi_fisik', $opsi_kondisi, false);
                         } else {
                             $opsi_kondisi = [
                                 'Normal' => 'Normal (Aman)',
                                 'Berfungsi' => 'Rusak (Masih Berfungsi)',
                                 'Tidak Berfungsi' => 'Rusak (Tidak Berfungsi)'
                             ];
-                            echo buat_dropdown_astar('kondisi_fisik', $opsi_kondisi, 'Normal');
+                            echo buat_dropdown_astar('kondisi_fisik', $opsi_kondisi, false);
                         }
                         ?>
                     </div>

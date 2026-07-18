@@ -161,10 +161,10 @@ include '../../../../components/header.php';
                         <?php
                         if ($kondisi_awal_barang === 'Berfungsi') {
                             $opsi_kondisi = ['Berfungsi' => 'Sama Seperti Sebelumnya (Aman)', 'Tidak Berfungsi' => 'Makin Rusak (Tidak Berfungsi)'];
-                            echo buat_dropdown_astar('kondisi_fisik', $opsi_kondisi, 'Berfungsi');
+                            echo buat_dropdown_astar('kondisi_fisik', $opsi_kondisi, false);
                         } else {
                             $opsi_kondisi = ['Normal' => 'Normal (Aman)', 'Berfungsi' => 'Rusak (Masih Berfungsi)', 'Tidak Berfungsi' => 'Rusak (Tidak Berfungsi)'];
-                            echo buat_dropdown_astar('kondisi_fisik', $opsi_kondisi, 'Normal');
+                            echo buat_dropdown_astar('kondisi_fisik', $opsi_kondisi, false);
                         }
                         ?>
                     </div>

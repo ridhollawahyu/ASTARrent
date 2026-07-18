@@ -31,6 +31,8 @@ if (isset($_POST['submit'])) {
     // 4. VALIDASI & INSERT
     if (cek_email_ganda($email)) {
         set_notifikasi('error', 'Gagal! Email tersebut sudah terdaftar.');
+        header('Location: create.php');
+        exit;
     }
     if (cek_telp_ganda($telp)) {
         set_notifikasi('error', 'Gagal! Nomor telepon tersebut sudah terdaftar.');

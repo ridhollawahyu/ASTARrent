@@ -36,7 +36,6 @@ if (!$data) {
 if (isset($_POST['update'])) {
     $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
 
-    // UPDATE DATABASE (Kita cuma nge-update nama dan kondisi. Kategori dan Ketersediaan gak usah dimasukin query!)
     $query_update = "UPDATE kategori SET 
                         namaKategori = '$nama'
                      WHERE idKategori = '$id'";

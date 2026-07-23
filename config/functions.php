@@ -136,7 +136,7 @@ function buat_input_telp($val_telp = '', $val_kode = '+62')
     $html .= '
             </div>
         </div>
-        <input type="text" name="no_telp" class="form-control" required maxlength="12" style="border: 2px solid #e0e6ed; border-left: none; background-color: #f9fbfd; color: #1d4197; font-weight: 500;" oninput="this.value = this.value.replace(/[^0-9]/g, \'\');" placeholder="81234567890" value="' . $val_telp . '">
+        <input type="text" name="no_telp" class="form-control" required minlength="10" maxlength="12" style="border: 2px solid #e0e6ed; border-left: none; background-color: #f9fbfd; color: #1d4197; font-weight: 500;" oninput="this.value = this.value.replace(/[^0-9]/g, \'\');" placeholder="81234567890" value="' . $val_telp . '">
     </div>
     <script>
         if (typeof selectTelpOption === "undefined") {
@@ -1166,8 +1166,15 @@ function script_dinamis_supplier_input($kebutuhan_jumlah)
         }
         function hapusBaris(btn) {
             let row = btn.closest('.vendor-row');
-            if (document.querySelectorAll('.vendor-row').length > 1) { row.remove(); cekTotalStok(); } 
-            else { alert('Minimal harus ada 1 vendor perbandingan!'); }
+            if (document.querySelectorAll('.vendor-row').length > 1) { 
+                row.remove(); cekTotalStok(); 
+            } else { 
+                document.getElementById('alertHeader').style.backgroundColor = '#dc3545';
+                document.getElementById('alertTitle').innerText = 'Peringatan!';
+                document.getElementById('alertIcon').className = 'bi bi-exclamation-triangle-fill text-danger';
+                document.getElementById('alertMessage').innerText = 'Minimal harus ada 1 vendor!';
+                new bootstrap.Modal(document.getElementById('alertModal')).show();
+            }
         }
         window.onload = cekTotalStok;
     </script>";
@@ -1279,8 +1286,15 @@ function script_dinamis_reparasi()
         }
         function hapusBaris(btn) {
             let row = btn.closest('.komponen-row');
-            if (document.querySelectorAll('.komponen-row').length > 1) row.remove();
-            else alert('Minimal harus ada 1 komponen yang diselamatkan jika memilih Pembongkaran!');
+            if (document.querySelectorAll('.komponen-row').length > 1) {
+                row.remove();
+            } else { 
+                document.getElementById('alertHeader').style.backgroundColor = '#dc3545';
+                document.getElementById('alertTitle').innerText = 'Peringatan!';
+                document.getElementById('alertIcon').className = 'bi bi-exclamation-triangle-fill text-danger';
+                document.getElementById('alertMessage').innerText = 'Minimal harus ada 1 komponen yang diselamatkan jika memilih Pembongkaran!';
+                new bootstrap.Modal(document.getElementById('alertModal')).show();
+            }
         }
         window.onload = toggleTindakan;
     </script>";
@@ -1301,8 +1315,8 @@ function cek_kedatangan_aset_otomatis()
         FROM detail_pengadaan_vendor dv
         JOIN transaksi_pengadaan tp ON dv.idPengadaan = tp.idPengadaan
         WHERE dv.statusPilihan = 'Terpilih' 
-          AND dv.statusKedatangan = 'Belum Tiba' 
-          AND dv.tanggalJatuhTempo <= '$waktu_sekarang'
+        AND dv.statusKedatangan = 'Belum Tiba' 
+        AND dv.tanggalJatuhTempo <= '$waktu_sekarang'
     ");
 
     while ($vendor = mysqli_fetch_assoc($q_cek)) {

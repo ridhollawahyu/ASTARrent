@@ -49,7 +49,6 @@ if (isset($_POST['proses_validasi'])) {
         // TANGKAP ALASAN TOLAK
         $alasan_tolak = mysqli_real_escape_string($koneksi, trim($_POST['alasan_tolak']));
 
-        // 1. UPDATE TRANSAKSI MENJADI DITOLAK BESERTA ALASANNYA
         mysqli_query($koneksi, "UPDATE transaksi_pengadaan 
                                 SET statusPengadaan = 'Ditolak', 
                                     idKepalaGA = '$id_kepala_ga',

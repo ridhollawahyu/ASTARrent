@@ -19,7 +19,6 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Tenaga Pendidik') {
 if (isset($_GET['id'])) {
     $id = mysqli_real_escape_string($koneksi, $_GET['id']);
 
-    // PERBAIKAN CERDAS: Kita TIDAK menghapus datanya, kita "Soft Delete" dengan UPDATE!
     $query_soft_delete = "UPDATE kategori SET statusKategori = 'Nonaktif' WHERE idKategori = '$id'";
 
     if (mysqli_query($koneksi, $query_soft_delete)) {

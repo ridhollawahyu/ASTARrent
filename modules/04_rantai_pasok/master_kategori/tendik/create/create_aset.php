@@ -29,7 +29,7 @@ if (isset($_POST['submit_kategori_draft'])) {
             $_SESSION['draft_kategori_nama'] = $nama;
             set_notifikasi('success', 'Kategori baru berhasil dibuat. Form otomatis dikunci ke Draft baru.');
         } else {
-            set_notifikasi('error', 'Gagal menyimpan ke database MySQL!');
+            set_notifikasi('error', 'Gagal menyimpan ke database!');
         }
     }
     // Langsung redirect ke halaman sebelumnya!

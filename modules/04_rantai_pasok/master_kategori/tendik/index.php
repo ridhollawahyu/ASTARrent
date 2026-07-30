@@ -17,7 +17,7 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Tenaga Pendidik') {
     header('Location: ../../../00_auth/login.php');
 }
 
-$where_sql = "WHERE statusKategori != 'Nonaktif'";
+$where_sql = "WHERE statusKategori != 'Nonaktif' AND tipeKategori != 'Fasilitas Non-Akademik'";
 
 $status_terpilih = "";
 $kategori_terpilih = "";
@@ -28,16 +28,16 @@ if (isset($_GET['filter']) && $_GET['filter'] != '') {
 
     if ($status_terpilih == 'Semua_Termasuk_Arsip') {
         // Tampilkan semua data, override default
-        $where_sql = "WHERE 1=1";
+        $where_sql = "WHERE tipeKategori != 'Fasilitas Non-Akademik'";
     } elseif ($status_terpilih == 'Aset') {
         // Tampilkan semua data, override default
         $where_sql = "WHERE tipeKategori = '$status_terpilih'";
-    } elseif ($status_terpilih == 'Fasilitas') {
+    } elseif ($status_terpilih == 'Fasilitas Akademik') {
         // Tampilkan semua data, override default
         $where_sql = "WHERE tipeKategori = '$status_terpilih'";
     } else {
         // Tampilkan sesuai yang dipilih user
-        $where_sql = "WHERE statusKategori = '$status_terpilih'";
+        $where_sql = "WHERE statusKategori = '$status_terpilih' AND tipeKategori != 'Fasilitas Non-Akademik'";
     }
 }
 
@@ -78,7 +78,7 @@ include '../../../../components/header.php';
                 $opsi_filter = [
                     '' => '-- Status Default (Aktif) --',
                     'Aset' => 'Aset',
-                    'Fasilitas' => 'Fasilitas',
+                    'Fasilitas Akademik' => 'Fasilitas',
                     'Nonaktif' => 'Arsip',
                     'Semua_Termasuk_Arsip' => 'Tampilkan Semua Data'
                 ];
@@ -133,13 +133,15 @@ include '../../../../components/header.php';
                                 <td class="text-center">
                                     <?php if ($data['statusKategori'] == 'Aktif'): ?>
                                         <span class="badge bg-success rounded-pill px-3">Aktif</span>
+                                    <?php elseif ($data['statusKategori'] == 'Draft'): ?>
+                                        <span class="badge bg-warning rounded-pill px-3">Draft</span>
                                     <?php else: ?>
                                         <span class="badge bg-secondary rounded-pill px-3">Nonaktif</span>
                                     <?php endif; ?>
                                 </td>
 
                                 <td class="text-center">
-                                    <?php if ($data['statusKategori'] != 'Nonaktif'): ?>
+                                    <?php if ($data['statusKategori'] == 'Aktif'): ?>
                                         <!-- Tombol Edit -->
                                         <a href="edit.php?id=<?= $data['idKategori']; ?>" class="btn btn-warning btn-sm fw-bold"><i class="bi bi-pencil-square"></i></a>
 

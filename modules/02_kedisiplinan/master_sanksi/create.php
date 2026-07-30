@@ -35,7 +35,7 @@ if (isset($_POST['submit'])) {
         exit;
     }
     if (empty($klasifikasi_waktu)) {
-        set_notifikasi('error', "Gagal! Wajib pilih klasifikasi kondisi");
+        set_notifikasi('error', "Gagal! Wajib pilih klasifikasi waktu");
         header('Location: create.php');
         exit;
     }
@@ -80,27 +80,25 @@ if (isset($_POST['submit'])) {
                             <label class="form-label text-astar fw-bold"><i class="bi bi-clock-history me-1"></i> Klasifikasi Waktu Sanksi <span class="text-danger">*</span></label>
                             <?php
                             $opsi_waktu = [
-                                'Manual' => 'Pilih Kondisi Waktu',
                                 'Tepat Waktu' => 'Tepat Waktu',
                                 'Telat < 24 Jam' => 'Telat < 24 Jam',
                                 'Telat 1-3 Hari' => 'Telat 1-3 Hari',
                                 'Telat > 3 Hari' => 'Telat > 3 Hari',
                                 'Manual' => 'Lainnya / Sanksi Khusus (Manual)'
                             ];
-                            echo buat_dropdown_astar('klasifikasi_waktu', $opsi_waktu, 'Manual');
+                            echo buat_dropdown_astar('klasifikasi_waktu', $opsi_waktu, '');
                             ?>
                         </div>
                         <div class="col-md-6 border-start">
                             <label class="form-label text-astar fw-bold"><i class="bi bi-box me-1"></i> Klasifikasi Kondisi Fisik Sanksi <span class="text-danger">*</span></label>
                             <?php
                             $opsi_kondisi = [
-                                'Manual' => 'Pilih Kondisi Fisik',
                                 'Normal' => 'Normal / Aman',
                                 'Berfungsi' => 'Rusak (Masih Berfungsi)',
                                 'Tidak Berfungsi' => 'Rusak (Tidak Berfungsi)',
                                 'Manual' => 'Lainnya / Sanksi Khusus (Manual)'
                             ];
-                            echo buat_dropdown_astar('klasifikasi_kondisi', $opsi_kondisi, 'Manual');
+                            echo buat_dropdown_astar('klasifikasi_kondisi', $opsi_kondisi, '');
                             ?>
                         </div>
                     </div>

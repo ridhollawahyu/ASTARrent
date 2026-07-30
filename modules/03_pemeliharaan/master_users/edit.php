@@ -150,7 +150,7 @@ include '../../../components/header.php';
                             <!-- 2. MODE TENDIK (Dropdown Prodi) -->
                             <div id="dept_dropdown_container" style="display: <?= $display_drop; ?>;">
                                 <?php
-                                $opsi_prodi = ['P4' => 'P4', 'TPM' => 'TPM', 'MO' => 'MO', 'MK' => 'MK', 'MI' => 'MI', 'TKBG' => 'TKBG', 'TRPAB' => 'TRPAB', 'TRL' => 'TRL', 'TRPL' => 'TRPL'];
+                                $opsi_prodi = ['P3P' => 'P3P', 'TPM' => 'TPM', 'MOT' => 'MOT', 'MEK' => 'MEK', 'MIN' => 'MIN', 'TKB' => 'TKB', 'TAB' => 'TAB', 'TRL' => 'TRL', 'RPL' => 'RPL'];
                                 echo buat_dropdown_astar('dept_prodi', $opsi_prodi, $data['kodeDepartemen'], false);
                                 ?>
                             </div>

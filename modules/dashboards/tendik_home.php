@@ -191,7 +191,7 @@ include '../../components/header.php';
                 <div class="card-body d-flex flex-column">
                     <div class="icon-box"><i class="bi bi-door-open-fill"></i></div>
                     <h5 class="fw-bold text-dark mb-3">Pengelolaan Fasilitas</h5>
-                    <p class="text-secondary mb-4 flex-grow-1">Kelola data Fasilitas ruangan, lapangan, lalu cek ketersediaan, dan update kondisi fasilitas.</p>
+                    <p class="text-secondary mb-4 flex-grow-1">Kelola data Fasilitas ruangan akademik, lalu cek ketersediaan, dan update kondisi fasilitas.</p>
                     <a href="../02_kedisiplinan/master_fasilitas/tendik/index.php" class="btn btn-outline-secondary mt-auto py-2 fw-bold" style="color: #1d4197; border-color: #1d4197;">Kelola Aset <i class="bi bi-arrow-right ms-2"></i></a>
                 </div>
             </div>

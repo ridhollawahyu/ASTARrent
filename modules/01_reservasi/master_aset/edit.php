@@ -96,7 +96,7 @@ include '../../../components/header.php';
                     <div class="row mb-4 bg-light p-3 rounded align-items-center">
                         <div class="col-md-6">
                             <label class="form-label text-astar fw-bold">Update Kondisi Fisik</label>
-                            <input type="text" class="form-control bg-light fw-bold text-secondary" value="<?= $data['kondisiAset']; ?>" readonly>
+                            <input type="text" name="kondisi" class="form-control bg-light fw-bold text-secondary" value="<?= $data['kondisiAset']; ?>" readonly>
                             <small class="text-danger mt-1 d-block" style="font-size:11px;">*Kondisi fisik Aset tidak dapat diubah.</small>
                         </div>
                         <div class="col-md-6 text-center border-start">

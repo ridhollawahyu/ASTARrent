@@ -26,7 +26,7 @@ if (isset($_GET['id'])) {
     if (!$data) {
         set_notifikasi('error', 'Data komponen tidak ditemukan.');
     } elseif ($data['statusKomponen'] == 'Sudah Dipakai') {
-        set_notifikasi('error', 'Komponen yang sudah dipakai tidak boleh diarsipkan dari tombol hapus. Ubah status lewat halaman edit jika dibutuhkan.');
+        set_notifikasi('error', 'Komponen yang sudah dipakai tidak boleh diarsipkan.');
     } else {
         $query_soft_delete = "UPDATE komponen SET statusKomponen = 'Nonaktif' WHERE idKomponen = '$id'";
 

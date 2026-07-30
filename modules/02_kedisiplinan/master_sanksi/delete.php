@@ -24,7 +24,7 @@ if (isset($_GET['id'])) {
     $query_soft_delete = "UPDATE sanksi SET statusSanksi = 'Nonaktif' WHERE idSanksi = '$id'";
 
     if (mysqli_query($koneksi, $query_soft_delete)) {
-        set_notifikasi('success', 'Berhasil! Sanksi dipindahkan ke arsip (Inaktif).');
+        set_notifikasi('success', 'Berhasil! Sanksi dipindahkan ke arsip (Nonaktif).');
     } else {
         set_notifikasi('error', 'Terjadi kesalahan pada database!');
     }

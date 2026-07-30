@@ -60,7 +60,7 @@ if (isset($_POST['submit'])) {
                     </div>
                     <div class="mb-6">
                         <label class="form-label text-astar fw-bold">Tipe Kategori </label>
-                        <input type="text" name="tipe" class="form-control fw-bold" required value="Fasilitas" readonly>
+                        <input type="text" name="tipe" class="form-control fw-bold" required value="Fasilitas Akademik" readonly>
                         <small class="text-danger">*Untuk create kategori Aset, dibuat langsung pada Transaksi Pengadaan</small>
                     </div>
 

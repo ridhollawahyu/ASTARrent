@@ -5,7 +5,7 @@
 
 $host = "localhost";
 $user = "root";
-$pass = ""; // Sesuaikan jika ada password XAMPP
+$pass = "";
 $db_name = "astarrent_db";
 
 $conn = mysqli_connect($host, $user, $pass);

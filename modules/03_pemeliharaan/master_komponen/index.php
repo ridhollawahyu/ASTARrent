@@ -17,7 +17,7 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Staff GA') {
     exit;
 }
 
-$where_sql = "WHERE komponen.statusKomponen != 'Nonaktif'";
+$where_sql = "WHERE komponen.statusKomponen = 'Tersedia'";
 $status_terpilih = "";
 $kondisi_terpilih = "";
 

@@ -165,8 +165,10 @@ include '../../../../components/header.php';
                                         <span class="badge bg-primary rounded-pill px-3">Dipinjam</span>
                                     <?php elseif ($data['ketersediaanFasilitas'] == 'Sedang Diperbaiki'): ?>
                                         <span class="badge bg-warning text-dark rounded-pill px-3">Sedang Diperbaiki</span>
-                                    <?php else: ?>
+                                    <?php elseif ($data['ketersediaanFasilitas'] == 'Tidak Tersedia'): ?>
                                         <span class="badge bg-secondary rounded-pill px-3">Tidak Tersedia</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-dark rounded-pill px-3">Nonaktif</span>
                                     <?php endif; ?>
                                 </td>
 

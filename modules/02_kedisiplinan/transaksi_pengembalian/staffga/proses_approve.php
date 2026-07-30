@@ -21,6 +21,12 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'Staff GA') {
 // =====================================================================
 // 1. PROSES SIMPAN KE DATABASE (JIKA TOMBOL SUBMIT DITEKAN)
 // =====================================================================
+if (!isset($_GET['id'])) {
+    header('Location: index.php');
+    exit;
+}
+$id = mysqli_real_escape_string($koneksi, $_GET['id']);
+
 if (isset($_POST['submit_pengembalian'])) {
 
     $id_peminjaman = mysqli_real_escape_string($koneksi, $_POST['id_peminjaman']);
@@ -37,7 +43,7 @@ if (isset($_POST['submit_pengembalian'])) {
 
     if (empty($kondisi_fisik)) {
         set_notifikasi('error', "Gagal! Wajib pilih kondisi fisik");
-        header('Location: proses_approve.php');
+        header("Location: proses_approve.php?id=$id");
         exit;
     }
     $kondisi_untuk_robot = $kondisi_fisik;

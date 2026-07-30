@@ -1265,13 +1265,13 @@ function script_dinamis_reparasi()
             let idUnik = 'drop_' + Math.floor(Math.random() * 9000 + 1000);
             let dropdown_html = `
             <div class=\"custom-dropdanger-container\" id=\"container_\${idUnik}\">
-                <input type=\"hidden\" name=\"komp_kondisi[]\" id=\"input_\${idUnik}\" value=\"Sangat Baik\">
+                <input type=\"hidden\" name=\"komp_kondisi[]\" id=\"input_\${idUnik}\" value=\"\">
                 <div class=\"custom-dropdanger-selected\" onclick=\"toggleDropdown('\${idUnik}')\">
-                    <span id=\"text_\${idUnik}\">Sangat Baik</span>
+                    <span id=\"text_\${idUnik}\">-- Pilih --</span>
                     <i class=\"bi bi-chevron-down float-end\"></i>
                 </div>
                 <div class=\"custom-dropdanger-options shadow\" id=\"options_\${idUnik}\">
-                    <div class=\"custom-dropdanger-item active\" onclick=\"selectOption('\${idUnik}', 'Sangat Baik', 'Sangat Baik')\">Sangat Baik</div>
+                    <div class=\"custom-dropdanger-item\" onclick=\"selectOption('\${idUnik}', 'Sangat Baik', 'Sangat Baik')\">Sangat Baik</div>
                     <div class=\"custom-dropdanger-item\" onclick=\"selectOption('\${idUnik}', 'Layak Pakai', 'Layak Pakai')\">Layak Pakai</div>
                 </div>
             </div>`;

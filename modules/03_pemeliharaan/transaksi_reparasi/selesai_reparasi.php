@@ -41,26 +41,35 @@ if (isset($_POST['selesai'])) {
     $waktu = date('Y-m-d H:i:s');
 
     if ($tindakan_akhir == 'kanibal') {
-        // ====================================================
-        // JIKA DIKANIBAL: LOOPING DATA KOMPONEN YANG DIINPUT
-        // ====================================================
         $nama_komp = $_POST['komp_nama'];
         $spek_komp = $_POST['komp_spek'];
         $kond_komp = $_POST['komp_kondisi'];
-        $jumlah_masuk = 0;
 
+        // ====================================================
+        // FASE 1: VALIDASI KESELURUHAN (Cek kosong/tidak)
+        // ====================================================
+        for ($i = 0; $i < count($nama_komp); $i++) {
+            // Hanya cek baris yang nama komponennya diisi
+            if (!empty(trim($nama_komp[$i]))) {
+                // Jika dropdown kondisi di baris tersebut belum dipilih
+                if (empty($kond_komp[$i])) {
+                    set_notifikasi('error', "Gagal! Wajib pilih kondisi fisik komponen.");
+                    header("Location: selesai_reparasi.php?id_rep=$id_rep&tipe=$tipe_barang&id_brg=$id_brg&action=kanibal");
+                    exit; // Keluar SEBELUM database disentuh
+                }
+            }
+        }
+
+        // ====================================================
+        // FASE 2: PROSES INSERT (Berjalan jika lolos Fase 1)
+        // ====================================================
+        $jumlah_masuk = 0;
         for ($i = 0; $i < count($nama_komp); $i++) {
             if (!empty(trim($nama_komp[$i]))) {
                 $id_komp_baru = generate_id('KMP', 'komponen', 'idKomponen');
-                $nama_k = mysqli_real_escape_string($koneksi, $nama_komp[$i]);
-                $spek_k = mysqli_real_escape_string($koneksi, $spek_komp[$i]);
-                $kond_k = mysqli_real_escape_string($koneksi, $kond_komp[$i]);
-
-                if (empty($kond_komp)) {
-                    set_notifikasi('error', "Gagal! Wajib pilih kondisi fisik komponen");
-                    header('Location: proses_approve.php');
-                    exit;
-                }
+                $nama_k = mysqli_real_escape_string($koneksi, trim($nama_komp[$i]));
+                $spek_k = mysqli_real_escape_string($koneksi, trim($spek_komp[$i]));
+                $kond_k = mysqli_real_escape_string($koneksi, $kond_komp[$i]); // Sudah pasti terisi berkat Fase 1
 
                 $q_komp = "INSERT INTO komponen (idKomponen, idReparasi, namaKomponen, tanggalMasuk, spesifikasiKomponen, kondisiKomponen, statusKomponen) 
                            VALUES ('$id_komp_baru', '$id_rep', '$nama_k', '$waktu', '$spek_k', '$kond_k', 'Tersedia')";
@@ -83,7 +92,7 @@ if (isset($_POST['selesai'])) {
         $kondisi_akhir = $_POST['kondisi_akhir'];
         if (empty($kondisi_akhir)) {
             set_notifikasi('error', 'Gagal! Kondisi Penyelesaian harus diisi.');
-            header('Location: selesai_reparasi.php');
+            header("Location: selesai_reparasi.php?id_rep=$id_rep&tipe=$tipe_barang&id_brg=$id_brg");
             exit;
         }
         mysqli_query($koneksi, "UPDATE reparasi_fasilitas_aset SET statusReparasi = 'Selesai', tanggalSelesai = '$waktu', catatanReparasi = CONCAT(IFNULL(catatanReparasi, ''), '\n[Diperbaiki]: $catatan') WHERE idReparasi = '$id_rep'");
@@ -123,16 +132,18 @@ include '../../../components/header.php';
                             // Jika bisa kanibal, tombol dibagi dua (col-md-6). Jika tidak, tombol perbaiki jadi full (col-md-12).
                             $kolom_class = $bisa_kanibal ? 'col-md-6' : 'col-md-12';
                             $detail = $bisa_kanibal ? 'btn btn-outline-astar w-100 py-3 fw-bold text-start' : 'btn btn-outline-astar w-100 py-3 fw-bold text-center';
+                            $is_kanibal_aktif = (isset($_GET['action']) && $_GET['action'] == 'kanibal') ? 'checked' : '';
+                            $is_perbaiki_aktif = ($is_kanibal_aktif == '') ? 'checked' : '';
                             ?>
                             <div class="<?= $kolom_class ?>">
-                                <input type="radio" class="btn-check" name="tindakan_akhir" id="aksi_perbaiki" value="perbaiki" checked onchange="toggleTindakan()">
+                                <input type="radio" class="btn-check" name="tindakan_akhir" id="aksi_perbaiki" value="perbaiki" <?= $is_perbaiki_aktif ?> onchange="toggleTindakan()">
                                 <label class="<?= $detail ?>" for="aksi_perbaiki" style="border-radius: 10px; border-width: 2px;">
                                     <i class="bi bi-tools fs-4 d-block mb-1"></i> Berhasil Diperbaiki
                                 </label>
                             </div>
                             <?php if ($bisa_kanibal): ?>
                                 <div class="col-md-6">
-                                    <input type="radio" class="btn-check" name="tindakan_akhir" id="aksi_kanibal" value="kanibal" onchange="toggleTindakan()">
+                                    <input type="radio" class="btn-check" name="tindakan_akhir" id="aksi_kanibal" value="kanibal" <?= $is_kanibal_aktif ?> onchange="toggleTindakan()">
                                     <label class="btn btn-outline-danger w-100 py-3 fw-bold text-start" for="aksi_kanibal" style="border-radius: 10px; border-width: 2px;">
                                         <i class="bi bi-recycle fs-4 d-block mb-1"></i> Gagal Diperbaiki (Dibongkar)
                                     </label>
@@ -172,7 +183,7 @@ include '../../../components/header.php';
                                 <div class="col-md-3">
                                     <?php
                                     $opsi_kondisi_komponen = ['Sangat Baik' => 'Sangat Baik', 'Layak Pakai' => 'Layak Pakai'];
-                                    echo buat_dropdown_danger('komp_kondisi[]', $opsi_kondisi_komponen, 'Sangat Baik');
+                                    echo buat_dropdown_danger('komp_kondisi[]', $opsi_kondisi_komponen, '');
                                     ?>
                                 </div>
                                 <div class="col-md-1">

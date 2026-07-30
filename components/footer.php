@@ -106,7 +106,7 @@
             <i class="bi bi-exclamation-triangle-fill me-1"></i> Alasan ini akan terlihat di Dashboard Mahasiswa.
           </div>
           <label class="form-label text-danger fw-bold">Alasan Penolakan <span class="text-danger">*</span></label>
-          <textarea name="alasan_tolak" class="form-control border-danger" rows="3" required placeholder="Contoh: Barang sedang diservis..."></textarea>
+          <textarea name="alasan_tolak" class="form-control border-danger" rows="3" placeholder="Contoh: Barang sedang diservis..."></textarea>
         </div>
         <div class="modal-footer justify-content-center border-0 pb-4 px-4 gap-3">
           <button type="button" class="btn btn-light fw-bold px-4 text-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Batal</button>
@@ -119,7 +119,6 @@
 </div>
 
 <script>
-  // Hanya mengatur Form Action dan Munculin Modal
   let modalTolak;
 
   function bukaModalTolak(idPeminjaman, urlEndpoint) {
